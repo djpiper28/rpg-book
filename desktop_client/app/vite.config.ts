@@ -29,4 +29,9 @@ export default defineConfig({
     }),
     tailwindcss(),
   ],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"), // Add this for path aliases
+    },
+  },
 });
