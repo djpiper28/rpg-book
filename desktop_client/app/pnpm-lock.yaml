@@ -177,6 +177,9 @@ importers:
       '@storybook/test':
         specifier: ^8.6.11
         version: 8.6.11(storybook@8.6.11)
+      '@types/node':
+        specifier: ^22.13.14
+        version: 22.13.14
       '@types/react':
         specifier: ^18.2.64
         version: 18.3.20
@@ -5716,7 +5719,7 @@ snapshots:
     dependencies:
       '@types/http-cache-semantics': 4.0.4
       '@types/keyv': 3.1.4
-      '@types/node': 20.17.28
+      '@types/node': 22.13.14
       '@types/responselike': 1.0.3
 
   '@types/cookie@0.6.0': {}
@@ -5761,7 +5764,7 @@ snapshots:
 
   '@types/keyv@3.1.4':
     dependencies:
-      '@types/node': 20.17.28
+      '@types/node': 22.13.14
 
   '@types/mdx@2.0.13': {}
 
@@ -5796,7 +5799,7 @@ snapshots:
 
   '@types/responselike@1.0.3':
     dependencies:
-      '@types/node': 20.17.28
+      '@types/node': 22.13.14
 
   '@types/statuses@2.0.5': {}
 
@@ -5809,7 +5812,7 @@ snapshots:
 
   '@types/yauzl@2.10.3':
     dependencies:
-      '@types/node': 20.17.28
+      '@types/node': 22.13.14
     optional: true
 
   '@typescript-eslint/eslint-plugin@7.18.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.8.2))(eslint@8.57.1)(typescript@5.8.2)':

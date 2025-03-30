@@ -1,9 +1,9 @@
 // @see - https://www.electron.build/configuration/configuration
 {
   $schema: "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  appId: "YourAppID",
+  appId: "RPG-Book",
   asar: true,
-  productName: "YourAppName",
+  productName: "RPG-Book",
   directories: {
     output: "release/${version}",
   },
@@ -16,7 +16,7 @@
     target: [
       {
         target: "nsis",
-        arch: ["x64"],
+        arch: ["x64", "arm64"],
       },
     ],
     artifactName: "${productName}-Windows-${version}-Setup.${ext}",
