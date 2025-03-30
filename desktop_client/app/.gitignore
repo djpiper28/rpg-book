@@ -26,3 +26,5 @@ dist-ssr
 dist/
 dist-electron/
 release/
+
+*storybook.log
