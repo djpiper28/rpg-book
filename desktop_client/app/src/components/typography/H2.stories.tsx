@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { H2 } from "./H2";
-import React from "react";
 
 const meta = {
   component: H2,

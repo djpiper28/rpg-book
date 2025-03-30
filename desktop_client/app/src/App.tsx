@@ -1,4 +1,3 @@
-import React from "react";
 import { H1 } from "./components/typography/H1";
 
 function App() {
