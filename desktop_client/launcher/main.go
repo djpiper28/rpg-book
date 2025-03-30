@@ -12,8 +12,8 @@ import (
 )
 
 type Options struct {
-	LogLevel          string `long:"log" short:"l" default:"info" description:"Logging level, (info, error, or warning)"`
-	WorkdingDirectory string `long:"dir" short:"d" description:"Directory to execute the launcher in"`
+	LogLevel          string `long:"log-level" short:"l" default:"info" description:"Logging level, (info, error, or warning)"`
+	WorkdingDirectory string `long:"working-dir" short:"d" description:"Directory to execute the launcher in"`
 }
 
 func main() {
