@@ -1,5 +1,5 @@
-import { H1 } from "./components/typography/H1";
-import { Menubar } from "./components/ui/menubar";
+import { H1 } from "@/components/typography/H1";
+import { Menubar } from "@/components/ui/menubar";
 
 function App() {
   return (

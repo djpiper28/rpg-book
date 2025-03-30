@@ -70,4 +70,6 @@ func main() {
 	if code != 0 {
 		log.Fatal("Application crashed", loggertags.TagExitCode, code)
 	}
+
+	log.Infof("Exited without error")
 }
