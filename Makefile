@@ -1,7 +1,7 @@
 .PHONY: all
 all: desktop-client
 
-DESKTOP_APP=./desktop_client/app/
+DESKTOP_APP=$(shell pwd)/desktop_client/app/
 
 .PHONY: desktop-client-deps
 desktop-client-deps:
@@ -20,7 +20,7 @@ desktop-client-backend: go-core
 
 .PHONY: go-generate
 go-generate:
-	go generate ./...
+	PATH="$$PATH:$(DESKTOP_APP)/node_modules/.bin" go generate ./...
 
 .PHONY: go-core
 go-core: go-generate
