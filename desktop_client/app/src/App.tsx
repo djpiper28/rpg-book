@@ -1,33 +1,17 @@
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@radix-ui/react-navigation-menu";
-import { H1 } from "./components/typography/H1";
+import { H1 } from "@/components/typography/H1";
+import { Menubar } from "@/components/ui/menubar";
+import { Button } from "./components/ui/button";
+import { Settings } from "lucide-react";
 
 function App() {
   return (
     <div className="flex flex-col gap-3">
-      <NavigationMenu>
-        <NavigationMenuList>
-          <NavigationMenuItem>
-            <H1>RPG Book</H1>
-            <NavigationMenuTrigger>Projects</NavigationMenuTrigger>
-            <NavigationMenuContent>
-              <NavigationMenuLink>Create a project</NavigationMenuLink>
-            </NavigationMenuContent>
-            <NavigationMenuTrigger>Settings</NavigationMenuTrigger>
-            <NavigationMenuContent>
-              <NavigationMenuLink>Appearance</NavigationMenuLink>
-            </NavigationMenuContent>
-          </NavigationMenuItem>
-        </NavigationMenuList>
-      </NavigationMenu>
-
-      <p className="text-red-500">TEST</p>
+      <Menubar id="menu" className="flex flex-row gap-3 justify-between">
+        <H1>RPG Book</H1>
+        <Button aria-label="Open settings">
+          <Settings /> Settings
+        </Button>
+      </Menubar>
     </div>
   );
 }

@@ -10,7 +10,13 @@ func New() (*Server, error) {
 		Port: 9881,
 	}
 
+	go server.start()
+
 	return server, nil
+}
+
+func (s *Server) start() {
+  
 }
 
 type ClientCredentials struct {
