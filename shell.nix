@@ -9,5 +9,6 @@ pkgs.mkShell {
     golangci-lint
     electron_35
     p7zip
+    protoc-gen-js
   ];
 }
