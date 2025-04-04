@@ -6,12 +6,12 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"crypto/x509/pkix"
+	"encoding/pem"
 	"errors"
 	mathrand "math/rand/v2"
 	"net"
 	"time"
 
-	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_settings"
 	"google.golang.org/grpc"
 )
 
@@ -79,7 +79,7 @@ func (s *Server) start() error {
 	}
 
 	s.server = grpc.NewServer()
-  // TODO: register gRPC services
+	// TODO: register gRPC services
 	go s.server.Serve(listener)
 	return nil
 }
@@ -92,4 +92,18 @@ func (s *Server) Stop() {
 type ClientCredentials struct {
 	Port         int    `json:"port"`
 	PublicKeyB64 string `json:"publicKey"`
+}
+
+func (s *Server) ClientCredentials() *ClientCredentials {
+	certPem := string(pem.EncodeToMemory(
+		&pem.Block{
+			Type:  "CERTIFICATE",
+			Bytes: s.cert,
+		},
+	))
+
+	return &ClientCredentials{
+		Port:         s.Port,
+		PublicKeyB64: certPem,
+	}
 }
