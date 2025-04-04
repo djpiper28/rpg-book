@@ -7,8 +7,12 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"errors"
+	mathrand "math/rand/v2"
 	"net"
 	"time"
+
+	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_settings"
+	"google.golang.org/grpc"
 )
 
 type Server struct {
@@ -16,9 +20,16 @@ type Server struct {
 	Port   int
 	cert   []byte
 	cancel func()
+	server *grpc.Server
 }
 
-func New() (*Server, error) {
+func RandPort() int {
+	return 9000 + mathrand.IntN(1000)
+}
+
+var localhost = net.IPv4(127, 0, 0, 1)
+
+func New(port int) (*Server, error) {
 	key, err := rsa.GenerateKey(rand.Reader, 4096)
 	if err != nil {
 		return nil, errors.Join(errors.New("Cannot create RSA key for gRPC"), err)
@@ -39,7 +50,7 @@ func New() (*Server, error) {
 		KeyUsage:           x509.KeyUsage(x509.ExtKeyUsageAny),
 		EmailAddresses:     []string{"djpiper28@gmail.com"},
 		IsCA:               true,
-		IPAddresses:        []net.IP{net.IPv4(127, 0, 0, 1)},
+		IPAddresses:        []net.IP{localhost},
 	}
 	cert, err := x509.CreateCertificate(rand.Reader,
 		template, template,
@@ -51,23 +62,31 @@ func New() (*Server, error) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	server := &Server{
-		Port:   9881,
+		Port:   port,
 		ctx:    ctx,
 		cancel: cancel,
 		cert:   cert,
 	}
 
-	go server.start()
-
-	return server, nil
+	err = server.start()
+	return server, err
 }
 
-func (s *Server) start() {
+func (s *Server) start() error {
+	listener, err := net.ListenTCP("tcp4", &net.TCPAddr{IP: localhost, Port: s.Port})
+	if err != nil {
+		return err
+	}
 
+	s.server = grpc.NewServer()
+  // TODO: register gRPC services
+	go s.server.Serve(listener)
+	return nil
 }
 
 func (s *Server) Stop() {
 	s.cancel()
+	s.server.GracefulStop()
 }
 
 type ClientCredentials struct {

@@ -8,7 +8,7 @@ import (
 )
 
 func TestStartStopBackend(t *testing.T) {
-	server, err := backend.New()
+	server, err := backend.New(backend.RandPort())
 	require.NoError(t, err)
 	server.Stop()
 }
