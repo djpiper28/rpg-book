@@ -7,11 +7,12 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
-	"encoding/base64"
 	"encoding/pem"
 	"errors"
+	"fmt"
 	mathrand "math/rand/v2"
 	"net"
+	"net/url"
 	"time"
 
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_settings"
@@ -41,6 +42,11 @@ func New(port int) (*Server, error) {
 		return nil, errors.Join(errors.New("Cannot create RSA key for gRPC"), err)
 	}
 
+	hostedUrl, err := url.Parse(fmt.Sprintf("https://127.0.0.1:%d", port))
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot create URL for cert"), err)
+	}
+
 	template := &x509.Certificate{
 		Issuer: pkix.Name{
 			Organization:       []string{"djpiper28"},
@@ -57,6 +63,8 @@ func New(port int) (*Server, error) {
 		EmailAddresses:     []string{"djpiper28@gmail.com"},
 		IsCA:               true,
 		IPAddresses:        []net.IP{localhost},
+		URIs:               []*url.URL{hostedUrl},
+		Version:            1,
 	}
 	cert, err := x509.CreateCertificate(rand.Reader,
 		template, template,
@@ -90,7 +98,7 @@ func (s *Server) loadTLSCredentials() (credentials.TransportCredentials, error) 
 
 	serverCert, err := tls.X509KeyPair([]byte(certPem), []byte(keyPem))
 	if err != nil {
-		return nil, err
+		return nil, errors.Join(errors.New("Cannot parse generated x509 cert"), err)
 	}
 
 	config := &tls.Config{
@@ -119,13 +127,18 @@ func (s *Server) Stop() {
 }
 
 type ClientCredentials struct {
-	Port       int    `json:"port"`
+	Port    int    `json:"port"`
 	CertPem string `json:"cert"`
 }
 
 func (s *Server) ClientCredentials() *ClientCredentials {
 	return &ClientCredentials{
-		Port:       s.Port,
-		CertPem: base64.StdEncoding.EncodeToString(s.cert),
+		Port: s.Port,
+		CertPem: string(pem.EncodeToMemory(
+			&pem.Block{
+				Type:  "CERTIFICATE",
+				Bytes: s.cert,
+			},
+		)),
 	}
 }
