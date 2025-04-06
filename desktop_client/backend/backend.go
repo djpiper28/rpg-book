@@ -90,8 +90,8 @@ func (s *Server) Stop() {
 }
 
 type ClientCredentials struct {
-	Port         int    `json:"port"`
-	PublicKeyB64 string `json:"publicKey"`
+	Port int    `json:"port"`
+	Cert string `json:"publicKey"`
 }
 
 func (s *Server) ClientCredentials() *ClientCredentials {
@@ -103,7 +103,7 @@ func (s *Server) ClientCredentials() *ClientCredentials {
 	))
 
 	return &ClientCredentials{
-		Port:         s.Port,
-		PublicKeyB64: certPem,
+		Port: s.Port,
+		Cert: certPem,
 	}
 }

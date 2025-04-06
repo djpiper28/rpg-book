@@ -6,6 +6,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  envPrefix: ["VITE_", "RPG_BOOK_"],
   plugins: [
     react(),
     electron({

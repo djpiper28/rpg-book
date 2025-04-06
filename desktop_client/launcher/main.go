@@ -8,6 +8,7 @@ import (
 
 	"github.com/charmbracelet/log"
 	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
+	"github.com/djpiper28/rpg-book/desktop_client/backend"
 	"github.com/jessevdk/go-flags"
 )
 
@@ -15,6 +16,10 @@ type Options struct {
 	LogLevel          string `long:"log-level" short:"l" default:"info" description:"Logging level, (info, error, or warning)"`
 	WorkdingDirectory string `long:"working-dir" short:"d" description:"Directory to execute the launcher in"`
 }
+
+const (
+	EnvVarPrefix = "RPG_BOOK_"
+)
 
 func main() {
 	fmt.Println("Starting RPG Book")
@@ -47,14 +52,25 @@ func main() {
 		panic("TODO: set default launcher cmd")
 	}
 
-	// TODO: start a server, and append the server port to the arguments
+	server, err := backend.New(backend.RandPort())
+	if err != nil {
+		log.Fatal("Cannot start gRPC server", loggertags.TagError, err)
+	}
+	defer server.Stop()
 
-	log.Infof("Starting RPG book with %+v, directory %s", launcherCmd, opts.WorkdingDirectory)
+	log.Info("Starting RPG book",
+		"cmd", launcherCmd,
+		"directory", opts.WorkdingDirectory,
+		"port", server.Port)
+
 	cmd := exec.Command(launcherCmd[0], launcherCmd[1:]...)
 	cmd.Dir = opts.WorkdingDirectory
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
 	cmd.Stdin = os.Stdin
+	cmd.Env = append(cmd.Env, os.Environ()...)
+	cmd.Env = append(cmd.Env, fmt.Sprintf(EnvVarPrefix+"CERTIFICATE=%s", server.ClientCredentials().Cert))
+	cmd.Env = append(cmd.Env, fmt.Sprintf(EnvVarPrefix+"PORT=%d", server.ClientCredentials().Port))
 
 	err = cmd.Start()
 	if err != nil {

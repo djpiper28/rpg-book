@@ -24,6 +24,6 @@ func TestServerClientCredentialsProducesValidCert(t *testing.T) {
 	credentials := server.ClientCredentials()
 	require.Equal(t, port, credentials.Port)
 
-	_, rest := pem.Decode([]byte(credentials.PublicKeyB64))
+	_, rest := pem.Decode([]byte(credentials.Cert))
 	require.Len(t, rest, 0)
 }
