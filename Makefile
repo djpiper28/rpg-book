@@ -38,3 +38,14 @@ desktop-client-test: desktop-client-codegen
 
 .PHONY: test
 test: go-test desktop-client-test
+
+.PHONY: go-fmt
+go-fmt:
+	go fmt -w -l ./...
+
+.PHONY: prettier
+prettier:
+	cd $(DESKTOP_APP) && npx prettier -w .
+
+.PHONY: format
+format: go-fmt prettier
