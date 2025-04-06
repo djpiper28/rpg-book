@@ -69,7 +69,7 @@ func main() {
 	cmd.Stdout = os.Stdout
 	cmd.Stdin = os.Stdin
 	cmd.Env = append(cmd.Env, os.Environ()...)
-	cmd.Env = append(cmd.Env, fmt.Sprintf(EnvVarPrefix+"CERTIFICATE=%s", server.ClientCredentials().Cert))
+	cmd.Env = append(cmd.Env, fmt.Sprintf(EnvVarPrefix+"CERTIFICATE=%s", server.ClientCredentials().CertPem))
 	cmd.Env = append(cmd.Env, fmt.Sprintf(EnvVarPrefix+"PORT=%d", server.ClientCredentials().Port))
 
 	err = cmd.Start()

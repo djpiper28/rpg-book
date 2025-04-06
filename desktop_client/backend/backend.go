@@ -4,8 +4,10 @@ import (
 	"context"
 	"crypto/rand"
 	"crypto/rsa"
+	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
+	"encoding/base64"
 	"encoding/pem"
 	"errors"
 	mathrand "math/rand/v2"
@@ -15,14 +17,16 @@ import (
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_settings"
 	settingssvc "github.com/djpiper28/rpg-book/desktop_client/backend/svc/settings_svc"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 type Server struct {
-	ctx    context.Context
-	Port   int
-	cert   []byte
-	cancel func()
-	server *grpc.Server
+	ctx      context.Context
+	Port     int
+	cert     []byte
+	certKeys *rsa.PrivateKey
+	cancel   func()
+	server   *grpc.Server
 }
 
 func RandPort() int {
@@ -64,14 +68,37 @@ func New(port int) (*Server, error) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	server := &Server{
-		Port:   port,
-		ctx:    ctx,
-		cancel: cancel,
-		cert:   cert,
+		Port:     port,
+		ctx:      ctx,
+		cancel:   cancel,
+		cert:     cert,
+		certKeys: key,
 	}
 
 	err = server.start()
 	return server, err
+}
+
+func (s *Server) loadTLSCredentials() (credentials.TransportCredentials, error) {
+	keyPem := x509.MarshalPKCS1PrivateKey(s.certKeys)
+	certPem := string(pem.EncodeToMemory(
+		&pem.Block{
+			Type:  "CERTIFICATE",
+			Bytes: s.cert,
+		},
+	))
+
+	serverCert, err := tls.X509KeyPair([]byte(certPem), []byte(keyPem))
+	if err != nil {
+		return nil, err
+	}
+
+	config := &tls.Config{
+		Certificates: []tls.Certificate{serverCert},
+		ClientAuth:   tls.NoClientCert,
+	}
+
+	return credentials.NewTLS(config), nil
 }
 
 func (s *Server) start() error {
@@ -92,20 +119,13 @@ func (s *Server) Stop() {
 }
 
 type ClientCredentials struct {
-	Port int    `json:"port"`
-	Cert string `json:"publicKey"`
+	Port       int    `json:"port"`
+	CertPem string `json:"cert"`
 }
 
 func (s *Server) ClientCredentials() *ClientCredentials {
-	certPem := string(pem.EncodeToMemory(
-		&pem.Block{
-			Type:  "CERTIFICATE",
-			Bytes: s.cert,
-		},
-	))
-
 	return &ClientCredentials{
-		Port: s.Port,
-		Cert: certPem,
+		Port:       s.Port,
+		CertPem: base64.StdEncoding.EncodeToString(s.cert),
 	}
 }

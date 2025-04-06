@@ -1,7 +1,8 @@
 package backend_test
 
 import (
-	"encoding/pem"
+	"crypto/x509"
+	"encoding/base64"
 	"testing"
 
 	"github.com/djpiper28/rpg-book/desktop_client/backend"
@@ -24,6 +25,7 @@ func TestServerClientCredentialsProducesValidCert(t *testing.T) {
 	credentials := server.ClientCredentials()
 	require.Equal(t, port, credentials.Port)
 
-	_, rest := pem.Decode([]byte(credentials.Cert))
-	require.Len(t, rest, 0)
+	certDer, err := base64.StdEncoding.DecodeString(credentials.CertPem)
+	require.NoError(t, err)
+	x509.ParseCertificate(certDer)
 }
