@@ -15,6 +15,8 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/charmbracelet/log"
+	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_settings"
 	settingssvc "github.com/djpiper28/rpg-book/desktop_client/backend/svc/settings_svc"
 	"google.golang.org/grpc"
@@ -88,13 +90,18 @@ func New(port int) (*Server, error) {
 }
 
 func (s *Server) loadTLSCredentials() (credentials.TransportCredentials, error) {
-	keyPem := x509.MarshalPKCS1PrivateKey(s.certKeys)
-	certPem := string(pem.EncodeToMemory(
+	keyPem := pem.EncodeToMemory(
+		&pem.Block{
+			Type:  "RSA PRIVATE KEY",
+			Bytes: x509.MarshalPKCS1PrivateKey(s.certKeys),
+		},
+	)
+	certPem := pem.EncodeToMemory(
 		&pem.Block{
 			Type:  "CERTIFICATE",
 			Bytes: s.cert,
 		},
-	))
+	)
 
 	serverCert, err := tls.X509KeyPair([]byte(certPem), []byte(keyPem))
 	if err != nil {
@@ -112,12 +119,23 @@ func (s *Server) loadTLSCredentials() (credentials.TransportCredentials, error) 
 func (s *Server) start() error {
 	listener, err := net.ListenTCP("tcp4", &net.TCPAddr{IP: localhost, Port: s.Port})
 	if err != nil {
-		return err
+		return errors.Join(errors.New("Cannot bind to port"), err)
 	}
 
-	s.server = grpc.NewServer()
+	creds, err := s.loadTLSCredentials()
+	if err != nil {
+		return errors.Join(errors.New("Cannot load TLS certificates"), err)
+	}
+
+	s.server = grpc.NewServer(grpc.Creds(creds))
 	s.server.RegisterService(&pb_settings.SettingsSvc_ServiceDesc, settingssvc.New())
-	go s.server.Serve(listener)
+	go func() {
+    defer listener.Close()
+		err := s.server.Serve(listener)
+		if err != nil {
+			log.Info("Server died", loggertags.TagError, err)
+		}
+	}()
 	return nil
 }
 

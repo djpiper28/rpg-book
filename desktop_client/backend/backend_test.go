@@ -39,7 +39,7 @@ func TestServerClientCredentialsProducesValidCert(t *testing.T) {
 	require.NotNil(t, block)
 }
 
-func TestServerNoTlsGet(t *testing.T) {
+func TestServerWithoutCertificateTlsGet(t *testing.T) {
 	t.Parallel()
 	port := backend.RandPort()
 
@@ -47,7 +47,7 @@ func TestServerNoTlsGet(t *testing.T) {
 	require.NoError(t, err)
 	defer server.Stop()
 
-	grpcClient, err := grpc.NewClient(fmt.Sprintf("http://localhost:%d", server.ClientCredentials().Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	grpcClient, err := grpc.NewClient(fmt.Sprintf("localhost:%d", server.ClientCredentials().Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	require.NoError(t, err)
 	defer grpcClient.Close()
 
@@ -72,7 +72,7 @@ func TestServerTlsGet(t *testing.T) {
 	require.True(t, ok)
 
 	grpcClient, err := grpc.NewClient(
-		fmt.Sprintf("https://127.0.0.1:%d", server.ClientCredentials().Port),
+		fmt.Sprintf("127.0.0.1:%d", server.ClientCredentials().Port),
 		grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(certPool, "")))
 	require.NoError(t, err)
 	defer grpcClient.Close()
