@@ -12,6 +12,8 @@ import (
 	"net"
 	"time"
 
+	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_settings"
+	settingssvc "github.com/djpiper28/rpg-book/desktop_client/backend/svc/settings_svc"
 	"google.golang.org/grpc"
 )
 
@@ -79,7 +81,7 @@ func (s *Server) start() error {
 	}
 
 	s.server = grpc.NewServer()
-	// TODO: register gRPC services
+	s.server.RegisterService(&pb_settings.SettingsSvc_ServiceDesc, settingssvc.New())
 	go s.server.Serve(listener)
 	return nil
 }
