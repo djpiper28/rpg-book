@@ -16,7 +16,7 @@ func handleFile(filename string) error {
 		return err
 	}
 
-	data := string(dataB) + fmt.Sprintf(`}
+	data := string(dataB) + fmt.Sprintf(`
 
 %s
 module.exports = proto;
