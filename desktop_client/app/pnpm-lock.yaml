@@ -110,6 +110,9 @@ importers:
       embla-carousel-react:
         specifier: ^8.5.2
         version: 8.5.2(react@18.3.1)
+      google-protobuf:
+        specifier: ^3.21.4
+        version: 3.21.4
       grpc-tools:
         specifier: ^1.13.0
         version: 1.13.0
@@ -161,6 +164,9 @@ importers:
       vaul:
         specifier: ^1.1.2
         version: 1.1.2(@types/react-dom@18.3.6(@types/react@18.3.20))(@types/react@18.3.20)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      vite-plugin-commonjs:
+        specifier: ^0.10.4
+        version: 0.10.4
       zod:
         specifier: ^3.24.2
         version: 3.24.2
@@ -4350,6 +4356,12 @@ packages:
     resolution: {integrity: sha512-V+IxPAE2FvXpTCHXyNem0M+gWm6J7eRyWPR6vYoG/Gl+IscNOjXzztUhimQgTxaAoUoj40Qqimaa0NLIOOAH4w==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
+
+  vite-plugin-commonjs@0.10.4:
+    resolution: {integrity: sha512-eWQuvQKCcx0QYB5e5xfxBNjQKyrjEWZIR9UOkOV6JAgxVhtbZvCOF+FNC2ZijBJ3U3Px04ZMMyyMyFBVWIJ5+g==}
+
+  vite-plugin-dynamic-import@1.6.0:
+    resolution: {integrity: sha512-TM0sz70wfzTIo9YCxVFwS8OA9lNREsh+0vMHGSkWDTZ7bgd1Yjs5RV8EgB634l/91IsXJReg0xtmuQqP0mf+rg==}
 
   vite-plugin-electron-renderer@0.14.6:
     resolution: {integrity: sha512-oqkWFa7kQIkvHXG7+Mnl1RTroA4sP0yesKatmAy0gjZC4VwUqlvF9IvOpHd1fpLWsqYX/eZlVxlhULNtaQ78Jw==}
@@ -8847,6 +8859,19 @@ snapshots:
       - sugarss
       - supports-color
       - terser
+
+  vite-plugin-commonjs@0.10.4:
+    dependencies:
+      acorn: 8.14.1
+      magic-string: 0.30.17
+      vite-plugin-dynamic-import: 1.6.0
+
+  vite-plugin-dynamic-import@1.6.0:
+    dependencies:
+      acorn: 8.14.1
+      es-module-lexer: 1.6.0
+      fast-glob: 3.3.3
+      magic-string: 0.30.17
 
   vite-plugin-electron-renderer@0.14.6: {}
 

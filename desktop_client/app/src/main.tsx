@@ -5,9 +5,9 @@ import "./index.css";
 import { ThemeProvider } from "./components/theme-provider.tsx";
 import { EnvVarCertificate, EnvVarPort } from "./lib/launcherTypes/index.ts";
 import { credentials } from "@grpc/grpc-js";
-import { Empty } from "./lib/grpcClient/pb/common_pb.js";
-import { SystemSvcClient } from "./lib/grpcClient/pb/system_grpc_pb.js";
-import { LogLevel, LogRequest } from "./lib/grpcClient/pb/system_pb.js";
+import { SystemSvcClient } from "./lib/grpcClient/pb/system_grpc_pb";
+import { LogLevel, LogRequest } from "./lib/grpcClient/pb/system_pb";
+import { Empty } from "./lib/grpcClient/pb/common_pb";
 
 function mustHave(x: string | undefined): string {
   if (x) {
