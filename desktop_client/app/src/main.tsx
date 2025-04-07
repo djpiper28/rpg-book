@@ -3,40 +3,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import { ThemeProvider } from "./components/theme-provider.tsx";
-import { EnvVarCertificate, EnvVarPort } from "./lib/launcherTypes/index.ts";
-import { credentials } from "@grpc/grpc-js";
-import { SystemSvcClient } from "./lib/grpcClient/pb/system_grpc_pb";
-import { LogLevel, LogRequest } from "./lib/grpcClient/pb/system_pb";
-import { Empty } from "./lib/grpcClient/pb/common_pb";
-
-function mustHave(x: string | undefined): string {
-  if (x) {
-    return x;
-  }
-
-  throw new Error("Cannot find env vars");
-}
-
-const certificate = mustHave(process.env[EnvVarCertificate]);
-const port = mustHave(process.env[EnvVarPort]);
-
-// TODO: remove this test code
-Promise.resolve(async () => {
-  const grpcClient = new SystemSvcClient(
-    `localhost:${port}`,
-    credentials.createSsl(Buffer.from(certificate)),
-  );
-
-  grpcClient.getSettings(new Empty(), (settings) => {
-    console.log("Settings are:", settings);
-  });
-
-  const req = new LogRequest();
-  req.setLevel(LogLevel.INFO)
-  req.setCaller(__filename)
-  req.setMessage("Hello world from JS")
-  grpcClient.log(req, () => {})
-});
+import { logger } from "./lib/grpcClient/client.ts";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -50,3 +17,5 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 window.ipcRenderer.on("main-process-message", (_event, message) => {
   console.log(message);
 });
+
+logger.info("Application has started!", {});
