@@ -12,13 +12,15 @@ import (
 	"github.com/jessevdk/go-flags"
 )
 
-type Options struct {
+type options struct {
 	LogLevel          string `long:"log-level" short:"l" default:"info" description:"Logging level, (info, error, or warning)"`
 	WorkdingDirectory string `long:"working-dir" short:"d" description:"Directory to execute the launcher in"`
 }
 
 const (
-	EnvVarPrefix = "RPG_BOOK_"
+	EnvVarPrefix      = "RPG_BOOK_"
+	EnvVarCertificate = EnvVarPrefix + "CERTIFICATE"
+	EnvVarPort        = EnvVarPrefix + "PORT"
 )
 
 func main() {
@@ -26,7 +28,7 @@ func main() {
 	log.Default().SetReportCaller(true)
 	log.Default().SetReportTimestamp(true)
 
-	var opts Options
+	var opts options
 	launcherCmd, err := flags.Parse(&opts)
 	if err != nil {
 		log.Fatal("Cannot parse arguments", loggertags.TagError)
@@ -69,8 +71,8 @@ func main() {
 	cmd.Stdout = os.Stdout
 	cmd.Stdin = os.Stdin
 	cmd.Env = append(cmd.Env, os.Environ()...)
-	cmd.Env = append(cmd.Env, fmt.Sprintf(EnvVarPrefix+"CERTIFICATE=%s", server.ClientCredentials().CertPem))
-	cmd.Env = append(cmd.Env, fmt.Sprintf(EnvVarPrefix+"PORT=%d", server.ClientCredentials().Port))
+	cmd.Env = append(cmd.Env, fmt.Sprintf(EnvVarCertificate+"=%s", server.ClientCredentials().CertPem))
+	cmd.Env = append(cmd.Env, fmt.Sprintf(EnvVarPort+"=%d", server.ClientCredentials().Port))
 
 	err = cmd.Start()
 	if err != nil {

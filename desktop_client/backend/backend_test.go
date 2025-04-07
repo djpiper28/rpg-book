@@ -9,7 +9,7 @@ import (
 	testutils "github.com/djpiper28/rpg-book/common/test_utils"
 	"github.com/djpiper28/rpg-book/desktop_client/backend"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_common"
-	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_settings"
+	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_system"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -51,7 +51,7 @@ func TestServerWithoutCertificateTlsGet(t *testing.T) {
 	require.NoError(t, err)
 	defer grpcClient.Close()
 
-	client := pb_settings.NewSettingsSvcClient(grpcClient)
+	client := pb_system.NewSystemSvcClient(grpcClient)
 	ctx, cancel := testutils.NewTestContext()
 	defer cancel()
 
@@ -77,7 +77,7 @@ func TestServerTlsGet(t *testing.T) {
 	require.NoError(t, err)
 	defer grpcClient.Close()
 
-	client := pb_settings.NewSettingsSvcClient(grpcClient)
+	client := pb_system.NewSystemSvcClient(grpcClient)
 	ctx, cancel := testutils.NewTestContext()
 	defer cancel()
 

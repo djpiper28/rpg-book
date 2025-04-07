@@ -1,0 +1,31 @@
+syntax = "proto3";
+option go_package = "github.com/djpiper28/rpg-book/desktop_client/backend/pb_system";
+import 'common.proto';
+
+service SystemSvc {
+  rpc GetSettings(Empty) returns (Settings) {}
+  rpc Log(LogRequest) returns (Empty) {}
+}
+
+message Settings {
+
+}
+
+message LogRequest {
+  string caller = 1;
+  LogLevel level = 2;
+  string message = 3;
+  repeated LogProperty properties = 4;
+}
+
+message LogProperty {
+  string key = 1;
+  string value = 2;
+}
+
+enum LogLevel {
+  INFO = 0;
+  WARNING = 1;
+  ERROR = 2;
+  FATAL = 3;
+}

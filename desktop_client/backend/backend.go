@@ -17,8 +17,8 @@ import (
 
 	"github.com/charmbracelet/log"
 	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
-	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_settings"
-	settingssvc "github.com/djpiper28/rpg-book/desktop_client/backend/svc/settings_svc"
+	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_system"
+	systemsvc "github.com/djpiper28/rpg-book/desktop_client/backend/svc/system_svc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -128,7 +128,7 @@ func (s *Server) start() error {
 	}
 
 	s.server = grpc.NewServer(grpc.Creds(creds))
-	s.server.RegisterService(&pb_settings.SettingsSvc_ServiceDesc, settingssvc.New())
+	s.server.RegisterService(&pb_system.SystemSvc_ServiceDesc, systemsvc.New())
 	go func() {
     defer listener.Close()
 		err := s.server.Serve(listener)
