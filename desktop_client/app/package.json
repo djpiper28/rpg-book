@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "__dev": "vite",
-    "dev": "cd ../launcher/ && ./launcher --working-dir ../app/ -- pnpm __dev",
+    "__build_launcher": "cd ../../ && make desktop-client-backend -j",
+    "dev": "pnpm __build_launcher && cd ../launcher/ && ./launcher --working-dir ../app/ -- pnpm __dev",
     "build": "tsc && vite build && electron-builder",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
