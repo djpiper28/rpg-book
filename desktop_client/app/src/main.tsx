@@ -3,7 +3,6 @@ import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import { ThemeProvider } from "./components/theme-provider.tsx";
-import { logger } from "./lib/grpcClient/client.ts";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -17,5 +16,3 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 window.ipcRenderer.on("main-process-message", (_event, message) => {
   console.log(message);
 });
-
-logger.info("Application has started!", {});
