@@ -1,7 +1,9 @@
 import { credentials } from "@grpc/grpc-js";
 import { EnvVarCertificate, EnvVarPort } from "../launcherTypes";
-import { LogLevel, LogProperty, LogRequest } from "./pb/system_pb";
+import * as system from "./pb/system_pb";
 import { SystemSvcClient } from "./pb/system_grpc_pb";
+
+const { LogLevel, LogProperty, LogRequest } = system;
 
 function mustHave(x: string | undefined): string {
   if (x) {
@@ -37,7 +39,7 @@ function logAtLevel(level: any, msg: string, props: Record<string, string>) {
   req.setCaller(logAtLevel.caller.caller.name);
   req.setMessage(msg);
 
-  const properties: LogProperty[] = [];
+  const properties: system.LogProperty[] = [];
   for (const key of Object.keys(props)) {
     const item = new LogProperty();
     item.setKey(key);
