@@ -1,8 +1,7 @@
 import { EnvVarPort } from "../launcherTypes";
-require("google-closure-library");
-import * as system from "./pb/system_pb";
-import { SystemSvcClient } from "./pb/SystemServiceClientPb";
-const { LogLevel, LogProperty, LogRequest } = system;
+import { LogLevel, LogProperty, LogRequest } from "./pb/system";
+import { SystemSvcClient } from "./pb/system.client";
+import { GrpcWebFetchTransport } from "@protobuf-ts/grpcweb-transport";
 
 function mustHave(x: string | undefined): string {
   if (x) {
@@ -13,7 +12,11 @@ function mustHave(x: string | undefined): string {
 }
 
 export const port = mustHave(process.env[EnvVarPort]);
-export const client = new SystemSvcClient(`localhost:${port}`, null, null);
+const transport = new GrpcWebFetchTransport({
+  baseUrl: `127.0.0.1:${port}`,
+});
+
+export const client = new SystemSvcClient(transport);
 export const logger = {
   info: (msg: string, props: Record<string, string>) =>
     logAtLevel(LogLevel.INFO, msg, props),
@@ -27,21 +30,28 @@ export const logger = {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function logAtLevel(level: any, msg: string, props: Record<string, string>) {
-  const req = new LogRequest();
-  req.setLevel(level);
-  req.setCaller(logAtLevel.caller.caller.name);
-  req.setMessage(msg);
-
   const properties = [];
   for (const key of Object.keys(props)) {
-    const item = new LogProperty();
-    item.setKey(key);
-    item.setValue(props[key]);
+    const item = LogProperty.create({
+      key: key,
+      value: props[key],
+    });
 
     properties.push(item);
   }
-  req.setPropertiesList(properties);
+
+  const req = LogRequest.create({
+    level: level,
+    message: msg,
+    // caller: logAtLevel.caller.caller.name,
+    properties: properties,
+  });
 
   console.log(`${level} - ${msg} - ${props}`);
-  client.log(req);
+  client
+    .log(req)
+    .then(() => {})
+    .catch((e) => {
+      console.error("Cannot log:", e);
+    });
 }

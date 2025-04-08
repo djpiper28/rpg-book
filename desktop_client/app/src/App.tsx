@@ -5,7 +5,7 @@ import { Settings } from "lucide-react";
 import { logger } from "./lib/grpcClient/client";
 
 function App() {
-  logger.warn("FUCKING SHIT FUCKING LANGUAGE", {});
+  logger.warn("render call", {});
   return (
     <div className="flex flex-col gap-3">
       <Menubar id="menu" className="flex flex-row gap-3 justify-between">
