@@ -116,6 +116,14 @@ func (s *Server) loadTLSCredentials() (credentials.TransportCredentials, error) 
 	return credentials.NewTLS(config), nil
 }
 
+const (
+	k              = 1024
+	m              = k * k
+	g              = m * k
+	maxMessageSize = g
+	maxHeaderSize  = 3 * m
+)
+
 func (s *Server) start() error {
 	listener, err := net.ListenTCP("tcp4", &net.TCPAddr{IP: localhost, Port: s.Port})
 	if err != nil {
@@ -127,10 +135,15 @@ func (s *Server) start() error {
 		return errors.Join(errors.New("Cannot load TLS certificates"), err)
 	}
 
-	s.server = grpc.NewServer(grpc.Creds(creds))
+	s.server = grpc.NewServer(
+		grpc.Creds(creds),
+		grpc.MaxSendMsgSize(maxMessageSize),
+		grpc.MaxRecvMsgSize(maxMessageSize),
+		grpc.MaxHeaderListSize(maxHeaderSize),
+	)
 	s.server.RegisterService(&pb_system.SystemSvc_ServiceDesc, systemsvc.New())
 	go func() {
-    defer listener.Close()
+		defer listener.Close()
 		err := s.server.Serve(listener)
 		if err != nil {
 			log.Info("Server died", loggertags.TagError, err)

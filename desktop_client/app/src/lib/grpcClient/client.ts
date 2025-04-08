@@ -13,7 +13,13 @@ function mustHave(x: string | undefined): string {
 
 export const port = mustHave(process.env[EnvVarPort]);
 const transport = new GrpcWebFetchTransport({
-  baseUrl: `127.0.0.1:${port}`,
+  baseUrl: `https://127.0.0.1:${port}`,
+  fetchInit: {
+    mode: "no-cors",
+    keepalive: true,
+  },
+  format: "binary",
+  timeout: 5_000,
 });
 
 export const client = new SystemSvcClient(transport);

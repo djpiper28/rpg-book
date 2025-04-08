@@ -68,19 +68,48 @@ app.on("activate", () => {
 
 app.whenReady().then(() => {
   // TODO: use the generated const, but things are broken and I no longer care and I want a pint
-  const certificate = process.env.RPG_BOOK_CERTIFICATE;
-  if (certificate) {
-    session.defaultSession.setCertificateVerifyProc((request, callback) => {
-      try {
-        const presentedCert = request.certificate.data.replace(/\r\n/g, "\n");
-        const trustedCert = certificate.trim().replace(/\r\n/g, "\n");
+  const certificate = process.env.RPG_BOOK_CERTIFICATE ?? "";
+  const port = process.env.RPG_BOOK_PORT ?? "";
 
-        callback(presentedCert === trustedCert ? 0 : -3);
-      } catch (error) {
-        callback(-2); // FAILED
+  session.defaultSession.setCertificateVerifyProc((request, callback) => {
+    try {
+      const presentedCert = request.certificate.data.replace(/\s/, "");
+      const trustedCert = certificate.replace(/\s/, "");
+
+      const eq = presentedCert === trustedCert;
+      if (!eq) {
+        console.error("The certificates do not match");
       }
-    });
-  }
+      callback(eq ? 0 : -3);
+    } catch (error) {
+      callback(-2); // FAILED
+    }
+  });
+
+  session.defaultSession.webRequest.onHeadersReceived(
+    {
+      urls: [`https://127.0.0.1:${port}/*`],
+    },
+    (details, callback) => {
+      if (!details.responseHeaders) {
+        details.responseHeaders = {};
+      }
+
+      details.responseHeaders["Access-Control-Allow-Origin"] = ["*"];
+      details.responseHeaders["Access-Control-Allow-"] = ["*"];
+      callback({ responseHeaders: details.responseHeaders });
+    },
+  );
+
+  session.defaultSession.webRequest.onBeforeSendHeaders(
+    {
+      urls: [`https://127.0.0.1:${port}/*`],
+    },
+    (details, callback) => {
+      details.requestHeaders["Content-Type"] = "application/grpc";
+      callback({ requestHeaders: details.requestHeaders });
+    },
+  );
 
   createWindow();
 });
