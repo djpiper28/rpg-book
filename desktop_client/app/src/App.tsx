@@ -2,8 +2,10 @@ import { H1 } from "@/components/typography/H1";
 import { Menubar } from "@/components/ui/menubar";
 import { Button } from "./components/ui/button";
 import { Settings } from "lucide-react";
+import { logger } from "./lib/grpcClient/client";
 
 function App() {
+  logger.warn("FUCKING SHIT FUCKING LANGUAGE", {});
   return (
     <div className="flex flex-col gap-3">
       <Menubar id="menu" className="flex flex-row gap-3 justify-between">

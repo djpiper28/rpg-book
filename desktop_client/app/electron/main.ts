@@ -1,8 +1,6 @@
-import { app, BrowserWindow } from "electron";
-// import { createRequire } from 'node:module'
+import { app, BrowserWindow, session } from "electron";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-import { logger } from "../src/lib/grpcClient/client.ts";
 
 // const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -34,8 +32,6 @@ function createWindow() {
     icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
     webPreferences: {
       preload: path.join(__dirname, "preload.mjs"),
-      nodeInegration: true,
-      contextIsolation: false,
     },
   });
 
@@ -50,8 +46,6 @@ function createWindow() {
     // win.loadFile('dist/index.html')
     win.loadFile(path.join(RENDERER_DIST, "index.html"));
   }
-
-  logger.info("Window is visible", {});
 }
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -72,6 +66,21 @@ app.on("activate", () => {
   }
 });
 
-logger.info("Application has started!", {});
+app.whenReady().then(() => {
+  // TODO: use the generated const, but things are broken and I no longer care and I want a pint
+  const certificate = process.env.RPG_BOOK_CERTIFICATE;
+  if (certificate) {
+    session.defaultSession.setCertificateVerifyProc((request, callback) => {
+      try {
+        const presentedCert = request.certificate.data.replace(/\r\n/g, "\n");
+        const trustedCert = certificate.trim().replace(/\r\n/g, "\n");
 
-app.whenReady().then(createWindow);
+        callback(presentedCert === trustedCert ? 0 : -3);
+      } catch (error) {
+        callback(-2); // FAILED
+      }
+    });
+  }
+
+  createWindow();
+});
