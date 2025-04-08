@@ -1,9 +1,5 @@
-import { credentials } from "@grpc/grpc-js";
 import { EnvVarCertificate, EnvVarPort } from "../launcherTypes";
-import * as system from "./pb/system_pb";
-import { SystemSvcClient } from "./pb/system_grpc_pb";
-
-const { LogLevel, LogProperty, LogRequest } = system;
+import { credentials, load } from "grpc";
 
 function mustHave(x: string | undefined): string {
   if (x) {
@@ -16,7 +12,8 @@ function mustHave(x: string | undefined): string {
 export const certificate = mustHave(process.env[EnvVarCertificate]);
 export const port = mustHave(process.env[EnvVarPort]);
 
-export const grpcClient = new SystemSvcClient(
+const systemProto = load("../../../pubblic/protos/system.proto");
+export const client = new systemProto.SystemSvc(
   `localhost:${port}`,
   credentials.createSsl(Buffer.from(certificate)),
 );
@@ -34,14 +31,14 @@ export const logger = {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function logAtLevel(level: any, msg: string, props: Record<string, string>) {
-  const req = new LogRequest();
+  const req = new systemProto.LogRequest();
   req.setLevel(level);
   req.setCaller(logAtLevel.caller.caller.name);
   req.setMessage(msg);
 
-  const properties: system.LogProperty[] = [];
+  const properties: systemProto.LogProperty[] = [];
   for (const key of Object.keys(props)) {
-    const item = new LogProperty();
+    const item = new systemProto.LogProperty();
     item.setKey(key);
     item.setValue(props[key]);
 
