@@ -18,9 +18,19 @@ type Db struct {
 }
 
 const (
-	DbTimeout   = time.Second * 10
-	DbExtension = ".sqlite"
+	DbTimeout       = time.Second * 10
+	DbExtension     = ".sqlite"
+	migrationsTable = `
+CREATE TABLE IF NOT EXISTS migrations (
+  version INTEGER PRIMARY KEY,
+  date TIMESTAMPTZ NOT NULL
+);`
 )
+
+type Migrations struct {
+	Version int       `db:"version"`
+	Date    time.Time `db:"date"`
+}
 
 func New(filename string) (*Db, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), DbTimeout)
@@ -33,10 +43,22 @@ func New(filename string) (*Db, error) {
 
 	log.Info("Connected to new database", loggertags.TagFileName, filename)
 	db.SetMaxOpenConns(1)
-	return &Db{
+
+	ret := &Db{
 		Db:       db,
 		filename: filename,
-	}, nil
+	}
+
+	err = ret.prepareMigrations()
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot check initial migrations table"), err)
+	}
+
+	return ret, nil
+}
+
+func (d *Db) prepareMigrations() error {
+	return nil
 }
 
 func (d *Db) Close() {
