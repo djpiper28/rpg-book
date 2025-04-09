@@ -17,6 +17,7 @@ import (
 
 	"github.com/charmbracelet/log"
 	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
+	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_system"
 	systemsvc "github.com/djpiper28/rpg-book/desktop_client/backend/svc/system_svc"
 	"google.golang.org/grpc"
@@ -24,12 +25,13 @@ import (
 )
 
 type Server struct {
-	ctx      context.Context
-	Port     int
-	cert     []byte
-	certKeys *rsa.PrivateKey
-	cancel   func()
-	server   *grpc.Server
+	ctx       context.Context
+	Port      int
+	cert      []byte
+	certKeys  *rsa.PrivateKey
+	cancel    func()
+	server    *grpc.Server
+	primaryDb *database.Db
 }
 
 func RandPort() int {
@@ -37,6 +39,8 @@ func RandPort() int {
 }
 
 var localhost = net.IPv4(127, 0, 0, 1)
+
+const primaryDb = "rpg-book-primary" + database.DbExtension
 
 func New(port int) (*Server, error) {
 	key, err := rsa.GenerateKey(rand.Reader, 4096)
@@ -76,13 +80,19 @@ func New(port int) (*Server, error) {
 		return nil, errors.Join(errors.New("Cannot create x509 certificate for gRPC"), err)
 	}
 
+	db, err := database.New(primaryDb)
+	if err != nil {
+		return nil, errors.Join(fmt.Errorf("Cannot create primaryDb (%s)", primaryDb), err)
+	}
+
 	ctx, cancel := context.WithCancel(context.Background())
 	server := &Server{
-		Port:     port,
-		ctx:      ctx,
-		cancel:   cancel,
-		cert:     cert,
-		certKeys: key,
+		Port:      port,
+		ctx:       ctx,
+		cancel:    cancel,
+		cert:      cert,
+		certKeys:  key,
+		primaryDb: db,
 	}
 
 	err = server.start()
@@ -153,8 +163,9 @@ func (s *Server) start() error {
 }
 
 func (s *Server) Stop() {
+	defer s.server.GracefulStop()
+	defer s.primaryDb.Close()
 	s.cancel()
-	s.server.GracefulStop()
 }
 
 type ClientCredentials struct {
