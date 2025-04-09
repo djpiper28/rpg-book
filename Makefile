@@ -8,7 +8,7 @@ desktop-client-deps:
 	cd $(DESKTOP_APP) && pnpm i
 
 .PHONY: desktop-client-codegen
-desktop-client-codegen: desktop-client-deps go-generate
+desktop-client-codegen: go-generate
 
 .PHONY: desktop-client-app
 desktop-client-app: desktop-client-codegen 
@@ -19,7 +19,7 @@ desktop-client-backend: go-core
 	cd ./desktop_client/launcher && go build
 
 .PHONY: go-generate
-go-generate:
+go-generate: desktop-client-deps
 	PATH="$$PATH:$(DESKTOP_APP)/node_modules/.bin" go generate ./...
 
 .PHONY: go-core
