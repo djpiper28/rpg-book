@@ -1,8 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* .gitignore'd directories are ignored by default */
-@source "./components/ui/";
 @custom-variant dark (&:is(.dark *));
 
 :root {

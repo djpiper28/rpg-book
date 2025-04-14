@@ -8,7 +8,7 @@ service SystemSvc {
 }
 
 message Settings {
-  boolean DevMode = 1;
+  bool DevMode = 1;
 }
 
 message LogRequest {
