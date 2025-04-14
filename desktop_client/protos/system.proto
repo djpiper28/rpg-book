@@ -9,6 +9,7 @@ service SystemSvc {
 
 message Settings {
   bool DevMode = 1;
+  bool DarkMode = 2;
 }
 
 message LogRequest {
