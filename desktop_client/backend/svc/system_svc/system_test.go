@@ -7,33 +7,42 @@ import (
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_common"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_system"
 	systemsvc "github.com/djpiper28/rpg-book/desktop_client/backend/svc/system_svc"
+	testdbutils "github.com/djpiper28/rpg-book/desktop_client/test_db_utils"
 	"github.com/stretchr/testify/require"
 )
 
-var system pb_system.SystemSvcServer = systemsvc.New()
+func TestSettings(t *testing.T) {
+	db, cleanup := testdbutils.GetDb()
+	defer cleanup()
 
-func TestNew(t *testing.T) {
-	require.NotNil(t, system)
-}
+	system := systemsvc.New(db)
 
-func TestGetSettings(t *testing.T) {
-	settings, err := system.GetSettings(context.Background(), &pb_common.Empty{})
-	require.NoError(t, err)
-	require.NotNil(t, settings)
-}
-
-func TestLogger(t *testing.T) {
-	_, err := system.Log(context.Background(), &pb_system.LogRequest{
-		Caller:  "test_caller.js:123",
-		Level:   pb_system.LogLevel_WARNING,
-		Message: "Hello world",
-		Properties: []*pb_system.LogProperty{
-			&pb_system.LogProperty{
-				Key:   "key",
-				Value: "Value",
-			},
-		},
+	t.Run("Init", func(t *testing.T) {
+		require.NotNil(t, system)
 	})
 
-  require.NoError(t, err)
+	t.Run("Get Settings", func(t *testing.T) {
+		settings, err := system.GetSettings(context.Background(), &pb_common.Empty{})
+		require.NoError(t, err)
+		require.NotNil(t, settings)
+
+		require.True(t, settings.DarkMode)
+		require.False(t, settings.DevMode)
+	})
+
+	t.Run("Call Logger", func(t *testing.T) {
+		_, err := system.Log(context.Background(), &pb_system.LogRequest{
+			Caller:  "test_caller.js:123",
+			Level:   pb_system.LogLevel_WARNING,
+			Message: "Hello world",
+			Properties: []*pb_system.LogProperty{
+				&pb_system.LogProperty{
+					Key:   "key",
+					Value: "Value",
+				},
+			},
+		})
+
+		require.NoError(t, err)
+	})
 }

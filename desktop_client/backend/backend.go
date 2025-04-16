@@ -85,6 +85,11 @@ func New(port int) (*Server, error) {
 		return nil, errors.Join(fmt.Errorf("Cannot create primaryDb (%s)", primaryDb), err)
 	}
 
+	err = Migrate(db)
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot perform default migrations"), err)
+	}
+
 	ctx, cancel := context.WithCancel(context.Background())
 	server := &Server{
 		Port:      port,
@@ -151,7 +156,7 @@ func (s *Server) start() error {
 		grpc.MaxRecvMsgSize(maxMessageSize),
 		grpc.MaxHeaderListSize(maxHeaderSize),
 	)
-	s.server.RegisterService(&pb_system.SystemSvc_ServiceDesc, systemsvc.New())
+	s.server.RegisterService(&pb_system.SystemSvc_ServiceDesc, systemsvc.New(s.primaryDb))
 	go func() {
 		defer listener.Close()
 		err := s.server.Serve(listener)

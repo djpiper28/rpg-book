@@ -49,3 +49,7 @@ prettier:
 
 .PHONY: format
 format: go-fmt prettier
+
+.PHONY: cleanup
+cleanup:
+	find desktop_client | grep -E ".*\\.sqlite(-journal)?" | xargs rm -rf

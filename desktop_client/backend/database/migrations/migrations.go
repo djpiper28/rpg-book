@@ -8,13 +8,14 @@ import (
 	"github.com/charmbracelet/log"
 	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
+	"github.com/jmoiron/sqlx"
 )
 
 type Migration struct {
-	PreProcess  func(*sql.Tx) error
+	PreProcess  func(*sqlx.Tx) error
 	Sql         string
-	PostProcess func(*sql.Tx) error
-	Test        func(*sql.Tx) error // Don't edit the database in tests plx
+	PostProcess func(*sqlx.Tx) error
+	Test        func(*sqlx.Tx) error // Don't edit the database in tests plx
 }
 
 type DbMigrator struct {
@@ -26,7 +27,7 @@ func New(migrations []Migration) *DbMigrator {
 }
 
 func (m *DbMigrator) Migrate(db *database.Db) error {
-	tx, err := db.Db.Begin()
+	tx, err := db.Db.Beginx()
 	if err != nil {
 		return errors.Join(errors.New("Cannot start transaction"), err)
 	}
@@ -34,10 +35,6 @@ func (m *DbMigrator) Migrate(db *database.Db) error {
 	var currentMigration int
 	var migrationDate string
 	row := tx.QueryRow("SELECT version, date FROM migrations ORDER BY version DESC LIMIT 1;")
-	if row == nil {
-		return errors.New("Cannot get current migration version")
-	}
-
 	err = row.Scan(&currentMigration, &migrationDate)
 	if errors.Is(err, sql.ErrNoRows) {
 		migrationDate = time.Now().Local().String()

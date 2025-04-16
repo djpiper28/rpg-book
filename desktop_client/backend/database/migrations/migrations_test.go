@@ -1,13 +1,13 @@
 package migrations_test
 
 import (
-	"database/sql"
 	"os"
 	"testing"
 
 	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/database/migrations"
 	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/require"
 )
 
@@ -35,12 +35,12 @@ func TestMigrationsOneTable(t *testing.T) {
 	var preProcessDone, postProcessDone, testDone bool
 	m := migrations.New([]migrations.Migration{
 		{
-			PreProcess: func(tx *sql.Tx) error {
+			PreProcess: func(tx *sqlx.Tx) error {
 				preProcessDone = true
 				require.NotNil(t, tx)
 				return nil
 			},
-			PostProcess: func(tx *sql.Tx) error {
+			PostProcess: func(tx *sqlx.Tx) error {
 				postProcessDone = true
 				require.NotNil(t, tx)
 				return nil
@@ -50,7 +50,7 @@ func TestMigrationsOneTable(t *testing.T) {
     id UUID PRIMARY KEY
   );
       `,
-			Test: func(tx *sql.Tx) error {
+			Test: func(tx *sqlx.Tx) error {
 				testDone = true
 				require.NotNil(t, tx)
 				_, err := tx.Exec("INSERT INTO test_table (id) values('9e48d824-13ff-4e6f-aac7-fbe42498556e');")
@@ -162,7 +162,7 @@ func TestExecutedMigrationsAreNotExecutedAgain(t *testing.T) {
 			Sql: `
       INVALID SQL
       `,
-			PreProcess: func(tx *sql.Tx) error {
+			PreProcess: func(tx *sqlx.Tx) error {
 				t.Log("This migration should never have been executed")
 				t.Fail()
 				return nil

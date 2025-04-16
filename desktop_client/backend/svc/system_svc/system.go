@@ -2,22 +2,36 @@ package systemsvc
 
 import (
 	"context"
+	"errors"
 
 	"github.com/charmbracelet/log"
+	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
+	"github.com/djpiper28/rpg-book/desktop_client/backend/model"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_common"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_system"
 )
 
 type SystemSvc struct {
 	pb_system.UnimplementedSystemSvcServer
+	db *database.Db
 }
 
-func New() *SystemSvc {
-	return &SystemSvc{}
+func New(db *database.Db) *SystemSvc {
+	return &SystemSvc{
+		db: db,
+	}
 }
 
 func (s *SystemSvc) GetSettings(ctx context.Context, in *pb_common.Empty) (*pb_system.Settings, error) {
-	return &pb_system.Settings{}, nil
+	rows := s.db.Db.QueryRowx("SELECT * FROM settings;")
+
+	var settings model.Settings
+	err := rows.StructScan(&settings)
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot get settings"), err)
+	}
+
+	return settings.ToProto(), nil
 }
 
 func (s *SystemSvc) Log(ctx context.Context, req *pb_system.LogRequest) (*pb_common.Empty, error) {
