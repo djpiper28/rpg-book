@@ -14,6 +14,9 @@ interface SettingsStore {
 export const useSettingsStore = create<SettingsStore>(
   (set): SettingsStore => ({
     settings: defaultSettings,
-    setSettings: (settings: Settings) => set({ settings: settings }),
+    setSettings: (settings: Settings) => {
+      set({ settings: settings });
+      console.log(settings);
+    },
   }),
 );

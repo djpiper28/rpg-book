@@ -25,7 +25,7 @@ function App() {
       withCSSVariables
       withGlobalStyles
       withNormalizeCSS
-      defaultColorScheme={settings.darkMode ? "dark" : "light"}
+      forceColorScheme={settings.darkMode ? "dark" : "light"}
     >
       <div className="flex flex-col gap-3 p-2">
         <div
