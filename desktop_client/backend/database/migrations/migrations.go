@@ -3,6 +3,7 @@ package migrations
 import (
 	"database/sql"
 	"errors"
+	"time"
 
 	"github.com/charmbracelet/log"
 	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
@@ -10,9 +11,9 @@ import (
 )
 
 type Migration struct {
-	PreProcess  func() error
+	PreProcess  func(*sql.Tx) error
 	Sql         string
-	PostProcess func() error
+	PostProcess func(*sql.Tx) error
 	Test        func(*sql.Tx) error // Don't edit the database in tests plx
 }
 
@@ -30,10 +31,27 @@ func (m *DbMigrator) Migrate(db *database.Db) error {
 		return errors.Join(errors.New("Cannot start transaction"), err)
 	}
 
-	for i, migration := range m.migrations {
-		log.Info("Migrating database", loggertags.TagCurrent, i+1, loggertags.TagCount, len(m.migrations))
+	var currentMigration int
+	var migrationDate string
+	row := tx.QueryRow("SELECT version, date FROM migrations ORDER BY version DESC LIMIT 1;")
+	if row == nil {
+		return errors.New("Cannot get current migration version")
+	}
+
+	err = row.Scan(&currentMigration, &migrationDate)
+	if errors.Is(err, sql.ErrNoRows) {
+		migrationDate = time.Now().Local().String()
+		currentMigration = -1 // causes the migration slice to start from 0
+	} else if err != nil {
+		return errors.Join(errors.New("Cannot get current migration version"), err)
+	}
+
+	log.Info("Starting migrations from last version onwards", loggertags.TagDate, migrationDate, loggertags.TagVersion, currentMigration)
+
+	for version, migration := range m.migrations[currentMigration+1:] {
+		log.Info("Migrating database", loggertags.TagCurrent, version+1, loggertags.TagCount, len(m.migrations))
 		if migration.PreProcess != nil {
-			err = migration.PreProcess()
+			err = migration.PreProcess(tx)
 			if err != nil {
 				return errors.Join(errors.New("Cannot run pre-processing"), err)
 			}
@@ -45,7 +63,7 @@ func (m *DbMigrator) Migrate(db *database.Db) error {
 		}
 
 		if migration.PostProcess != nil {
-			err = migration.PostProcess()
+			err = migration.PostProcess(tx)
 			if err != nil {
 				return errors.Join(errors.New("Cannot run post-processing"), err)
 			}
@@ -56,6 +74,14 @@ func (m *DbMigrator) Migrate(db *database.Db) error {
 			if err != nil {
 				return errors.Join(errors.New("Tests for the migration failed"), err)
 			}
+		}
+
+		_, err = tx.Exec(`
+      INSERT INTO migrations (version, date)
+      VALUES (?, ?);
+    `, version, time.Now())
+		if err != nil {
+			return errors.Join(errors.New("Cannot insert migration record"), err)
 		}
 	}
 

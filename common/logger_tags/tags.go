@@ -6,4 +6,6 @@ const (
 	TagFileName = "filename"
 	TagCurrent  = "current" // 1 - bound
 	TagCount    = "count"
+	TagDate     = "date"
+	TagVersion  = "version"
 )

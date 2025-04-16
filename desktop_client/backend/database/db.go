@@ -24,7 +24,8 @@ const (
 CREATE TABLE IF NOT EXISTS migrations (
   version INTEGER PRIMARY KEY,
   date TIMESTAMPTZ NOT NULL
-);`
+);
+  `
 )
 
 type Migrations struct {
@@ -36,7 +37,7 @@ func New(filename string) (*Db, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), DbTimeout)
 	defer cancel()
 
-	db, err := sqlx.ConnectContext(ctx, "sqlite3", fmt.Sprintf("file:%s?cache=shared", filename))
+	db, err := sqlx.ConnectContext(ctx, "sqlite3", fmt.Sprintf("file:%s?cache=shared&parseTime=true", filename))
 	if err != nil {
 		return nil, errors.Join(fmt.Errorf("Cannot create database connetion for %s", filename), err)
 	}
@@ -58,6 +59,11 @@ func New(filename string) (*Db, error) {
 }
 
 func (d *Db) prepareMigrations() error {
+	_, err := d.Db.Exec(migrationsTable)
+	if err != nil {
+		return errors.Join(errors.New("Cannot check for migrations table"), err)
+	}
+
 	return nil
 }
 
