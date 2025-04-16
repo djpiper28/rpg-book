@@ -1,10 +1,11 @@
 import { Settings } from "lucide-react";
 import { client, logger } from "./lib/grpcClient/client";
-import { Button, MantineProvider, Table, Title } from "@mantine/core";
-import { P } from "./components/typography/P";
-import { H2 } from "./components/typography/H2";
+import { Button, MantineProvider, Title } from "@mantine/core";
 import { useEffect } from "react";
 import { useSettingsStore } from "./stores/settingsStore";
+import { BrowserRouter, Routes, Route } from "react-router";
+import { IndexPage } from "./pages";
+import { SettingsPage } from "./pages/settings/settings";
 
 function App() {
   const { settings, setSettings } = useSettingsStore((s) => s);
@@ -29,34 +30,28 @@ function App() {
       <div className="flex flex-col gap-3 p-2">
         <div
           id="menu"
-          className="flex flex-row gap-3 justify-between items-center"
+          className="flex flex-row gap-3 justify-between items-center border-b border-b-gray-100 border-r-2"
         >
-          <Title>RPG Book</Title>
-          <Button aria-label="Open settings" variant="filled">
+          <Title>
+            <a href="/">RPG Book</a>
+          </Title>
+          <Button
+            aria-label="Open settings"
+            variant="filled"
+            onClick={() => (window.location.href = "/settings")}
+          >
             <Settings /> Settings
           </Button>
         </div>
 
-        <H2>Recent Projects:</H2>
-        <P>Lorem ipsum sit amet dolor</P>
-        <Table variant="vertical">
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Project Name</Table.Th>
-              <Table.Th>Last Opened</Table.Th>
-              <Table.Th>Size</Table.Th>
-              <Table.Th>Location</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            <Table.Tr>
-              <Table.Th>Test Project</Table.Th>
-              <Table.Th>3 days ago</Table.Th>
-              <Table.Th>5 MiB</Table.Th>
-              <Table.Th>/home/example/test.rpg</Table.Th>
-            </Table.Tr>
-          </Table.Tbody>
-        </Table>
+        <div className="flex flex-col gap-3 p-2">
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<IndexPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+            </Routes>
+          </BrowserRouter>
+        </div>
       </div>
     </MantineProvider>
   );
