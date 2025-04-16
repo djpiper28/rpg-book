@@ -15,8 +15,9 @@ export const port = mustHave(process.env[EnvVarPort]);
 const transport = new GrpcWebFetchTransport({
   baseUrl: `https://127.0.0.1:${port}`,
   fetchInit: {
-    mode: "no-cors",
     keepalive: true,
+    redirect: "error",
+    cache: "no-cache",
   },
   format: "binary",
   timeout: 5_000,

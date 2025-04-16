@@ -12,6 +12,7 @@ import (
 	"fmt"
 	mathrand "math/rand/v2"
 	"net"
+	"net/http"
 	"net/url"
 	"time"
 
@@ -20,8 +21,8 @@ import (
 	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_system"
 	systemsvc "github.com/djpiper28/rpg-book/desktop_client/backend/svc/system_svc"
+	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 )
 
 type Server struct {
@@ -34,11 +35,11 @@ type Server struct {
 	primaryDb *database.Db
 }
 
+var localhost = net.IP{127, 0, 0, 1}
+
 func RandPort() int {
 	return 9000 + mathrand.IntN(1000)
 }
-
-var localhost = net.IPv4(127, 0, 0, 1)
 
 const primaryDb = "rpg-book-primary" + database.DbExtension
 
@@ -104,7 +105,7 @@ func New(port int) (*Server, error) {
 	return server, err
 }
 
-func (s *Server) loadTLSCredentials() (credentials.TransportCredentials, error) {
+func (s *Server) loadTLSCredentials() (*tls.Config, error) {
 	keyPem := pem.EncodeToMemory(
 		&pem.Block{
 			Type:  "RSA PRIVATE KEY",
@@ -128,7 +129,7 @@ func (s *Server) loadTLSCredentials() (credentials.TransportCredentials, error) 
 		ClientAuth:   tls.NoClientCert,
 	}
 
-	return credentials.NewTLS(config), nil
+	return config, nil
 }
 
 const (
@@ -140,26 +141,36 @@ const (
 )
 
 func (s *Server) start() error {
-	listener, err := net.ListenTCP("tcp4", &net.TCPAddr{IP: localhost, Port: s.Port})
-	if err != nil {
-		return errors.Join(errors.New("Cannot bind to port"), err)
-	}
-
 	creds, err := s.loadTLSCredentials()
 	if err != nil {
 		return errors.Join(errors.New("Cannot load TLS certificates"), err)
 	}
 
 	s.server = grpc.NewServer(
-		grpc.Creds(creds),
 		grpc.MaxSendMsgSize(maxMessageSize),
 		grpc.MaxRecvMsgSize(maxMessageSize),
 		grpc.MaxHeaderListSize(maxHeaderSize),
 	)
 	s.server.RegisterService(&pb_system.SystemSvc_ServiceDesc, systemsvc.New(s.primaryDb))
+
+	wrappedGrpc := grpcweb.WrapServer(s.server)
+
+	httpServer := &http.Server{
+		Addr:      fmt.Sprintf("127.0.0.1:%d", s.Port),
+		TLSConfig: creds,
+		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if wrappedGrpc.IsGrpcWebRequest(r) {
+				wrappedGrpc.ServeHTTP(w, r)
+				return
+			}
+
+			// Fall back to other servers.
+			http.DefaultServeMux.ServeHTTP(w, r)
+		}),
+	}
 	go func() {
-		defer listener.Close()
-		err := s.server.Serve(listener)
+		defer httpServer.Close()
+		err := httpServer.ListenAndServeTLS("", "")
 		if err != nil {
 			log.Info("Server died", loggertags.TagError, err)
 		}

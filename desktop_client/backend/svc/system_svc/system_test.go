@@ -30,6 +30,36 @@ func TestSettings(t *testing.T) {
 		require.False(t, settings.DevMode)
 	})
 
+	t.Run("Set Settings", func(t *testing.T) {
+		settings, err := system.GetSettings(context.Background(), &pb_common.Empty{})
+		require.NoError(t, err)
+
+		settings.DevMode = false
+		settings.DarkMode = false
+		_, err = system.SetSettings(context.Background(), settings)
+		require.NoError(t, err)
+
+		settings2, err := system.GetSettings(context.Background(), &pb_common.Empty{})
+		require.NoError(t, err)
+
+		require.Equal(t, settings, settings2)
+		require.False(t, settings.DarkMode)
+		require.False(t, settings.DevMode)
+	})
+
+	t.Run("Set Settings (no change)", func(t *testing.T) {
+		settings, err := system.GetSettings(context.Background(), &pb_common.Empty{})
+		require.NoError(t, err)
+
+		_, err = system.SetSettings(context.Background(), settings)
+		require.NoError(t, err)
+
+		settings2, err := system.GetSettings(context.Background(), &pb_common.Empty{})
+		require.NoError(t, err)
+
+		require.Equal(t, settings, settings2)
+	})
+
 	t.Run("Call Logger", func(t *testing.T) {
 		_, err := system.Log(context.Background(), &pb_system.LogRequest{
 			Caller:  "test_caller.js:123",

@@ -4,6 +4,7 @@ import 'common.proto';
 
 service SystemSvc {
   rpc GetSettings(Empty) returns (Settings) {}
+  rpc SetSettings(Settings) returns (Empty) {}
   rpc Log(LogRequest) returns (Empty) {}
 }
 

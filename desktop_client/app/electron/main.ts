@@ -30,8 +30,10 @@ let win: BrowserWindow | null;
 function createWindow() {
   win = new BrowserWindow({
     icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
+    title: "RPG Book",
     webPreferences: {
       preload: path.join(__dirname, "preload.mjs"),
+      webSecurity: false,
     },
   });
 
@@ -69,7 +71,6 @@ app.on("activate", () => {
 app.whenReady().then(() => {
   // TODO: use the generated const, but things are broken and I no longer care and I want a pint
   const certificate = process.env.RPG_BOOK_CERTIFICATE ?? "";
-  const port = process.env.RPG_BOOK_PORT ?? "";
 
   session.defaultSession.setCertificateVerifyProc((request, callback) => {
     try {
@@ -85,31 +86,6 @@ app.whenReady().then(() => {
       callback(-2); // FAILED
     }
   });
-
-  session.defaultSession.webRequest.onHeadersReceived(
-    {
-      urls: [`https://127.0.0.1:${port}/*`],
-    },
-    (details, callback) => {
-      if (!details.responseHeaders) {
-        details.responseHeaders = {};
-      }
-
-      details.responseHeaders["Access-Control-Allow-Origin"] = ["*"];
-      details.responseHeaders["Access-Control-Allow-"] = ["*"];
-      callback({ responseHeaders: details.responseHeaders });
-    },
-  );
-
-  session.defaultSession.webRequest.onBeforeSendHeaders(
-    {
-      urls: [`https://127.0.0.1:${port}/*`],
-    },
-    (details, callback) => {
-      details.requestHeaders["Content-Type"] = "application/grpc";
-      callback({ requestHeaders: details.requestHeaders });
-    },
-  );
 
   createWindow();
 });

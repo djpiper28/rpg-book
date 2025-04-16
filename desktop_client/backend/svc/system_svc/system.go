@@ -34,6 +34,15 @@ func (s *SystemSvc) GetSettings(ctx context.Context, in *pb_common.Empty) (*pb_s
 	return settings.ToProto(), nil
 }
 
+func (s *SystemSvc) SetSettings(ctx context.Context, in *pb_system.Settings) (*pb_common.Empty, error) {
+	_, err := s.db.Db.Exec("UPDATE settings SET dev_mode=?, dark_mode=?;", in.DevMode, in.DarkMode)
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot set settings"), err)
+	}
+
+	return &pb_common.Empty{}, nil
+}
+
 func (s *SystemSvc) Log(ctx context.Context, req *pb_system.LogRequest) (*pb_common.Empty, error) {
 	const callerTag = "js_caller"
 

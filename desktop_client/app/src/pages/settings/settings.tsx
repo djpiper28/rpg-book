@@ -1,6 +1,6 @@
 import { H1 } from "@/components/typography/H1";
 import { H2 } from "@/components/typography/H2";
-import { P } from "@/components/typography/P";
+import { client } from "@/lib/grpcClient/client";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { Button, Checkbox } from "@mantine/core";
 import { Settings, TriangleAlert } from "lucide-react";
@@ -18,6 +18,7 @@ export function SettingsPage() {
 
       <Checkbox
         label="Dark Mode"
+        description="Whether to use dark mode (checked), or light mode (unchecked) for RPG Book."
         checked={dirtySettings.darkMode}
         onChange={(event) => {
           const s = structuredClone(dirtySettings);
@@ -37,16 +38,20 @@ export function SettingsPage() {
         </Button>
         <Button
           onClick={() => {
-            // TODO: call the backend API
-            setSettings(dirtySettings);
-            window.location.href = "/";
+            client
+              .setSettings(dirtySettings)
+              .then(() => {
+                setSettings(dirtySettings);
+                window.location.href = "/";
+              })
+              .catch(alert);
           }}
         >
           Save
         </Button>
       </div>
 
-      <div className="flex flex-col gap-3 py-20 m-2 px-5 border-r-2 border border-red-500">
+      <div className="flex flex-col gap-3 mt-20 m-2 p-5 border-r-2 border border-red-500 rounded-lg">
         <div className="flex flex-row gap-2 items-center">
           <TriangleAlert />
           <H2>Scary Settings - Best Not To Touch</H2>
