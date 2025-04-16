@@ -13,3 +13,10 @@ func (s *Settings) ToProto() *pb_system.Settings {
 		DarkMode: s.DarkMode,
 	}
 }
+
+func SettingsFromProto(p *pb_system.Settings) *Settings {
+	return &Settings{
+		DevMode:  p.DevMode,
+		DarkMode: p.DarkMode,
+	}
+}
