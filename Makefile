@@ -14,6 +14,11 @@ desktop-client-codegen: go-generate
 desktop-client-app: desktop-client-codegen 
 	cd $(DESKTOP_APP) && pnpm build
 
+# Starts a dev electron app (pnpm calls other targets in this, this just makes it simpler to use)
+.PHONY: dev
+dev:
+	cd $(DESKTOP_APP) && pnpm dev
+
 .PHONY: desktop-client-backend
 desktop-client-backend: go-core
 	cd ./desktop_client/launcher && go build
