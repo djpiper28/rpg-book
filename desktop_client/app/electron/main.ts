@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 // const require = createRequire(import.meta.url)
+// eslint-disable-next-line @typescript-eslint/naming-convention
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // The built directory structure
@@ -39,14 +40,16 @@ function createWindow() {
 
   // Test active push message to Renderer-process.
   win.webContents.on("did-finish-load", () => {
-    win?.webContents.send("main-process-message", new Date().toLocaleString());
+    win.webContents.send("main-process-message", new Date().toLocaleString());
   });
 
   if (VITE_DEV_SERVER_URL) {
-    win.loadURL(VITE_DEV_SERVER_URL);
+    win.loadURL(VITE_DEV_SERVER_URL).then().catch(console.error);
   } else {
-    // win.loadFile('dist/index.html')
-    win.loadFile(path.join(RENDERER_DIST, "index.html"));
+    win
+      .loadFile(path.join(RENDERER_DIST, "index.html"))
+      .then()
+      .catch(console.error);
   }
 }
 
@@ -56,7 +59,7 @@ function createWindow() {
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
-    win = null;
+    win = undefined;
   }
 });
 
@@ -68,6 +71,7 @@ app.on("activate", () => {
   }
 });
 
+// eslint-disable-next-line @typescript-eslint/no-floating-promises,unicorn/prefer-top-level-await
 app.whenReady().then(() => {
   // TODO: use the generated const, but things are broken and I no longer care and I want a pint
   const certificate = process.env.RPG_BOOK_CERTIFICATE ?? "";

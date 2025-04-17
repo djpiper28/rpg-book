@@ -4,13 +4,14 @@ import App from "./App.tsx";
 import "@mantine/core/styles.css";
 import "./index.css";
 
-ReactDOM.createRoot(document.querySelector("#root")!).render(
+ReactDOM.createRoot(document.querySelector("#root")).render(
   <React.StrictMode>
     <App />
   </React.StrictMode>,
 );
 
 // Use contextBridge
+// eslint-disable-next-line
 globalThis.ipcRenderer.on("main-process-message", (_event, message) => {
   console.log(message);
 });

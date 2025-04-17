@@ -16,8 +16,8 @@ function App() {
       .then((x) => {
         setSettings(x.response);
       })
-      .catch((error) => {
-        logger.error(`Cannot get settings ${error}`, {});
+      .catch((error: unknown) => {
+        logger.error(`Cannot get settings ${JSON.stringify(error)}`, {});
       });
   }, [setSettings]);
 
