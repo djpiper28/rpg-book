@@ -1,44 +1,45 @@
-import { Settings } from "lucide-react";
-import { client, logger } from "./lib/grpcClient/client";
 import { Button, MantineProvider, Title } from "@mantine/core";
+import { Settings } from "lucide-react";
 import { useEffect } from "react";
-import { useSettingsStore } from "./stores/settingsStore";
-import { BrowserRouter, Routes, Route } from "react-router";
+import { BrowserRouter, Route, Routes } from "react-router";
+import { client, logger } from "./lib/grpcClient/client";
 import { IndexPage } from "./pages";
 import { SettingsPage } from "./pages/settings/settings";
+import { useSettingsStore } from "./stores/settingsStore";
 
 function App() {
-  const { settings, setSettings } = useSettingsStore((s) => s);
+  const { setSettings, settings } = useSettingsStore((s) => s);
+
   useEffect(() => {
     client
       .getSettings({})
       .then((x) => {
         setSettings(x.response);
       })
-      .catch((e) => {
-        logger.error(`Cannot get settings ${e}`, {});
+      .catch((error) => {
+        logger.error(`Cannot get settings ${error}`, {});
       });
   }, [setSettings]);
 
   return (
     <MantineProvider
+      forceColorScheme={settings.darkMode ? "dark" : "light"}
       withCSSVariables
       withGlobalStyles
       withNormalizeCSS
-      forceColorScheme={settings.darkMode ? "dark" : "light"}
     >
       <div className="flex flex-col gap-3 p-2">
         <div
-          id="menu"
           className="flex flex-row gap-3 justify-between items-center border-b border-b-gray-100 border-r-2"
+          id="menu"
         >
           <Title>
             <a href="/">RPG Book</a>
           </Title>
           <Button
             aria-label="Open settings"
+            onClick={() => (globalThis.location.href = "/settings")}
             variant="filled"
-            onClick={() => (window.location.href = "/settings")}
           >
             <Settings /> Settings
           </Button>
@@ -47,8 +48,8 @@ function App() {
         <div className="flex flex-col gap-3 p-2">
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<IndexPage />} />
-              <Route path="/settings" element={<SettingsPage />} />
+              <Route element={<IndexPage />} path="/" />
+              <Route element={<SettingsPage />} path="/settings" />
             </Routes>
           </BrowserRouter>
         </div>

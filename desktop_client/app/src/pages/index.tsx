@@ -1,6 +1,6 @@
+import { Table } from "@mantine/core";
 import { H2 } from "@/components/typography/H2";
 import { P } from "@/components/typography/P";
-import { Table } from "@mantine/core";
 
 export function IndexPage() {
   return (

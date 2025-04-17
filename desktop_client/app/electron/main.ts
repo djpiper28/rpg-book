@@ -1,6 +1,6 @@
-import { app, BrowserWindow, session } from "electron";
-import { fileURLToPath } from "node:url";
+import { BrowserWindow, app, session } from "electron";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 // const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -17,7 +17,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 process.env.APP_ROOT = path.join(__dirname, "..");
 
 // 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
-export const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
+export const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
 export const MAIN_DIST = path.join(process.env.APP_ROOT, "dist-electron");
 export const RENDERER_DIST = path.join(process.env.APP_ROOT, "dist");
 
@@ -76,13 +76,14 @@ app.whenReady().then(() => {
     try {
       const presentedCert = request.certificate.data.replace(/\s/, "");
       const trustedCert = certificate.replace(/\s/, "");
-
       const eq = presentedCert === trustedCert;
+
       if (!eq) {
         console.error("The certificates do not match");
       }
+
       callback(eq ? 0 : -3);
-    } catch (error) {
+    } catch {
       callback(-2); // FAILED
     }
   });

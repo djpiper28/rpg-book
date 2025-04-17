@@ -1,22 +1,22 @@
-import { Settings } from "@/lib/grpcClient/pb/system";
 import { create } from "zustand";
+import { type Settings } from "@/lib/grpcClient/pb/system";
 
 const defaultSettings: Settings = {
-  devMode: false,
   darkMode: true,
+  devMode: false,
 };
 
 interface SettingsStore {
-  settings: Settings;
   setSettings: (settings: Settings) => void;
+  settings: Settings;
 }
 
 export const useSettingsStore = create<SettingsStore>(
   (set): SettingsStore => ({
-    settings: defaultSettings,
     setSettings: (settings: Settings) => {
-      set({ settings: settings });
+      set({ settings });
       console.log(settings);
     },
+    settings: defaultSettings,
   }),
 );

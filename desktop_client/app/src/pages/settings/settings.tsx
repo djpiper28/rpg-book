@@ -1,14 +1,15 @@
+import { Button, Checkbox } from "@mantine/core";
+import { Settings, TriangleAlert } from "lucide-react";
+import { useEffect, useState } from "react";
 import { H1 } from "@/components/typography/H1";
 import { H2 } from "@/components/typography/H2";
 import { client } from "@/lib/grpcClient/client";
 import { useSettingsStore } from "@/stores/settingsStore";
-import { Button, Checkbox } from "@mantine/core";
-import { Settings, TriangleAlert } from "lucide-react";
-import { useState, useEffect } from "react";
 
 export function SettingsPage() {
-  const { settings, setSettings } = useSettingsStore((s) => s);
+  const { setSettings, settings } = useSettingsStore((s) => s);
   const [dirtySettings, setDirtySettings] = useState(settings);
+
   useEffect(() => {
     setDirtySettings(settings);
   }, [settings]);
@@ -21,9 +22,9 @@ export function SettingsPage() {
       </div>
 
       <Checkbox
-        label="Dark Mode"
-        description="Whether to use dark mode (checked), or light mode (unchecked) for RPG Book."
         checked={dirtySettings.darkMode}
+        description="Whether to use dark mode (checked), or light mode (unchecked) for RPG Book."
+        label="Dark Mode"
         onChange={(event) => {
           const s = structuredClone(dirtySettings);
           s.darkMode = event.currentTarget.checked;
@@ -33,10 +34,10 @@ export function SettingsPage() {
 
       <div className="flex flex-row justify-between gap-3">
         <Button
-          variant="default"
           onClick={() => {
-            window.location.href = "/";
+            globalThis.location.href = "/";
           }}
+          variant="default"
         >
           Cancel
         </Button>
@@ -46,7 +47,7 @@ export function SettingsPage() {
               .setSettings(dirtySettings)
               .then(() => {
                 setSettings(dirtySettings);
-                window.location.href = "/";
+                globalThis.location.href = "/";
               })
               .catch(alert);
           }}
@@ -61,14 +62,14 @@ export function SettingsPage() {
           <H2>Scary Settings - Best Not To Touch</H2>
         </div>
         <Checkbox
-          label="Developer Mode"
           checked={dirtySettings.devMode}
+          description="Do not turn developer mode on unless you know what you are doing."
+          label="Developer Mode"
           onChange={(event) => {
             const s = structuredClone(dirtySettings);
             s.devMode = event.currentTarget.checked;
             setDirtySettings(s);
           }}
-          description="Do not turn developer mode on unless you know what you are doing."
         />
       </div>
     </>

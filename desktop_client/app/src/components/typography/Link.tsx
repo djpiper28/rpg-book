@@ -1,15 +1,15 @@
-import { ReactNode } from "react";
+import { type ReactNode } from "react";
 
 interface Props {
-  href: string;
   children: ReactNode;
+  href: string;
 }
 
 export function Link(props: Readonly<Props>) {
   return (
     <a
-      href={props.href}
       className="text-blue-700 hover:text-blue-600 underline"
+      href={props.href}
     >
       {props.children}
     </a>

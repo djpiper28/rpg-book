@@ -1,8 +1,8 @@
-import { ReactNode } from "react";
+import { type ReactNode } from "react";
 
 interface Props {
-  className?: string;
   children: string | ReactNode;
+  className?: string;
 }
 
 export function P(props: Readonly<Props>) {
