@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	buildinfo "github.com/djpiper28/rpg-book/common/build_info"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_common"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_system"
 	systemsvc "github.com/djpiper28/rpg-book/desktop_client/backend/svc/system_svc"
@@ -74,5 +75,11 @@ func TestSettings(t *testing.T) {
 		})
 
 		require.NoError(t, err)
+	})
+
+	t.Run("Call Version", func(t *testing.T) {
+		version, err := system.GetVersion(context.Background(), &pb_common.Empty{})
+		require.NoError(t, err)
+		require.Equal(t, version.Version, buildinfo.Version)
 	})
 }

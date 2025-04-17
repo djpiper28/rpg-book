@@ -6,6 +6,7 @@ service SystemSvc {
   rpc GetSettings(Empty) returns (Settings) {}
   rpc SetSettings(Settings) returns (Empty) {}
   rpc Log(LogRequest) returns (Empty) {}
+  rpc GetVersion(Empty) returns (Version) {}
 }
 
 message Settings {
@@ -30,4 +31,8 @@ enum LogLevel {
   WARNING = 1;
   ERROR = 2;
   FATAL = 3;
+}
+
+message Version {
+  string version = 1;
 }

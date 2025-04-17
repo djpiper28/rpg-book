@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/charmbracelet/log"
+	buildinfo "github.com/djpiper28/rpg-book/common/build_info"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/model"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_common"
@@ -61,4 +62,8 @@ func (s *SystemSvc) Log(ctx context.Context, req *pb_system.LogRequest) (*pb_com
 	}
 
 	return &pb_common.Empty{}, nil
+}
+
+func (s *SystemSvc) GetVersion(ctx context.Context, req *pb_common.Empty) (*pb_system.Version, error) {
+	return &pb_system.Version{Version: buildinfo.Version}, nil
 }
