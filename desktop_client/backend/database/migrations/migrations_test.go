@@ -179,6 +179,59 @@ func TestExecutedMigrationsAreNotExecutedAgain(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestMigrationsDifferentTransactions(t *testing.T) {
+	name := uuid.New().String() + database.DbExtension
+	defer os.Remove(name)
+
+	db, err := database.New(name)
+	require.NoError(t, err)
+
+	m := migrations.New([]migrations.Migration{
+		{
+			Sql: `
+    CREATE TABLE test_table (
+      id UUID PRIMARY KEY
+    );
+      `,
+		},
+	})
+	err = m.Migrate(db)
+	require.NoError(t, err)
+
+	_, err = db.Db.Exec(`
+    INSERT INTO test_table (id) 
+    VALUES ('578d07ce-5ad8-49ac-92b5-5b52c127fdcc');`)
+	require.NoError(t, err)
+
+	db.Close()
+
+	db, err = database.New(name)
+	defer db.Close()
+	require.NoError(t, err)
+
+	m = migrations.New([]migrations.Migration{
+		{
+			Sql: `
+    CREATE TABLE test_table (
+      id UUID PRIMARY KEY
+    );
+      `,
+		},
+		{
+			Sql: `
+    ALTER TABLE test_table ADD COLUMN foo TEXT DEFAULT('baz');
+      `,
+		},
+	})
+	err = m.Migrate(db)
+	require.NoError(t, err)
+
+	_, err = db.Db.Exec(`
+    INSERT INTO test_table (id) 
+    VALUES ('263e06d8-7e07-4d12-9479-d7faf0156743');`)
+	require.NoError(t, err)
+}
+
 func TestPreProcessError(t *testing.T) {
 	name := uuid.New().String() + database.DbExtension
 	defer os.Remove(name)

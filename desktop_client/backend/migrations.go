@@ -30,6 +30,15 @@ func Migrate(db *database.Db) error {
 				return err
 			},
 		},
+		{
+			Sql: `
+  CREATE TABLE recently_opened (
+    file_name TEXT PRIMARY KEY,
+    project_name TEXT NOT NULL,
+    last_opened TIMESTAMP WITH TIME ZONE NOT NULL
+  );
+      `,
+		},
 	})
 
 	err := m.Migrate(db)

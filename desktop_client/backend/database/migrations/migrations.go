@@ -47,7 +47,7 @@ func (m *DbMigrator) Migrate(db *database.Db) error {
 	log.Info("Starting migrations from last version onwards", loggertags.TagDate, migrationDate, loggertags.TagVersion, currentMigration)
 
 	for version, migration := range m.migrations[currentMigration+1:] {
-		log.Info("Migrating database", loggertags.TagCurrent, version+1, loggertags.TagCount, len(m.migrations))
+		log.Info("Migrating database", loggertags.TagCurrent, version+currentMigration+1, loggertags.TagCount, len(m.migrations))
 		if migration.PreProcess != nil {
 			err = migration.PreProcess(tx)
 			if err != nil {
@@ -77,7 +77,7 @@ func (m *DbMigrator) Migrate(db *database.Db) error {
 		_, err = tx.Exec(`
       INSERT INTO migrations (version, date)
       VALUES (?, ?);
-    `, version, time.Now())
+    `, version+currentMigration+1, time.Now())
 		if err != nil {
 			return errors.Join(errors.New("Cannot insert migration record"), err)
 		}
