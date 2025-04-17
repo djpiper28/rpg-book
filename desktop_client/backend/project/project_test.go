@@ -27,6 +27,7 @@ func TestCreateNewProject(t *testing.T) {
 	project, err := project.Create(filename, name)
 	require.NoError(t, err)
 	require.Equal(t, project.Settings.Name, name)
+  require.Equal(t, project.Filename, filename)
 	defer project.Close()
 }
 
@@ -45,4 +46,7 @@ func TestReOpenProject(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, project2.Settings.Name, name)
 	defer project2.Close()
+
+  require.Equal(t, project1.Filename, filename)
+  require.Equal(t, project2.Filename, filename)
 }
