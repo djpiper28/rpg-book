@@ -4,11 +4,15 @@ import { client } from "@/lib/grpcClient/client";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { Button, Checkbox } from "@mantine/core";
 import { Settings, TriangleAlert } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export function SettingsPage() {
   const { settings, setSettings } = useSettingsStore((s) => s);
   const [dirtySettings, setDirtySettings] = useState(settings);
+  useEffect(() => {
+    setDirtySettings(settings);
+  }, [settings]);
+
   return (
     <>
       <div className="flex flex-row gap-2 items-center">
