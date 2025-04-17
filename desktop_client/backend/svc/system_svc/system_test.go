@@ -13,7 +13,7 @@ import (
 )
 
 func TestSettings(t *testing.T) {
-	db, cleanup := testdbutils.GetDb()
+	db, cleanup := testdbutils.GetPrimaryDb()
 	defer cleanup()
 
 	system := systemsvc.New(db)

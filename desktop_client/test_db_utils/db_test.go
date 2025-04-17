@@ -7,8 +7,15 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestDb(t *testing.T) {
-	db, close := testdbutils.GetDb()
+func TestPrimaryDb(t *testing.T) {
+	db, close := testdbutils.GetPrimaryDb()
+	defer close()
+
+	require.NotNil(t, db)
+}
+
+func TestProjectDb(t *testing.T) {
+	db, close := testdbutils.GetProjectDb()
 	defer close()
 
 	require.NotNil(t, db)
