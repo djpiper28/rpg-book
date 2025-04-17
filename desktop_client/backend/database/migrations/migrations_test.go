@@ -1,6 +1,7 @@
 package migrations_test
 
 import (
+	"errors"
 	"os"
 	"testing"
 
@@ -176,4 +177,93 @@ func TestExecutedMigrationsAreNotExecutedAgain(t *testing.T) {
     INSERT INTO test_table (id) 
     VALUES ('263e06d8-7e07-4d12-9479-d7faf0156743');`)
 	require.NoError(t, err)
+}
+
+func TestPreProcessError(t *testing.T) {
+	name := uuid.New().String() + database.DbExtension
+	defer os.Remove(name)
+
+	db, err := database.New(name)
+	defer db.Close()
+	require.NoError(t, err)
+
+	m := migrations.New([]migrations.Migration{
+		{
+			PreProcess: func(tx *sqlx.Tx) error {
+				return errors.New("Mocked error")
+			},
+			Sql: `
+  SHOULD NOT BE EXECUTED;
+      `,
+		},
+	})
+	err = m.Migrate(db)
+	require.Error(t, err)
+}
+
+func TestSqlError(t *testing.T) {
+	name := uuid.New().String() + database.DbExtension
+	defer os.Remove(name)
+
+	db, err := database.New(name)
+	defer db.Close()
+	require.NoError(t, err)
+
+	m := migrations.New([]migrations.Migration{
+		{
+			Sql: `
+  SHOULD CAUSE AN ERROR;
+      `,
+		},
+	})
+	err = m.Migrate(db)
+	require.Error(t, err)
+}
+
+func TestPostProcessError(t *testing.T) {
+	name := uuid.New().String() + database.DbExtension
+	defer os.Remove(name)
+
+	db, err := database.New(name)
+	defer db.Close()
+	require.NoError(t, err)
+
+	m := migrations.New([]migrations.Migration{
+		{
+			Sql: `
+  CREATE TABLE test_table (
+    id UUID PRIMARY KEY
+  );
+      `,
+			PostProcess: func(tx *sqlx.Tx) error {
+				return errors.New("Mocked error")
+			},
+		},
+	})
+	err = m.Migrate(db)
+	require.Error(t, err)
+}
+
+func TestSqlTestError(t *testing.T) {
+	name := uuid.New().String() + database.DbExtension
+	defer os.Remove(name)
+
+	db, err := database.New(name)
+	defer db.Close()
+	require.NoError(t, err)
+
+	m := migrations.New([]migrations.Migration{
+		{
+			Sql: `
+  CREATE TABLE test_table (
+    id UUID PRIMARY KEY
+  );
+      `,
+			Test: func(tx *sqlx.Tx) error {
+				return errors.New("Mocked error")
+			},
+		},
+	})
+	err = m.Migrate(db)
+	require.Error(t, err)
 }

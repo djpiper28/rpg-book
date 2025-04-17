@@ -31,6 +31,7 @@ func (m *DbMigrator) Migrate(db *database.Db) error {
 	if err != nil {
 		return errors.Join(errors.New("Cannot start transaction"), err)
 	}
+	defer tx.Rollback()
 
 	var currentMigration int
 	var migrationDate string
