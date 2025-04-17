@@ -1,6 +1,6 @@
 import { Button, Checkbox, InputDescription } from "@mantine/core";
 import { Settings, TriangleAlert } from "lucide-react";
-import { ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { H1 } from "@/components/typography/H1";
 import { H2 } from "@/components/typography/H2";
 import { client } from "@/lib/grpcClient/client";
