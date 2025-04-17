@@ -3,7 +3,7 @@ import { Settings, TriangleAlert } from "lucide-react";
 import { useEffect, useState } from "react";
 import { H1 } from "@/components/typography/H1";
 import { H2 } from "@/components/typography/H2";
-import { client } from "@/lib/grpcClient/client";
+import { systemClient } from "@/lib/grpcClient/client";
 import { useSettingsStore } from "@/stores/settingsStore";
 
 export function SettingsPage() {
@@ -12,7 +12,7 @@ export function SettingsPage() {
   const [version, setVersion] = useState(<></>);
 
   useEffect(() => {
-    client
+    systemClient
       .getVersion({})
       .then((resp) => {
         setVersion(
@@ -66,7 +66,7 @@ export function SettingsPage() {
         </Button>
         <Button
           onClick={() => {
-            client
+            systemClient
               .setSettings(dirtySettings)
               .then(() => {
                 setSettings(dirtySettings);

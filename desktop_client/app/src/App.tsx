@@ -2,7 +2,7 @@ import { Button, MantineProvider, Title } from "@mantine/core";
 import { Settings } from "lucide-react";
 import { useEffect } from "react";
 import { BrowserRouter, Route, Routes } from "react-router";
-import { client, logger } from "./lib/grpcClient/client";
+import { systemClient, logger } from "./lib/grpcClient/client";
 import { IndexPage } from "./pages";
 import { SettingsPage } from "./pages/settings/settings";
 import { useSettingsStore } from "./stores/settingsStore";
@@ -11,7 +11,7 @@ function App() {
   const { setSettings, settings } = useSettingsStore((s) => s);
 
   useEffect(() => {
-    client
+    systemClient
       .getSettings({})
       .then((x) => {
         setSettings(x.response);

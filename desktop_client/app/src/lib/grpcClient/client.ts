@@ -1,4 +1,5 @@
 import { EnvVarPort } from "../launcherTypes";
+import { ProjectSvcClient } from "./pb/project.client";
 import { LogLevel, LogProperty, LogRequest } from "./pb/system";
 import { SystemSvcClient } from "./pb/system.client";
 import { GrpcWebFetchTransport } from "@protobuf-ts/grpcweb-transport";
@@ -23,7 +24,8 @@ const transport = new GrpcWebFetchTransport({
   timeout: 5_000,
 });
 
-export const client = new SystemSvcClient(transport);
+export const systemClient = new SystemSvcClient(transport);
+export const projectClient = new ProjectSvcClient(transport);
 export const logger = {
   info: (msg: string, props: Record<string, string>) =>
     logAtLevel(LogLevel.INFO, msg, props),
@@ -55,7 +57,7 @@ function logAtLevel(level: any, msg: string, props: Record<string, string>) {
   });
 
   console.log(`${level} - ${msg} - ${props}`);
-  client
+  systemClient
     .log(req)
     .then(() => {})
     .catch((e) => {

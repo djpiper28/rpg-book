@@ -1,0 +1,34 @@
+syntax = "proto3";
+option go_package = "github.com/djpiper28/rpg-book/desktop_client/backend/pb_project";
+import 'common.proto';
+
+service ProjectSvc {
+  rpc CreateProject(CreateProjectReq) returns (ProjectHandle) {}
+  rpc OpenProject(OpenProjectReq) returns (ProjectHandle) {}
+  rpc RecentProjects(Empty) returns (RecentProjectsResp) {}
+}
+
+message CreateProjectReq {
+  string projectName = 1;
+  string fileName = 2;
+}
+
+message OpenProjectReq {
+  string fileName = 1;
+}
+
+message ProjectHandle {
+  // ID that the backend is using to track the project, changes per open
+  string id = 1;
+}
+
+message RecentProject {
+  string projectName = 1;
+  string fileName = 2;
+  int64 fileSizeBytes = 3;
+  string lastOpened = 4;
+}
+
+message RecentProjectsResp {
+  repeated RecentProject projects = 1;
+}
