@@ -1,22 +1,34 @@
 import { Button, Checkbox, InputDescription } from "@mantine/core";
 import { Settings, TriangleAlert } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { H1 } from "@/components/typography/H1";
 import { H2 } from "@/components/typography/H2";
 import { client } from "@/lib/grpcClient/client";
 import { useSettingsStore } from "@/stores/settingsStore";
-import { P } from "@/components/typography/P";
 
 export function SettingsPage() {
   const { setSettings, settings } = useSettingsStore((s) => s);
   const [dirtySettings, setDirtySettings] = useState(settings);
-  const [version, setVersion] = useState("");
+  const [version, setVersion] = useState(<></>);
 
   useEffect(() => {
     client
       .getVersion({})
       .then((resp) => {
-        setVersion(resp.response.version);
+        setVersion(
+          resp.response.version.split("\n").reduce(
+            (a, b, _) => {
+              return (
+                <>
+                  {a}
+                  <br />
+                  {b}
+                </>
+              );
+            },
+            <></>,
+          ),
+        );
       })
       .catch(console.error);
   }, []);
