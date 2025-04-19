@@ -42,7 +42,7 @@ func New(filename string) (*Db, error) {
 		return nil, errors.Join(fmt.Errorf("Cannot create database connetion for %s", filename), err)
 	}
 
-  err = db.Ping()
+	err = db.Ping()
 	if err != nil {
 		return nil, errors.Join(fmt.Errorf("Cannot ping database %s", filename), err)
 	}

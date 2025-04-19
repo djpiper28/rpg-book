@@ -4,6 +4,8 @@ import (
 	"errors"
 	"os"
 
+	"github.com/charmbracelet/log"
+	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/project/model"
 )
@@ -47,6 +49,7 @@ func Open(filename string) (*Project, error) {
 		return nil, errors.Join(errors.New("Cannot get project settings"), err)
 	}
 
+	log.Info("Opened a project", loggertags.TagFileName, filename)
 	return &Project{
 		db:       db,
 		Settings: settings,
@@ -74,6 +77,7 @@ func Create(filename string, projectName string) (*Project, error) {
 		return nil, errors.Join(errors.New("Cannot create project settings"), err)
 	}
 
+	log.Info("Created a project", loggertags.TagFileName, filename)
 	return &Project{
 		db: db,
 		Settings: model.ProjectSettings{
