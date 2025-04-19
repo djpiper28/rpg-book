@@ -21,10 +21,8 @@ import (
 	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_project"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_system"
-	"github.com/djpiper28/rpg-book/desktop_client/backend/project"
 	projectsvc "github.com/djpiper28/rpg-book/desktop_client/backend/svc/project_svc"
 	systemsvc "github.com/djpiper28/rpg-book/desktop_client/backend/svc/system_svc"
-	"github.com/google/uuid"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"google.golang.org/grpc"
 )
