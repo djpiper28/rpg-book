@@ -209,31 +209,3 @@ func (s *Server) ClientCredentials() *ClientCredentials {
 		)),
 	}
 }
-
-func (s *Server) NewProject(filename, projectName string) (uuid.UUID, error) {
-	proj, err := project.Create(filename, projectName)
-	if err != nil {
-		return uuid.Nil, err
-	}
-
-	id := uuid.New()
-	s.projects[id] = proj
-	return id, nil
-}
-
-func (s *Server) OpenProject(filename string) (uuid.UUID, error) {
-	for _, proj := range s.projects {
-		if proj.Filename == filename {
-			return uuid.Nil, errors.New("Already open")
-		}
-	}
-
-	proj, err := project.Open(filename)
-	if err != nil {
-		return uuid.Nil, err
-	}
-
-	id := uuid.New()
-	s.projects[id] = proj
-	return id, nil
-}
