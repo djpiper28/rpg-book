@@ -46,10 +46,11 @@ test: go-test desktop-client-test
 
 .PHONY: go-fmt
 go-fmt:
-	go fmt -w -l ./...
+	gofmt -w -l .
 
 .PHONY: prettier
 prettier:
+	cd $(DESKTOP_APP) && pnpm lint --fix
 	cd $(DESKTOP_APP) && npx prettier -w .
 
 .PHONY: format
