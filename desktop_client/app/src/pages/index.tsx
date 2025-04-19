@@ -1,5 +1,5 @@
 import { Table } from "@mantine/core";
-import * as dayjs from "dayjs";
+import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { H2 } from "@/components/typography/H2";
 import { P } from "@/components/typography/P";

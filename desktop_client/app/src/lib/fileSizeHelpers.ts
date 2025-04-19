@@ -1,21 +1,22 @@
 export function bytesToFriendly(bytes: number): string {
   let exponent = 0;
-  while (bytes > 1024) {
+  while (bytes > 1000) {
     exponent++;
-    bytes /= 1024;
+    bytes /= 1000;
   }
 
-  switch (bytes) {
+  const size = bytes.toPrecision(3);
+  switch (exponent) {
     case 0:
-      return `${bytes} bytes`;
+      return `${size} bytes`;
     case 1:
-      return `${bytes} KiB)`;
+      return `${size} KB`;
     case 2:
-      return `${bytes} MiB)`;
+      return `${size} MB`;
     case 3:
-      return `${bytes} GiB)`;
+      return `${size} GB`;
     case 4:
-      return `${bytes} TiB)`;
+      return `${size} TB`;
     default:
       throw new Error("The FILE IS HUGE!!");
   }
