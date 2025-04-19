@@ -19,8 +19,10 @@ import (
 	"github.com/charmbracelet/log"
 	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
+	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_project"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_system"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/project"
+	projectsvc "github.com/djpiper28/rpg-book/desktop_client/backend/svc/project_svc"
 	systemsvc "github.com/djpiper28/rpg-book/desktop_client/backend/svc/system_svc"
 	"github.com/google/uuid"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
@@ -28,14 +30,14 @@ import (
 )
 
 type Server struct {
-	ctx       context.Context
-	Port      int
-	cert      []byte
-	certKeys  *rsa.PrivateKey
-	cancel    func()
-	server    *grpc.Server
-	primaryDb *database.Db
-	projects  map[uuid.UUID]*project.Project
+	ctx        context.Context
+	Port       int
+	cert       []byte
+	certKeys   *rsa.PrivateKey
+	cancel     func()
+	server     *grpc.Server
+	primaryDb  *database.Db
+	projectSvc *projectsvc.ProjectSvc
 }
 
 var localhost = net.IP{127, 0, 0, 1}
@@ -102,7 +104,6 @@ func New(port int) (*Server, error) {
 		cert:      cert,
 		certKeys:  key,
 		primaryDb: db,
-		projects:  make(map[uuid.UUID]*project.Project),
 	}
 
 	err = server.start()
@@ -157,6 +158,9 @@ func (s *Server) start() error {
 	)
 	s.server.RegisterService(&pb_system.SystemSvc_ServiceDesc, systemsvc.New(s.primaryDb))
 
+	s.projectSvc = projectsvc.New(s.primaryDb)
+	s.server.RegisterService(&pb_project.ProjectSvc_ServiceDesc, s.projectSvc)
+
 	wrappedGrpc := grpcweb.WrapServer(s.server)
 
 	httpServer := &http.Server{
@@ -185,11 +189,8 @@ func (s *Server) start() error {
 func (s *Server) Stop() {
 	s.server.GracefulStop()
 	s.primaryDb.Close()
+	s.projectSvc.Close()
 	s.cancel()
-
-	for _, project := range s.projects {
-		project.Close()
-	}
 }
 
 type ClientCredentials struct {
@@ -221,11 +222,11 @@ func (s *Server) NewProject(filename, projectName string) (uuid.UUID, error) {
 }
 
 func (s *Server) OpenProject(filename string) (uuid.UUID, error) {
-  for _, proj := range s.projects {
-    if proj.Filename == filename {
-      return uuid.Nil, errors.New("Already open")
-    }
-  }
+	for _, proj := range s.projects {
+		if proj.Filename == filename {
+			return uuid.Nil, errors.New("Already open")
+		}
+	}
 
 	proj, err := project.Open(filename)
 	if err != nil {
