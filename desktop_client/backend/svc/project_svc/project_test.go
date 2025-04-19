@@ -95,4 +95,12 @@ func TestProjectSvc(t *testing.T) {
 		require.Equal(t, 1, count)
 		require.Equal(t, name, dbName)
 	})
+
+	t.Run("Test close proejct that does not exist", func(t *testing.T) {
+		_, err := svc.CloseProject(context.Background(), &pb_project.ProjectHandle{
+			Id: uuid.NewString(),
+		})
+
+		require.Error(t, err)
+	})
 }
