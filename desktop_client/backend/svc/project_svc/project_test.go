@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
+	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_common"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_project"
 	projectsvc "github.com/djpiper28/rpg-book/desktop_client/backend/svc/project_svc"
 	testdbutils "github.com/djpiper28/rpg-book/desktop_client/test_db_utils"
@@ -30,6 +31,12 @@ func TestProjectSvc(t *testing.T) {
 
 		closeProjectWithoutDelete(t, filename, handle)
 	}
+
+	t.Run("Test no recent projects", func(t *testing.T) {
+		projects, err := svc.RecentProjects(context.Background(), &pb_common.Empty{})
+		require.NoError(t, err)
+		require.Len(t, projects.Projects, 0)
+	})
 
 	t.Run("Test open project that does not exist", func(t *testing.T) {
 		const fileDoesNotExist = "does-not-exist"
@@ -102,5 +109,30 @@ func TestProjectSvc(t *testing.T) {
 		})
 
 		require.Error(t, err)
+	})
+
+	t.Run("Test created project appears in recently openeed projects", func(t *testing.T) {
+		filename := uuid.New().String() + database.DbExtension
+		name := uuid.New().String()
+
+		handle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
+			FileName:    filename,
+			ProjectName: name,
+		})
+		require.NoError(t, err)
+		defer closeProject(t, filename, handle)
+
+		recents, err := svc.RecentProjects(context.Background(), &pb_common.Empty{})
+		require.NoError(t, err)
+
+		for _, recent := range recents.Projects {
+			if recent.FileName == filename {
+				require.Equal(t, name, recent.ProjectName)
+				return
+			}
+		}
+
+		t.Log("Cannot find the project in the recent list")
+		t.Fail()
 	})
 }

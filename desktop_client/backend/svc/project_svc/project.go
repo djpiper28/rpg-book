@@ -3,10 +3,14 @@ package projectsvc
 import (
 	"context"
 	"errors"
+	"os"
 	"sync"
 	"time"
 
+	"github.com/charmbracelet/log"
+	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
+	"github.com/djpiper28/rpg-book/desktop_client/backend/model"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_common"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_project"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/project"
@@ -145,5 +149,36 @@ func (p *ProjectSvc) CloseProject(ctx context.Context, in *pb_project.ProjectHan
 }
 
 func (p *ProjectSvc) RecentProjects(ctx context.Context, in *pb_common.Empty) (*pb_project.RecentProjectsResp, error) {
-	return nil, errors.New("Unimplemented")
+	rows, err := p.primaryDb.Db.QueryxContext(ctx, "SELECT * FROM recently_opened ORDER BY last_opened DESC LIMIT 10;")
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot get recently opened projects"), err)
+	}
+
+	projects := make([]*pb_project.RecentProject, 0)
+	for rows.Next() {
+		var recent model.RecentlyOpened
+		err = rows.StructScan(&recent)
+		if err != nil {
+			return nil, errors.Join(errors.New("Cannot scan recently opened projects"), err)
+		}
+		var size int64 = 0
+		stat, err := os.Stat(recent.FileName)
+		if err != nil {
+			log.Warn("Recently opened project does not exist", loggertags.TagFileName, recent.FileName)
+			size = -1
+		} else {
+			size = stat.Size()
+		}
+
+		projects = append(projects, &pb_project.RecentProject{
+			ProjectName:   recent.ProjectName,
+			FileName:      recent.FileName,
+			LastOpened:    recent.LastOpened,
+			FileSizeBytes: size,
+		})
+	}
+
+	return &pb_project.RecentProjectsResp{
+		Projects: projects,
+	}, nil
 }
