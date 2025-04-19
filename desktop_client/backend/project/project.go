@@ -11,7 +11,7 @@ import (
 type Project struct {
 	db       *database.Db
 	Settings model.ProjectSettings
-  Filename string
+	Filename string
 }
 
 func openDatabase(filename string) (*database.Db, error) {
@@ -29,6 +29,11 @@ func openDatabase(filename string) (*database.Db, error) {
 }
 
 func Open(filename string) (*Project, error) {
+	_, err := os.Stat(filename)
+	if err != nil {
+		return nil, errors.New("Project does not exist so cannot be opned")
+	}
+
 	db, err := openDatabase(filename)
 	if err != nil {
 		return nil, err
@@ -45,7 +50,7 @@ func Open(filename string) (*Project, error) {
 	return &Project{
 		db:       db,
 		Settings: settings,
-    Filename: filename,
+		Filename: filename,
 	}, nil
 }
 
@@ -74,7 +79,7 @@ func Create(filename string, projectName string) (*Project, error) {
 		Settings: model.ProjectSettings{
 			Name: projectName,
 		},
-    Filename: filename,
+		Filename: filename,
 	}, nil
 }
 

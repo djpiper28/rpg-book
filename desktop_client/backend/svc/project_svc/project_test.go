@@ -2,6 +2,7 @@ package projectsvc_test
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
@@ -18,6 +19,17 @@ func TestProjectSvc(t *testing.T) {
 
 	svc := projectsvc.New(db)
 	defer svc.Close()
+
+	closeProjectWithoutDelete := func(t *testing.T, filename string, handle *pb_project.ProjectHandle) {
+		_, err := svc.CloseProject(context.Background(), handle)
+		require.NoError(t, err)
+	}
+
+	closeProject := func(t *testing.T, filename string, handle *pb_project.ProjectHandle) {
+		defer os.Remove(filename)
+
+		closeProjectWithoutDelete(t, filename, handle)
+	}
 
 	t.Run("Test open project that does not exist", func(t *testing.T) {
 		const fileDoesNotExist = "does-not-exist"
@@ -42,9 +54,37 @@ func TestProjectSvc(t *testing.T) {
 			FileName:    filename,
 			ProjectName: name,
 		})
+		require.NoError(t, err)
+		defer closeProject(t, filename, handle)
+
+		require.NotEmpty(t, handle)
+
+		var count int
+		var dbName string
+		rows := db.Db.QueryRow("SELECT COUNT(file_name), project_name FROM recently_opened WHERE file_name=?;", filename)
+		err = rows.Scan(&count, &dbName)
 
 		require.NoError(t, err)
-		require.NotEmpty(t, handle)
+		require.Equal(t, 1, count)
+		require.Equal(t, name, dbName)
+	})
+
+	t.Run("Open project after create", func(t *testing.T) {
+		filename := uuid.New().String() + database.DbExtension
+		name := uuid.New().String()
+
+		handle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
+			FileName:    filename,
+			ProjectName: name,
+		})
+		require.NoError(t, err)
+		closeProjectWithoutDelete(t, filename, handle)
+
+		handle, err = svc.OpenProject(context.Background(), &pb_project.OpenProjectReq{
+			FileName: filename,
+		})
+		require.NoError(t, err)
+		defer closeProject(t, filename, handle)
 
 		var count int
 		var dbName string

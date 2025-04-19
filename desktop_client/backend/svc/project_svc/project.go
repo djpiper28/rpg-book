@@ -110,7 +110,7 @@ func (p *ProjectSvc) OpenProject(ctx context.Context, in *pb_project.OpenProject
 		return nil, err
 	}
 
-	err = p.insertProjectOpened(ctx, proj.Filename, proj.Settings.Name)
+	err = p.updateProjectOpened(ctx, proj.Filename, proj.Settings.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -123,6 +123,25 @@ func (p *ProjectSvc) OpenProject(ctx context.Context, in *pb_project.OpenProject
 	return &pb_project.ProjectHandle{
 		Id: id.String(),
 	}, nil
+}
+
+func (p *ProjectSvc) CloseProject(ctx context.Context, in *pb_project.ProjectHandle) (*pb_common.Empty, error) {
+	id, err := uuid.Parse(in.Id)
+	if err != nil {
+		return nil, errors.Join(errors.New("Invalid project handle"), err)
+	}
+
+	p.lock.Lock()
+	defer p.lock.Unlock()
+
+	proj, found := p.projects[id]
+	if !found {
+		return nil, errors.New("Cannot find proejct")
+	}
+
+	delete(p.projects, id)
+	proj.Close()
+	return &pb_common.Empty{}, nil
 }
 
 func (p *ProjectSvc) RecentProjects(ctx context.Context, in *pb_common.Empty) (*pb_project.RecentProjectsResp, error) {

@@ -6,6 +6,7 @@ service ProjectSvc {
   rpc CreateProject(CreateProjectReq) returns (ProjectHandle) {}
   rpc OpenProject(OpenProjectReq) returns (ProjectHandle) {}
   rpc RecentProjects(Empty) returns (RecentProjectsResp) {}
+  rpc CloseProject(ProjectHandle) returns (Empty) {}
 }
 
 message CreateProjectReq {
