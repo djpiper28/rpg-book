@@ -55,7 +55,11 @@ func (p *ProjectSvc) trackProject(proj *project.Project) (uuid.UUID, error) {
 func (p *ProjectSvc) insertProjectOpened(ctx context.Context, filename, projectname string) error {
 	openedAt := time.Now()
 
-	_, err := p.primaryDb.Db.ExecContext(ctx, "INSERT INTO recently_opened(file_name, project_name, last_opened) VALUES (?, ?, ?);", filename, projectname, openedAt)
+	_, err := p.primaryDb.Db.ExecContext(ctx,
+		"INSERT INTO recently_opened(file_name, project_name, last_opened) VALUES (?, ?, ?);",
+		filename,
+		projectname,
+		openedAt)
 	if err != nil {
 		return errors.Join(errors.New("Cannot insert into recently opened projects"), err)
 	}
@@ -67,7 +71,11 @@ func (p *ProjectSvc) insertProjectOpened(ctx context.Context, filename, projectn
 func (p *ProjectSvc) updateProjectOpened(ctx context.Context, filename, projectname string) error {
 	openedAt := time.Now()
 
-	_, err := p.primaryDb.Db.ExecContext(ctx, "UPDATE recently_opened SET file_name=?, project_name=?, last_opened=?;", filename, projectname, openedAt)
+	_, err := p.primaryDb.Db.ExecContext(ctx,
+		"UPDATE recently_opened SET project_name=?, last_opened=? WHERE file_name=?;",
+		filename,
+		projectname,
+		openedAt)
 	if err != nil {
 		return errors.Join(errors.New("Cannot update recently opened projects"), err)
 	}
