@@ -1,8 +1,8 @@
 import { Button, MantineProvider, Tabs, Title } from "@mantine/core";
-import { Plus, Settings } from "lucide-react";
+import { X, Plus, Settings } from "lucide-react";
 import { useEffect } from "react";
 import { Route, Routes, useNavigate } from "react-router";
-import { systemClient } from "./lib/grpcClient/client";
+import { projectClient, systemClient } from "./lib/grpcClient/client";
 import { IndexPage } from "./pages";
 import { CreateProjectPage } from "./pages/createProject/createProject";
 import { ProjectPage } from "./pages/project/project";
@@ -62,10 +62,32 @@ function App() {
               variant="outline"
             >
               <Tabs.List grow>
-                {Object.values(tabs.tabs).map((x) => {
+                {Object.values(tabs.tabs).map((tab) => {
                   return (
-                    <Tabs.Tab key={x.handle.id} value={x.handle.id}>
-                      {x.name}
+                    <Tabs.Tab
+                      key={tab.handle.id}
+                      value={tab.handle.id}
+                      rightSection={
+                        <X
+                          color="red"
+                          role="button"
+                          className="cursor-pointer z-10"
+                          onClick={() => {
+                            projectClient
+                              .closeProject(tab.handle)
+                              .then(async () => {
+                                tabs.removeTab(tab.handle);
+
+                                if (tabs.selectedTab === tab.handle) {
+                                  await navigate("/");
+                                }
+                              })
+                              .catch(console.error);
+                          }}
+                        />
+                      }
+                    >
+                      {tab.name}
                     </Tabs.Tab>
                   );
                 })}

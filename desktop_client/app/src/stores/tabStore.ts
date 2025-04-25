@@ -34,7 +34,7 @@ export const useTabStore = create<TabStore>()(
       removeTab: (handle: ProjectHandle) => {
         const newTabs = structuredClone(get().tabs);
         // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-        delete newTabs.tabs[handle.id];
+        delete newTabs[handle.id];
 
         set({
           tabs: newTabs,
