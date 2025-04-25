@@ -1,7 +1,6 @@
 import { Button, Checkbox, InputDescription } from "@mantine/core";
 import { Settings, TriangleAlert } from "lucide-react";
 import { useEffect, useState } from "react";
-import { H1 } from "@/components/typography/H1";
 import { H2 } from "@/components/typography/H2";
 import { systemClient } from "@/lib/grpcClient/client";
 import { useSettingsStore } from "@/stores/settingsStore";
@@ -41,7 +40,7 @@ export function SettingsPage() {
     <>
       <div className="flex flex-row gap-2 items-center">
         <Settings />
-        <H1>Settings</H1>
+        <H2>Settings</H2>
       </div>
 
       <Checkbox

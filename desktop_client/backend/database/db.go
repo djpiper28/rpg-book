@@ -18,7 +18,7 @@ type Db struct {
 }
 
 const (
-	DbTimeout       = time.Second * 10
+	dbTimeout       = time.Second * 10
 	DbExtension     = ".sqlite"
 	migrationsTable = `
 CREATE TABLE IF NOT EXISTS migrations (
@@ -34,7 +34,7 @@ type Migrations struct {
 }
 
 func New(filename string) (*Db, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), DbTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
 	db, err := sqlx.ConnectContext(ctx, "sqlite3", fmt.Sprintf("file:%s?cache=shared&parseTime=true", filename))
