@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 import { type ProjectHandle } from "@/lib/grpcClient/pb/project";
 
 interface Tab {
@@ -14,35 +15,42 @@ interface TabStore {
   tabs: Record<string, Tab>;
 }
 
-export const useTabStore = create<TabStore>((set) => ({
-  addTab: (handle: ProjectHandle, name: string) => {
-    set((state) => {
-      state.tabs[handle.id] = {
-        handle,
-        name,
-      };
+export const useTabStore = create<TabStore>()(
+  persist(
+    (set, get) => ({
+      addTab: (handle: ProjectHandle, name: string) => {
+        const newTabs = structuredClone(get().tabs);
 
-      return {
-        selectedTab: handle,
-        tabs: state.tabs,
-      };
-    });
-  },
-  removeTab: (handle: ProjectHandle) => {
-    set((state) => {
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-      delete state.tabs[handle.id];
+        newTabs[handle.id] = {
+          handle,
+          name,
+        };
 
-      return {
-        tabs: state.tabs,
-      };
-    });
-  },
-  selectedTab: undefined,
-  setSelectedTab: (handle: ProjectHandle) => {
-    return {
-      selectedTab: handle,
-    };
-  },
-  tabs: {},
-}));
+        set({
+          selectedTab: handle,
+          tabs: newTabs,
+        });
+      },
+      removeTab: (handle: ProjectHandle) => {
+        const newTabs = structuredClone(get().tabs);
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+        delete newTabs.tabs[handle.id];
+
+        set({
+          tabs: newTabs,
+        });
+      },
+      selectedTab: undefined,
+      setSelectedTab: (handle: ProjectHandle) => {
+        set({
+          selectedTab: handle,
+        });
+      },
+      tabs: {},
+    }),
+    {
+      name: "tabs-storage",
+      storage: createJSONStorage(() => sessionStorage),
+    },
+  ),
+);
