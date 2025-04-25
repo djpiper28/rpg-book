@@ -1,4 +1,4 @@
-// import matchers from "@testing-library/jest-dom/matchers";
+import { EnvVarCertificate, EnvVarPort } from "@/lib/launcherTypes/index.ts";
 
 Object.defineProperty(window, "matchMedia", {
   writable: true,
@@ -14,4 +14,10 @@ Object.defineProperty(window, "matchMedia", {
   })),
 });
 
+// import matchers from "@testing-library/jest-dom/matchers";
 // expect.extend(matchers);
+
+process.env = {
+  [EnvVarPort]: "9000",
+  [EnvVarCertificate]: "Testing-cert",
+};
