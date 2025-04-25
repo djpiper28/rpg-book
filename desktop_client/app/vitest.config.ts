@@ -7,6 +7,6 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     include: ["**/*.test.tsx", "**/*.test.ts"],
-    // TODO: get additional jest-dom matchers working
+    setupFiles: "./setup-vitest.ts",
   },
 });

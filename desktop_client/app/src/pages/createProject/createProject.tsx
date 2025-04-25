@@ -1,9 +1,10 @@
 import { Button, FileInput, TextInput } from "@mantine/core";
 import { File as FileIcon, Plus, Text } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { H2 } from "@/components/typography/H2";
 import { H3 } from "@/components/typography/H3";
 import { DbExtension } from "@/lib/databaseTypes";
+import { randomPlace } from "@/lib/random/randomProjectName";
 
 function validateProjectName(rawName: string): string {
   const name = rawName.trim().normalize("NFC");
@@ -16,8 +17,18 @@ function validateProjectName(rawName: string): string {
 }
 
 export function CreateProjectPage() {
-  const [projectName, setProjectName] = useState<string>("");
+  const [projectName, setProjectName] = useState<string>(randomPlace());
   const [saveLocation, setSaveLocation] = useState<File | null>();
+
+  useEffect(() => {
+    if (validateProjectName(projectName) !== "") {
+      setSaveLocation(undefined);
+      return;
+    }
+
+    const filteredName = projectName.trim().normalize("NFC").slice(0, 30);
+    setSaveLocation(new File([], `${filteredName}${DbExtension}`));
+  }, [projectName]);
 
   return (
     <>
@@ -29,14 +40,6 @@ export function CreateProjectPage() {
         onChange={(ev) => {
           const name = ev.target.value;
           setProjectName(name);
-
-          if (validateProjectName(name) !== "") {
-            setSaveLocation(undefined);
-            return;
-          }
-
-          const filteredName = name.trim().normalize("NFC").slice(0, 20);
-          setSaveLocation(new File([], `${filteredName}${DbExtension}`));
         }}
         placeholder="Project name"
         rightSection={<Text />}
