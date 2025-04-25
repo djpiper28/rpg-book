@@ -5,6 +5,8 @@ import { H2 } from "@/components/typography/H2";
 import { H3 } from "@/components/typography/H3";
 import { DbExtension } from "@/lib/databaseTypes";
 import { randomPlace } from "@/lib/random/randomProjectName";
+import { projectClient } from "@/lib/grpcClient/client";
+import { useTabStore } from "@/stores/tabStore";
 
 function validateProjectName(rawName: string): string {
   const name = rawName.trim().normalize("NFC");
@@ -17,6 +19,7 @@ function validateProjectName(rawName: string): string {
 }
 
 export function CreateProjectPage() {
+  const tabs = useTabStore((x) => x);
   const [projectName, setProjectName] = useState<string>(randomPlace());
   const [saveLocation, setSaveLocation] = useState<File | null>();
 
@@ -62,9 +65,30 @@ export function CreateProjectPage() {
         withAsterisk={true}
       />
 
-      <Button>
+      <Button
+        onClick={() => {
+          if (validateProjectName(projectName) !== "") {
+            return;
+          }
+
+          if (!saveLocation) {
+            return;
+          }
+
+          projectClient
+            .createProject({
+              fileName: saveLocation.name,
+              projectName,
+            })
+            .then((resp) => {
+              tabs.addTab({ id: resp.response.id }, projectName);
+              globalThis.location.href = "/project";
+            })
+            .catch(console.error);
+        }}
+      >
         <Plus />
-        Create
+        Create Project
       </Button>
     </>
   );
