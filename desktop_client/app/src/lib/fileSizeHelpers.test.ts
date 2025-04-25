@@ -1,4 +1,3 @@
-import { describe, expect, it } from "vitest";
 import { bytesToFriendly } from "./fileSizeHelpers";
 
 describe("File size helpers", () => {

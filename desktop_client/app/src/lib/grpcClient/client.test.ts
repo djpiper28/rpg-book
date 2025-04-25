@@ -1,4 +1,3 @@
-import { describe, it, expect } from "vitest";
 import { EnvVarCertificate, EnvVarPort } from "../launcherTypes";
 
 const baseEnv = {
