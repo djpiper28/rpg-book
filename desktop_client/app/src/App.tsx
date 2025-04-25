@@ -1,5 +1,5 @@
 import { Button, MantineProvider, Tabs, Title } from "@mantine/core";
-import { X, Plus, Settings } from "lucide-react";
+import { Plus, Settings, X } from "lucide-react";
 import { useEffect } from "react";
 import { Route, Routes, useNavigate } from "react-router";
 import { projectClient, systemClient } from "./lib/grpcClient/client";
@@ -66,12 +66,10 @@ function App() {
                   return (
                     <Tabs.Tab
                       key={tab.handle.id}
-                      value={tab.handle.id}
                       rightSection={
                         <X
-                          color="red"
-                          role="button"
                           className="cursor-pointer z-10"
+                          color="red"
                           onClick={() => {
                             projectClient
                               .closeProject(tab.handle)
@@ -80,13 +78,15 @@ function App() {
 
                                 // TODO: figure out why this logic is not working
                                 // if (tabs.selectedTab === tab.handle) {
-                                  await navigate("/");
+                                await navigate("/");
                                 // }
                               })
                               .catch(console.error);
                           }}
+                          role="button"
                         />
                       }
+                      value={tab.handle.id}
                     >
                       {tab.name}
                     </Tabs.Tab>
