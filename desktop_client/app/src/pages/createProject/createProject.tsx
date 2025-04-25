@@ -49,6 +49,7 @@ export function CreateProjectPage() {
 
       <H3>Advanced Settings</H3>
       <FileInput
+        accept={`application/vnd.sqlite3,${DbExtension}`}
         description="Where to save the file, you usually don't need to touch this."
         error={saveLocation ? "" : "Please chose a location to save as"}
         label="Save Location"
