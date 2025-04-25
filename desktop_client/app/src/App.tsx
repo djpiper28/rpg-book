@@ -78,9 +78,10 @@ function App() {
                               .then(async () => {
                                 tabs.removeTab(tab.handle);
 
-                                if (tabs.selectedTab === tab.handle) {
+                                // TODO: figure out why this logic is not working
+                                // if (tabs.selectedTab === tab.handle) {
                                   await navigate("/");
-                                }
+                                // }
                               })
                               .catch(console.error);
                           }}
