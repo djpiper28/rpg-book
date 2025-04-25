@@ -10,6 +10,7 @@ interface TabStore {
   addTab: (handle: ProjectHandle, name: string) => void;
   removeTab: (handle: ProjectHandle) => void;
   selectedTab?: ProjectHandle;
+  setSelectedTab: (handle: ProjectHandle) => void;
   tabs: Record<string, Tab>;
 }
 
@@ -22,6 +23,7 @@ export const useTabStore = create<TabStore>((set) => ({
       };
 
       return {
+        selectedTab: handle,
         tabs: state.tabs,
       };
     });
@@ -37,5 +39,10 @@ export const useTabStore = create<TabStore>((set) => ({
     });
   },
   selectedTab: undefined,
+  setSelectedTab: (handle: ProjectHandle) => {
+    return {
+      selectedTab: handle,
+    };
+  },
   tabs: {},
 }));

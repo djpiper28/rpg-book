@@ -1,6 +1,6 @@
+import { MantineProvider } from "@mantine/core";
 import { render } from "@testing-library/react";
 import { CreateProjectPage } from "./createProject";
-import { MantineProvider } from "@mantine/core";
 
 describe("Create project", () => {
   it("Should render", () => {

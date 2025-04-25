@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"os"
+	"path/filepath"
 	"sync"
 	"time"
 
@@ -58,8 +59,12 @@ func (p *ProjectSvc) trackProject(proj *project.Project) (uuid.UUID, error) {
 // Called by CreateProject
 func (p *ProjectSvc) insertProjectOpened(ctx context.Context, filename, projectname string) error {
 	openedAt := time.Now()
+  absPath, err := filepath.Abs(filename)
+  if err != nil {
+    filename = absPath
+  }
 
-	_, err := p.primaryDb.Db.ExecContext(ctx,
+	_, err = p.primaryDb.Db.ExecContext(ctx,
 		"INSERT INTO recently_opened(file_name, project_name, last_opened) VALUES (?, ?, ?);",
 		filename,
 		projectname,
@@ -74,8 +79,12 @@ func (p *ProjectSvc) insertProjectOpened(ctx context.Context, filename, projectn
 // Called by OpenProject
 func (p *ProjectSvc) updateProjectOpened(ctx context.Context, filename, projectname string) error {
 	openedAt := time.Now()
+  absPath, err := filepath.Abs(filename)
+  if err != nil {
+    filename = absPath
+  }
 
-	_, err := p.primaryDb.Db.ExecContext(ctx,
+	_, err = p.primaryDb.Db.ExecContext(ctx,
 		"UPDATE recently_opened SET project_name=?, last_opened=? WHERE file_name=?;",
 		filename,
 		projectname,

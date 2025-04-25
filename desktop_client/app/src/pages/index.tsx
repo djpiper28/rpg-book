@@ -1,16 +1,21 @@
 import { Table } from "@mantine/core";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { H2 } from "@/components/typography/H2";
 import { P } from "@/components/typography/P";
 import { bytesToFriendly } from "@/lib/fileSizeHelpers";
 import { projectClient } from "@/lib/grpcClient/client";
 import { type RecentProjectsResp } from "@/lib/grpcClient/pb/project";
+import { useTabStore } from "@/stores/tabStore";
 
 export function IndexPage() {
   const [recentProjects, setRecentProjects] = useState<RecentProjectsResp>({
     projects: [],
   });
+
+  const tabs = useTabStore((x) => x);
+  const navigate = useNavigate();
 
   useEffect(() => {
     projectClient
@@ -39,7 +44,26 @@ export function IndexPage() {
           const size = bytesToFriendly(Number(x.fileSizeBytes));
 
           return (
-            <Table.Tbody key={x.fileName}>
+            <Table.Tbody
+              className="cursor-pointer"
+              key={x.fileName}
+              onClick={() => {
+                projectClient
+                  .openProject({ fileName: x.fileName })
+                  .then(async (resp) => {
+                    tabs.addTab(
+                      {
+                        id: resp.response.id,
+                      },
+                      x.projectName,
+                    );
+
+                    await navigate("/project");
+                  })
+                  .catch(console.error);
+              }}
+              role="button"
+            >
               <Table.Tr>
                 <Table.Th>{x.projectName}</Table.Th>
                 <Table.Th>{time.format()}</Table.Th>

@@ -1,11 +1,12 @@
 import { Button, FileInput, TextInput } from "@mantine/core";
 import { File as FileIcon, Plus, Text } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { H2 } from "@/components/typography/H2";
 import { H3 } from "@/components/typography/H3";
 import { DbExtension } from "@/lib/databaseTypes";
-import { randomPlace } from "@/lib/random/randomProjectName";
 import { projectClient } from "@/lib/grpcClient/client";
+import { randomPlace } from "@/lib/random/randomProjectName";
 import { useTabStore } from "@/stores/tabStore";
 
 function validateProjectName(rawName: string): string {
@@ -20,6 +21,7 @@ function validateProjectName(rawName: string): string {
 
 export function CreateProjectPage() {
   const tabs = useTabStore((x) => x);
+  const navigate = useNavigate();
   const [projectName, setProjectName] = useState<string>(randomPlace());
   const [saveLocation, setSaveLocation] = useState<File | null>();
 
@@ -52,7 +54,7 @@ export function CreateProjectPage() {
 
       <H3>Advanced Settings</H3>
       <FileInput
-        accept={`application/vnd.sqlite3,${DbExtension}`}
+        accept={`application/vnd.sqlite3, ${DbExtension}`}
         description="Where to save the file, you usually don't need to touch this."
         error={saveLocation ? "" : "Please chose a location to save as"}
         label="Save Location"
@@ -80,9 +82,9 @@ export function CreateProjectPage() {
               fileName: saveLocation.name,
               projectName,
             })
-            .then((resp) => {
+            .then(async (resp) => {
               tabs.addTab({ id: resp.response.id }, projectName);
-              globalThis.location.href = "/project";
+              await navigate("/project");
             })
             .catch(console.error);
         }}
