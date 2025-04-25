@@ -59,6 +59,7 @@ const places = [
   "Hell",
   "Heaven",
   "The Desert",
+  "The Coast",
 ];
 
 const adjectives = [
