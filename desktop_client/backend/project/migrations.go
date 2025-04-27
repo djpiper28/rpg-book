@@ -14,6 +14,14 @@ func Migrate(db *database.Db) error {
   CREATE TABLE project_settings (
     name TEXT NOT NULL
   );
+
+  CREATE TABLE character (
+    id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    created TIMESTAMP WITH TIME ZONE NOT NULL,
+    icon BLOB,
+    description TEXT NOT NULL
+  );
       `,
 		},
 	})
