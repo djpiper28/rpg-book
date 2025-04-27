@@ -1,4 +1,5 @@
 import { fireEvent, waitFor } from "@testing-library/react";
+import { act } from "react";
 import { DbExtension } from "@/lib/databaseTypes";
 import { projectClient } from "@/lib/grpcClient/client";
 import {
@@ -29,12 +30,15 @@ describe("Create project", () => {
 
     const dom = wrappedRender(<CreateProjectPage />);
     const testName = "Testing The Horrors";
-    const projectName = await dom.findByLabelText(/project name/i);
 
-    fireEvent.change(projectName, {
-      target: {
-        value: testName,
-      },
+    await act(async () => {
+      const projectName = await dom.findByLabelText(/project name/i);
+
+      fireEvent.change(projectName, {
+        target: {
+          value: testName,
+        },
+      });
     });
 
     await waitFor(async () => {
@@ -45,8 +49,10 @@ describe("Create project", () => {
       expect(projectNameInput.value).toBe(testName);
     });
 
-    const createButton = await dom.findByText(/create project/i);
-    fireEvent.click(createButton);
+    await act(async () => {
+      const createButton = await dom.findByText(/create project/i);
+      fireEvent.click(createButton);
+    });
 
     //eslint-disable-next-line @typescript-eslint/unbound-method
     expect(mockedClient.createProject).toHaveBeenCalledWith({
