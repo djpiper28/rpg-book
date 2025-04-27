@@ -2,6 +2,7 @@ import { Tabs } from "@mantine/core";
 import { useNavigate } from "react-router";
 import { H2 } from "@/components/typography/H2";
 import { useTabStore } from "@/stores/tabStore";
+import { CharacterTab } from "./tabs/characterTab";
 
 export function ProjectPage() {
   const navigate = useNavigate();
@@ -27,6 +28,10 @@ export function ProjectPage() {
           <Tabs.Tab value="maps">Maps &amp; Places</Tabs.Tab>
           <Tabs.Tab value="settings">Settings</Tabs.Tab>
         </Tabs.List>
+
+        <Tabs.Panel value="characters">
+          <CharacterTab />
+        </Tabs.Panel>
       </Tabs>
     </>
   );
