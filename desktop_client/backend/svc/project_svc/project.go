@@ -192,6 +192,32 @@ func (p *ProjectSvc) RecentProjects(ctx context.Context, in *pb_common.Empty) (*
 	}, nil
 }
 
+func (p *ProjectSvc) getProject(handle *pb_project.ProjectHandle) (*project.Project, error) {
+	p.lock.Lock()
+	defer p.lock.Unlock()
+
+	id, err := uuid.Parse(handle.Id)
+	if err != nil {
+		return nil, errors.Join(errors.New("Invalid project ID"), err)
+	}
+
+	project, found := p.projects[id]
+	if !found {
+		return nil, errors.New("Cannot find project")
+	}
+
+	return project, nil
+}
+
 func (p *ProjectSvc) CreateCharacter(ctx context.Context, in *pb_project.CreateCharacterReq) (*pb_project.CharacterHandle, error) {
-	return nil, errors.New("TODO: implement this")
+	project, err := p.getProject(in.Project)
+
+	character, err := project.CreateCharacter(in.Name)
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot create chracter"), err)
+	}
+
+	return &pb_project.CharacterHandle{
+		Id: character.Id.String(),
+	}, nil
 }

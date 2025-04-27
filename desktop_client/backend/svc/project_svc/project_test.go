@@ -135,4 +135,25 @@ func TestProjectSvc(t *testing.T) {
 		t.Log("Cannot find the project in the recent list")
 		t.Fail()
 	})
+
+	t.Run("Test create character in project", func(t *testing.T) {
+		filename := uuid.New().String() + database.DbExtension
+		projectName := uuid.New().String()
+		characterName := uuid.New().String()
+
+		projectHandle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
+			FileName:    filename,
+			ProjectName: projectName,
+		})
+		require.NoError(t, err)
+		defer closeProject(t, filename, projectHandle)
+
+		character, err := svc.CreateCharacter(context.Background(), &pb_project.CreateCharacterReq{
+			Name:    characterName,
+			Project: projectHandle,
+		})
+
+		require.NoError(t, err)
+		require.NotEmpty(t, character.Id)
+	})
 }
