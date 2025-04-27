@@ -59,10 +59,10 @@ func (p *ProjectSvc) trackProject(proj *project.Project) (uuid.UUID, error) {
 // Called by CreateProject
 func (p *ProjectSvc) insertProjectOpened(ctx context.Context, filename, projectname string) error {
 	openedAt := time.Now()
-  absPath, err := filepath.Abs(filename)
-  if err != nil {
-    filename = absPath
-  }
+	absPath, err := filepath.Abs(filename)
+	if err != nil {
+		filename = absPath
+	}
 
 	_, err = p.primaryDb.Db.ExecContext(ctx,
 		"INSERT INTO recently_opened(file_name, project_name, last_opened) VALUES (?, ?, ?);",
@@ -79,10 +79,10 @@ func (p *ProjectSvc) insertProjectOpened(ctx context.Context, filename, projectn
 // Called by OpenProject
 func (p *ProjectSvc) updateProjectOpened(ctx context.Context, filename, projectname string) error {
 	openedAt := time.Now()
-  absPath, err := filepath.Abs(filename)
-  if err != nil {
-    filename = absPath
-  }
+	absPath, err := filepath.Abs(filename)
+	if err != nil {
+		filename = absPath
+	}
 
 	_, err = p.primaryDb.Db.ExecContext(ctx,
 		"UPDATE recently_opened SET project_name=?, last_opened=? WHERE file_name=?;",
@@ -190,4 +190,8 @@ func (p *ProjectSvc) RecentProjects(ctx context.Context, in *pb_common.Empty) (*
 	return &pb_project.RecentProjectsResp{
 		Projects: projects,
 	}, nil
+}
+
+func (p *ProjectSvc) CreateCharacter(ctx context.Context, in *pb_project.CreateCharacterReq) (*pb_project.CharacterHandle, error) {
+	return nil, errors.New("TODO: implement this")
 }

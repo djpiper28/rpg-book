@@ -50,3 +50,23 @@ func TestReOpenProject(t *testing.T) {
 	require.Equal(t, project1.Filename, filename)
 	require.Equal(t, project2.Filename, filename)
 }
+
+func TestCreateCharacter(t *testing.T) {
+	filename := uuid.New().String() + database.DbExtension
+	defer os.Remove(filename)
+
+	projectName := uuid.New().String()
+
+	project, err := project.Create(filename, projectName)
+	require.NoError(t, err)
+	require.Equal(t, project.Settings.Name, projectName)
+	defer project.Close()
+
+	name := uuid.New().String()
+	c, err := project.CreateCharacter(name)
+	require.NoError(t, err)
+
+	require.Equal(t, name, c.Name)
+	require.NotEmpty(t, c.Created)
+	require.NotEmpty(t, c.Id)
+}

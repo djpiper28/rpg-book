@@ -87,6 +87,20 @@ func Create(filename string, projectName string) (*Project, error) {
 	}, nil
 }
 
+func (p *Project) CreateCharacter(name string) (*model.Character, error) {
+	character := model.NewCharacter(name)
+	_, err := p.db.Db.NamedExec(`
+    INSERT INTO 
+    characters (id, name, created, description)
+    VALUES(:id, :name, :created, :description);`,
+		character)
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot create character"), err)
+	}
+
+	return character, nil
+}
+
 func (p *Project) Close() {
 	defer p.db.Close()
 }

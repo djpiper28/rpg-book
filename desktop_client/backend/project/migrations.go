@@ -15,7 +15,7 @@ func Migrate(db *database.Db) error {
     name TEXT NOT NULL
   );
 
-  CREATE TABLE character (
+  CREATE TABLE characters (
     id TEXT NOT NULL,
     name TEXT NOT NULL,
     created TIMESTAMP WITH TIME ZONE NOT NULL,

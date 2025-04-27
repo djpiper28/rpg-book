@@ -7,6 +7,7 @@ service ProjectSvc {
   rpc OpenProject(OpenProjectReq) returns (ProjectHandle) {}
   rpc RecentProjects(Empty) returns (RecentProjectsResp) {}
   rpc CloseProject(ProjectHandle) returns (Empty) {}
+  rpc CreateCharacter(CreateCharacterReq) returns (CharacterHandle) {}
 }
 
 message CreateProjectReq {
@@ -32,4 +33,13 @@ message RecentProject {
 
 message RecentProjectsResp {
   repeated RecentProject projects = 1;
+}
+
+message CreateCharacterReq {
+  ProjectHandle project = 1;
+  string name = 2;
+}
+
+message CharacterHandle {
+  string id = 1;
 }

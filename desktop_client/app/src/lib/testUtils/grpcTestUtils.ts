@@ -22,8 +22,7 @@ export function newResult<T extends Object, V extends Object>(
         typeName: "Mocked call",
       },
     },
-    headers: {
-    },
+    headers: {},
     status: 200 as any,
     requestHeaders: {},
     trailers: {},

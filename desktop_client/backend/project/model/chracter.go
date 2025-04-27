@@ -6,20 +6,16 @@ import (
 	"github.com/google/uuid"
 )
 
-type ProjectSettings struct {
-	Name string `db:"name"`
-}
-
-type Project struct {
+type Character struct {
 	Id          uuid.UUID `db:"id"`
 	Name        string    `db:"name"`
 	Created     string    `db:"created"`
 	Icon        []byte    `db:"icon"`
-	Description string    `db:"Description"`
+	Description string    `db:"description"`
 }
 
-func NewProject(name string) *Project {
-	return &Project{
+func NewCharacter(name string) *Character {
+	return &Character{
 		Id:      uuid.New(),
 		Name:    name,
 		Created: time.Now().String(),
