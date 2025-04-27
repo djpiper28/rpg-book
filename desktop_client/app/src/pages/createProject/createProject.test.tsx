@@ -1,4 +1,4 @@
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import { DbExtension } from "@/lib/databaseTypes";
 import { projectClient } from "@/lib/grpcClient/client";
 import {
@@ -6,8 +6,8 @@ import {
   type ProjectHandle,
 } from "@/lib/grpcClient/pb/project";
 import { newResult } from "@/lib/testUtils/grpcTestUtils";
-import { CreateProjectPage } from "./createProject";
 import { wrappedRender } from "@/lib/testUtils/wrappedRender";
+import { CreateProjectPage } from "./createProject";
 
 vi.mock("../../lib/grpcClient/client.ts");
 const mockedClient = vi.mocked(projectClient);
@@ -28,27 +28,30 @@ describe("Create project", () => {
     );
 
     const dom = wrappedRender(<CreateProjectPage />);
-
     const testName = "Testing The Horrors";
     const projectName = await dom.findByLabelText(/project name/i);
 
     fireEvent.change(projectName, {
-      event: {
-        target: {
-          value: testName,
-        },
+      target: {
+        value: testName,
       },
     });
 
-    const createButton = await dom.findByRole("button");
+    await waitFor(async () => {
+      const projectNameInput = (await dom.findByLabelText(
+        /project name/i,
+      )) as HTMLInputElement;
+
+      expect(projectNameInput.value).toBe(testName);
+    });
+
+    const createButton = await dom.findByText(/create project/i);
     fireEvent.click(createButton);
 
     //eslint-disable-next-line @typescript-eslint/unbound-method
     expect(mockedClient.createProject).toHaveBeenCalledWith({
-      input: {
-        fileName: `${testName}${DbExtension}`,
-        projectName: testName,
-      },
-    });
+      fileName: `${testName}${DbExtension}`,
+      projectName: testName,
+    } as CreateProjectReq);
   });
 });
