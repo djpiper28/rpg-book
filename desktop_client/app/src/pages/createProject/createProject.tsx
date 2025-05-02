@@ -1,7 +1,8 @@
-import { Button, FileInput, TextInput } from "@mantine/core";
+import { Button, TextInput } from "@mantine/core";
 import { File as FileIcon, Plus, Text } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import { CreateFileInput } from "@/components/input/createFileInput";
 import { H2 } from "@/components/typography/H2";
 import { H3 } from "@/components/typography/H3";
 import { DbExtension } from "@/lib/databaseTypes";
@@ -24,7 +25,7 @@ export function CreateProjectPage() {
   const tabs = useTabStore((x) => x);
   const navigate = useNavigate();
   const [projectName, setProjectName] = useState<string>(randomPlace());
-  const [saveLocation, setSaveLocation] = useState<File | null>();
+  const [saveLocation, setSaveLocation] = useState<string | null>();
   const { setError } = useGlobalErrorStore((x) => x);
 
   useEffect(() => {
@@ -39,7 +40,7 @@ export function CreateProjectPage() {
       .replace("/", "")
       .slice(0, 30);
 
-    setSaveLocation(new File([], `${filteredName}${DbExtension}`));
+    setSaveLocation(`${filteredName}${DbExtension}`);
   }, [projectName]);
 
   return (
@@ -60,17 +61,22 @@ export function CreateProjectPage() {
       />
 
       <H3>Advanced Settings</H3>
-      <FileInput
-        accept={`application/vnd.sqlite3, ${DbExtension}`}
+      <CreateFileInput
         description="Where to save the file, you usually don't need to touch this."
         error={saveLocation ? "" : "Please chose a location to save as"}
+        filters={[
+          {
+            extensions: [DbExtension],
+            name: "Project",
+          },
+        ]}
         label="Save Location"
         onChange={(f) => {
           setSaveLocation(f);
         }}
         placeholder="Save location"
         rightSection={<FileIcon />}
-        value={saveLocation}
+        value={saveLocation ?? ""}
         withAsterisk={true}
       />
 
@@ -86,7 +92,7 @@ export function CreateProjectPage() {
 
           projectClient
             .createProject({
-              fileName: saveLocation.name,
+              fileName: saveLocation,
               projectName,
             })
             .then(async (resp) => {

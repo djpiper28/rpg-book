@@ -5,7 +5,6 @@ export function ErrorModal(props: Readonly<ModalProps>) {
   return (
     <MantineModal
       centered
-      color="red"
       onClose={props.close}
       opened={props.opened}
       size="md"
