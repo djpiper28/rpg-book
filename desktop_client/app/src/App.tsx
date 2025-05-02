@@ -1,12 +1,16 @@
 import { Button, MantineProvider, Tabs, Title } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { Plus, Settings, X } from "lucide-react";
 import { useEffect } from "react";
 import { Route, Routes, useNavigate } from "react-router";
+import { ErrorModal } from "./components/modal/errorModal";
+import { P } from "./components/typography/P";
 import { projectClient, systemClient } from "./lib/grpcClient/client";
 import { IndexPage } from "./pages";
 import { CreateProjectPage } from "./pages/createProject/createProject";
 import { ProjectPage } from "./pages/project/project";
 import { SettingsPage } from "./pages/settings/settings";
+import { useGlobalErrorStore } from "./stores/globalErrorStore";
 import { useSettingsStore } from "./stores/settingsStore";
 import { useTabStore } from "./stores/tabStore";
 
@@ -14,6 +18,14 @@ function App() {
   const { setSettings, settings } = useSettingsStore((s) => s);
   const tabs = useTabStore((x) => x);
   const navigate = useNavigate();
+  const [opened, { close, open }] = useDisclosure(false);
+  const { currentError, setError } = useGlobalErrorStore((x) => x);
+
+  useEffect(() => {
+    if (currentError) {
+      open();
+    }
+  }, [currentError, open]);
 
   useEffect(() => {
     systemClient
@@ -21,8 +33,12 @@ function App() {
       .then((x) => {
         setSettings(x.response);
       })
-      .catch(console.error);
-  }, [setSettings]);
+      .catch((error: unknown) => {
+        setError({
+          body: String(error),
+        });
+      });
+  }, [setSettings, setError]);
 
   return (
     <MantineProvider
@@ -31,6 +47,13 @@ function App() {
       withGlobalStyles
       withNormalizeCSS
     >
+      <ErrorModal
+        close={close}
+        opened={opened}
+        title={currentError?.title ?? "An Error Has Ocurred"}
+      >
+        <P>{currentError?.body}</P>
+      </ErrorModal>
       <div className="flex flex-col gap-3 p-2">
         <div
           className="flex flex-row gap-3 justify-between items-center border-b border-b-gray-100 border-r-2"

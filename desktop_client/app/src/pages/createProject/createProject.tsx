@@ -7,6 +7,7 @@ import { H3 } from "@/components/typography/H3";
 import { DbExtension } from "@/lib/databaseTypes";
 import { projectClient } from "@/lib/grpcClient/client";
 import { randomPlace } from "@/lib/random/randomProjectName";
+import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useTabStore } from "@/stores/tabStore";
 
 function validateProjectName(rawName: string): string {
@@ -24,6 +25,7 @@ export function CreateProjectPage() {
   const navigate = useNavigate();
   const [projectName, setProjectName] = useState<string>(randomPlace());
   const [saveLocation, setSaveLocation] = useState<File | null>();
+  const { setError } = useGlobalErrorStore((x) => x);
 
   useEffect(() => {
     if (validateProjectName(projectName) !== "") {
@@ -31,7 +33,12 @@ export function CreateProjectPage() {
       return;
     }
 
-    const filteredName = projectName.trim().normalize("NFC").slice(0, 30);
+    const filteredName = projectName
+      .trim()
+      .normalize("NFC")
+      .replace("/", "")
+      .slice(0, 30);
+
     setSaveLocation(new File([], `${filteredName}${DbExtension}`));
   }, [projectName]);
 
@@ -86,7 +93,11 @@ export function CreateProjectPage() {
               tabs.addTab({ id: resp.response.id }, projectName);
               await navigate("/project");
             })
-            .catch(console.error);
+            .catch((error: unknown) => {
+              setError({
+                body: String(error),
+              });
+            });
         }}
       >
         <Plus />

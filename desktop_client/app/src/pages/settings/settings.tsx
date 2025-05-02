@@ -3,12 +3,14 @@ import { Settings, TriangleAlert } from "lucide-react";
 import { useEffect, useState } from "react";
 import { H2 } from "@/components/typography/H2";
 import { systemClient } from "@/lib/grpcClient/client";
+import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 
 export function SettingsPage() {
   const { setSettings, settings } = useSettingsStore((s) => s);
   const [dirtySettings, setDirtySettings] = useState(settings);
   const [version, setVersion] = useState(<></>);
+  const { setError } = useGlobalErrorStore((x) => x);
 
   useEffect(() => {
     systemClient
@@ -29,8 +31,12 @@ export function SettingsPage() {
           ),
         );
       })
-      .catch(console.error);
-  }, []);
+      .catch((error: unknown) => {
+        setError({
+          body: String(error),
+        });
+      });
+  }, [setError]);
 
   useEffect(() => {
     setDirtySettings(settings);
@@ -71,7 +77,11 @@ export function SettingsPage() {
                 setSettings(dirtySettings);
                 globalThis.location.href = "/";
               })
-              .catch(alert);
+              .catch((error: unknown) => {
+                setError({
+                  body: String(error),
+                });
+              });
           }}
         >
           Save

@@ -1,4 +1,4 @@
-import { Table } from "@mantine/core";
+import { Button, Table } from "@mantine/core";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
@@ -7,6 +7,8 @@ import { P } from "@/components/typography/P";
 import { bytesToFriendly } from "@/lib/fileSizeHelpers";
 import { projectClient } from "@/lib/grpcClient/client";
 import { type RecentProjectsResp } from "@/lib/grpcClient/pb/project";
+import { useGlobalErrorStore } from "@/stores/globalErrorStore";
+import { useSettingsStore } from "@/stores/settingsStore";
 import { useTabStore } from "@/stores/tabStore";
 
 export function IndexPage() {
@@ -16,6 +18,8 @@ export function IndexPage() {
 
   const tabs = useTabStore((x) => x);
   const navigate = useNavigate();
+  const { setError } = useGlobalErrorStore((x) => x);
+  const settings = useSettingsStore((x) => x.settings);
 
   useEffect(() => {
     projectClient
@@ -23,8 +27,12 @@ export function IndexPage() {
       .then((x) => {
         setRecentProjects(x.response);
       })
-      .catch(console.error);
-  }, []);
+      .catch((error: unknown) => {
+        setError({
+          body: String(error),
+        });
+      });
+  }, [setError]);
 
   return (
     <>
@@ -74,6 +82,23 @@ export function IndexPage() {
           );
         })}
       </Table>
+      {settings.devMode ? (
+        <>
+          <Button
+            color="red"
+            onClick={() => {
+              setError({
+                body: "Test Error Message.",
+                title: "Dev Mode Test Error",
+              });
+            }}
+          >
+            Force Error
+          </Button>
+        </>
+      ) : (
+        ""
+      )}
     </>
   );
 }
