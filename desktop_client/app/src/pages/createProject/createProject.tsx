@@ -67,11 +67,15 @@ export function CreateProjectPage() {
         filters={[
           {
             extensions: [DbExtension],
-            name: "Project",
+            name: "Project (*.sqlite)",
           },
         ]}
         label="Save Location"
         onChange={(f) => {
+          if (!f.endsWith(DbExtension)) {
+            f += DbExtension;
+          }
+
           setSaveLocation(f);
         }}
         placeholder="Save location"

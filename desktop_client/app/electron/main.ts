@@ -1,3 +1,4 @@
+import * as remote from "@electron/remote/main";
 import { BrowserWindow, app, session } from "electron";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -5,6 +6,8 @@ import { fileURLToPath } from "node:url";
 // const require = createRequire(import.meta.url)
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+remote.initialize();
 
 // The built directory structure
 //
@@ -33,6 +36,8 @@ function createWindow() {
     icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
     title: "RPG Book",
     webPreferences: {
+      contextIsolation: false,
+      nodeIntegration: true,
       preload: path.join(__dirname, "preload.mjs"),
       webSecurity: false,
     },
@@ -42,6 +47,8 @@ function createWindow() {
   win.webContents.on("did-finish-load", () => {
     win.webContents.send("main-process-message", new Date().toLocaleString());
   });
+
+  remote.enable(win.webContents);
 
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL).then().catch(console.error);

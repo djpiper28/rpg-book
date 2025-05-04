@@ -10,6 +10,9 @@ importers:
       "@chromatic-com/storybook":
         specifier: ^3.2.6
         version: 3.2.6(react@19.1.0)(storybook@8.6.12(prettier@3.5.3))
+      "@electron/remote":
+        specifier: ^2.1.2
+        version: 2.1.2(electron@30.5.1)
       "@hookform/resolvers":
         specifier: ^4.1.3
         version: 4.1.3(react-hook-form@7.55.0(react@19.1.0))
@@ -636,6 +639,14 @@ packages:
       }
     engines: { node: ">=12.0.0" }
     hasBin: true
+
+  "@electron/remote@2.1.2":
+    resolution:
+      {
+        integrity: sha512-EPwNx+nhdrTBxyCqXt/pftoQg/ybtWDW3DUWHafejvnB1ZGGfMpv6e15D8KeempocjXe78T7WreyGGb3mlZxdA==,
+      }
+    peerDependencies:
+      electron: ">= 13.0.0"
 
   "@electron/universal@1.5.1":
     resolution:
@@ -9705,6 +9716,10 @@ snapshots:
       plist: 3.1.0
     transitivePeerDependencies:
       - supports-color
+
+  "@electron/remote@2.1.2(electron@30.5.1)":
+    dependencies:
+      electron: 30.5.1
 
   "@electron/universal@1.5.1":
     dependencies:

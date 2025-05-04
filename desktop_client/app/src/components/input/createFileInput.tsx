@@ -1,5 +1,5 @@
+import * as remote from "@electron/remote";
 import { Input, type InputVariant, InputWrapper } from "@mantine/core";
-import { BrowserWindow } from "electron";
 import { FileIcon } from "lucide-react";
 
 interface Props {
@@ -30,11 +30,10 @@ export function CreateFileInput(props: Readonly<Props>) {
         }}
         placeholder={props.placeholder}
         rightSection={
-          <FileIcon
-            className="cursor-pointer"
+          <button
             onClick={() => {
-              globalThis.Electron.dialog
-                .showSaveDialog(new BrowserWindow(), {
+              remote.dialog
+                .showSaveDialog(remote.getCurrentWindow(), {
                   buttonLabel: props.buttonLabel,
                   filters: props.filters,
                   title: props.title,
@@ -48,9 +47,11 @@ export function CreateFileInput(props: Readonly<Props>) {
                 })
                 .catch(console.error);
             }}
-            role="button"
-          />
+          >
+            <FileIcon />
+          </button>
         }
+        rightSectionPointerEvents="all"
         value={props.value}
       />
     </InputWrapper>
