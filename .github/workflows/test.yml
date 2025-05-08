@@ -11,6 +11,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./shared/setup.yml
+      - uses: .github/workflows/shared/setup.yml
       - name: Test
         run: make test -j
