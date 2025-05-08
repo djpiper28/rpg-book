@@ -14,4 +14,5 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/workflows/shared/setup
       - name: Test
+        shell: bash
         run: make test -j

@@ -18,6 +18,7 @@ runs:
         version: 10
 
     - name: Install required build tools
+      shell: bash
       run: |
         apt-get update
         apt-get install -y build-essentials protobuf-compiler
