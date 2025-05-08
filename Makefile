@@ -41,8 +41,12 @@ desktop-client: go-core desktop-client-app desktop-client-backend
 desktop-client-test: desktop-client-codegen 
 	cd $(DESKTOP_APP) && pnpm test
 
+.PHONY: go-lint
+go-lint:
+	go vet ./...
+
 .PHONY: test
-test: go-test desktop-client-test
+test: go-test go-lint desktop-client-test
 
 .PHONY: go-fmt
 go-fmt:

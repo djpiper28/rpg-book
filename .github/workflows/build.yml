@@ -1,0 +1,16 @@
+name: build 
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches: ["*"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./shared/setup.yml
+      - name: Build 
+        run: make desktop-client -j
