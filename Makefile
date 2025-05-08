@@ -12,7 +12,7 @@ desktop-client-codegen: go-generate
 
 .PHONY: desktop-client-app
 desktop-client-app: desktop-client-codegen 
-	cd $(DESKTOP_APP) && pnpm build
+	ELECTRON_OVERRIDE_DIST_PATH=./node_modules/electron/dist	cd $(DESKTOP_APP) && pnpm build
 
 # Starts a dev electron app (pnpm calls other targets in this, this just makes it simpler to use)
 .PHONY: dev
