@@ -17,5 +17,5 @@ runs:
       shell: bash
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential protobuf-compiler
+        sudo apt-get install -y build-essential protobuf-compiler protoc-gen-go
         go install google.golang.org/grpc/cmd/protoc-gen-go-grpc

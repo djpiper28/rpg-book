@@ -42,7 +42,7 @@ desktop-client-test: desktop-client-codegen
 	cd $(DESKTOP_APP) && pnpm test
 
 .PHONY: go-lint
-go-lint:
+go-lint: go-core
 	go vet ./...
 
 .PHONY: test
