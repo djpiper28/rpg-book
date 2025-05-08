@@ -16,6 +16,6 @@ runs:
     - name: Install required build tools
       shell: bash
       run: |
-        apt-get update
-        apt-get install -y build-essentials protobuf-compiler
+        sudo apt-get update
+        sudo apt-get install -y build-essentials protobuf-compiler
         go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
