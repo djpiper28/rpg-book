@@ -1,5 +1,10 @@
 # RPG Book
 
+> An all in one tool for tabletop RPG DM-ing.
+
+[![test](https://github.com/djpiper28/rpg-book/actions/workflows/test.yml/badge.svg)](https://github.com/djpiper28/rpg-book/actions/workflows/test.yml)
+[![build](https://github.com/djpiper28/rpg-book/actions/workflows/build.yml/badge.svg)](https://github.com/djpiper28/rpg-book/actions/workflows/build.yml)
+
 ## Architecture
 
 There is a Go monolith that uses SQLite3 when ran on the desktop app, and Postgres when used in the web app.
