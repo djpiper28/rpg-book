@@ -2,17 +2,13 @@ name: setup
 
 description: Setsup all of the project dependancies
 
-on:
-  workflow_call:
-
 runs:
-  runs-on: ubuntu-latest
+  using: composite
   steps:
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
         go-version: "1.24"
-
     - uses: pnpm/action-setup@v4
       with:
         version: 10
