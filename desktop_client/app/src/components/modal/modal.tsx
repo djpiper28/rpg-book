@@ -10,7 +10,7 @@ export function Modal(props: Readonly<ModalProps>) {
       size="auto"
       title={props.title}
     >
-      {props.children}
+      <div className="flex flex-col gap-3">{props.children}</div>
     </MantineModal>
   );
 }
