@@ -11,7 +11,7 @@ runs:
         go-version: "1.24"
     - uses: pnpm/action-setup@v4
       with:
-        version: 10
+        version: 9
 
     - name: Install required build tools
       shell: bash
