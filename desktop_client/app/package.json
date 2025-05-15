@@ -56,7 +56,7 @@
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
     "electron": "^36.2.0",
-    "electron-builder": "^24.13.3",
+    "electron-builder": "^26.0.12",
     "eslint": "^8.57.1",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.19",
