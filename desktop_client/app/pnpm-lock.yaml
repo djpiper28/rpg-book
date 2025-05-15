@@ -63,8 +63,8 @@ importers:
         specifier: ^2.9.6
         version: 2.9.6
       '@protobuf-ts/runtime-rpc':
-        specifier: ^2.9.6
-        version: 2.9.6
+        specifier: ^2.10.0
+        version: 2.10.0
       '@repodog/eslint-config':
         specifier: ^9.0.15
         version: 9.0.15(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.8.2))(eslint@8.57.1)(prettier@3.5.3)(typescript@5.8.2)
@@ -1098,8 +1098,11 @@ packages:
     resolution: {integrity: sha512-c0XvAPDIBAovH9HxV8gBv8gzOTreQIqibcusrB1+DxvFiSvy+2V1tjbUmG5gJEbjk3aAOaoj0a3+QuE+P28xUw==}
     hasBin: true
 
-  '@protobuf-ts/runtime-rpc@2.9.6':
-    resolution: {integrity: sha512-0UeqDRzNxgsh08lY5eWzFJNfD3gZ8Xf+WG1HzbIAbVAigzigwjwsYNNhTeas5H3gco1U5owTzCg177aambKOOw==}
+  '@protobuf-ts/runtime-rpc@2.10.0':
+    resolution: {integrity: sha512-8CS/XPv3+pMK4v8UKhtCdvbS4h9l7aqlteKdRt0/UbIKZ8n0qHj6hX8cBhz2ngvohxCOS0N08zPr9aCLBNhW3Q==}
+
+  '@protobuf-ts/runtime@2.10.0':
+    resolution: {integrity: sha512-ypYwGg9Pn3W/2lZ7/HW60hONGuSdzphvOY8Dq7LeNttymDe0y3LaTUUMRpuGqOT6FfrWEMnfQbyqU8AAreo8wA==}
 
   '@protobuf-ts/runtime@2.9.6':
     resolution: {integrity: sha512-C0CfpKx4n4LBbUrajOdRj2BTbd3qBoK0SiKWLq7RgCoU6xiN4wesBMFHUOBp3fFzKeZwgU8Q2KtzaqzIvPLRXg==}
@@ -6915,11 +6918,11 @@ snapshots:
   '@protobuf-ts/grpcweb-transport@2.9.6':
     dependencies:
       '@protobuf-ts/runtime': 2.9.6
-      '@protobuf-ts/runtime-rpc': 2.9.6
+      '@protobuf-ts/runtime-rpc': 2.10.0
 
   '@protobuf-ts/plugin-framework@2.9.6':
     dependencies:
-      '@protobuf-ts/runtime': 2.9.6
+      '@protobuf-ts/runtime': 2.10.0
       typescript: 3.9.10
 
   '@protobuf-ts/plugin@2.9.6':
@@ -6927,14 +6930,16 @@ snapshots:
       '@protobuf-ts/plugin-framework': 2.9.6
       '@protobuf-ts/protoc': 2.9.6
       '@protobuf-ts/runtime': 2.9.6
-      '@protobuf-ts/runtime-rpc': 2.9.6
+      '@protobuf-ts/runtime-rpc': 2.10.0
       typescript: 3.9.10
 
   '@protobuf-ts/protoc@2.9.6': {}
 
-  '@protobuf-ts/runtime-rpc@2.9.6':
+  '@protobuf-ts/runtime-rpc@2.10.0':
     dependencies:
-      '@protobuf-ts/runtime': 2.9.6
+      '@protobuf-ts/runtime': 2.10.0
+
+  '@protobuf-ts/runtime@2.10.0': {}
 
   '@protobuf-ts/runtime@2.9.6': {}
 
