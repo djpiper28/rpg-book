@@ -68,7 +68,12 @@ export function IndexPage() {
 
                     await navigate("/project");
                   })
-                  .catch(console.error);
+                  .catch((error: unknown) => {
+                    setError({
+                      body: String(error),
+                      title: "Cannot open project",
+                    });
+                  });
               }}
               role="button"
             >
