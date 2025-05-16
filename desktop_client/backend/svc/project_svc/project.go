@@ -14,6 +14,7 @@ import (
 	"github.com/djpiper28/rpg-book/desktop_client/backend/model"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_common"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_project"
+	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_project_character"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/project"
 	"github.com/google/uuid"
 )
@@ -117,7 +118,7 @@ func (p *ProjectSvc) CreateProject(ctx context.Context, in *pb_project.CreatePro
 	}, nil
 }
 
-func (p *ProjectSvc) OpenProject(ctx context.Context, in *pb_project.OpenProjectReq) (*pb_project.ProjectHandle, error) {
+func (p *ProjectSvc) OpenProject(ctx context.Context, in *pb_project.OpenProjectReq) (*pb_project.OpenProjectResp, error) {
 	proj, err := project.Open(in.FileName)
 	if err != nil {
 		return nil, err
@@ -133,8 +134,11 @@ func (p *ProjectSvc) OpenProject(ctx context.Context, in *pb_project.OpenProject
 		return nil, err
 	}
 
-	return &pb_project.ProjectHandle{
-		Id: id.String(),
+	return &pb_project.OpenProjectResp{
+		Handle: &pb_project.ProjectHandle{
+			Id: id.String(),
+		},
+		Characters: []*pb_project_character.BasicCharacterDetails{},
 	}, nil
 }
 

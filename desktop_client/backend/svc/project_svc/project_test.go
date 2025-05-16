@@ -87,11 +87,11 @@ func TestProjectSvc(t *testing.T) {
 		require.NoError(t, err)
 		closeProjectWithoutDelete(t, filename, handle)
 
-		handle, err = svc.OpenProject(context.Background(), &pb_project.OpenProjectReq{
+    resp, err := svc.OpenProject(context.Background(), &pb_project.OpenProjectReq{
 			FileName: filename,
 		})
 		require.NoError(t, err)
-		defer closeProject(t, filename, handle)
+		defer closeProject(t, filename, resp.Handle)
 
 		var count int
 		var dbName string

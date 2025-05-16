@@ -1,10 +1,11 @@
 syntax = "proto3";
 option go_package = "github.com/djpiper28/rpg-book/desktop_client/backend/pb_project";
 import 'common.proto';
+import 'project_character.proto';
 
 service ProjectSvc {
   rpc CreateProject(CreateProjectReq) returns (ProjectHandle) {}
-  rpc OpenProject(OpenProjectReq) returns (ProjectHandle) {}
+  rpc OpenProject(OpenProjectReq) returns (OpenProjectResp) {}
   rpc RecentProjects(Empty) returns (RecentProjectsResp) {}
   rpc CloseProject(ProjectHandle) returns (Empty) {}
   rpc CreateCharacter(CreateCharacterReq) returns (CharacterHandle) {}
@@ -23,6 +24,11 @@ message OpenProjectReq {
 message ProjectHandle {
   // ID that the backend is using to track the project, changes per open
   string id = 1;
+}
+
+message OpenProjectResp {
+  ProjectHandle handle = 1;
+  repeated BasicCharacterDetails characters = 2;
 }
 
 message RecentProject {
