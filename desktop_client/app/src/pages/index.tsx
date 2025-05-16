@@ -61,7 +61,7 @@ export function IndexPage() {
                   .then(async (resp) => {
                     tabs.addTab(
                       {
-                        id: resp.response.id,
+                        id: resp.response.handle?.id ?? "",
                       },
                       x.projectName,
                     );

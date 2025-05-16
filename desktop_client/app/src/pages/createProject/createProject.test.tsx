@@ -1,5 +1,6 @@
 import { fireEvent, waitFor } from "@testing-library/react";
 import { act } from "react";
+import { CreateFileInput } from "@/components/input/createFileInput";
 import { DbExtension } from "@/lib/databaseTypes";
 import { projectClient } from "@/lib/grpcClient/client";
 import {
@@ -14,9 +15,16 @@ vi.mock("../../lib/grpcClient/client.ts");
 const mockedClient = vi.mocked(projectClient);
 const id = "f23c1618-39c3-4368-a66b-c50ed7187ea6";
 
+vi.mock("../../components/input/createFileInput.tsx");
+const mockedCreateFileInput = vi.mocked(CreateFileInput);
+
 describe("Create project", () => {
   afterEach(() => {
     vi.restoreAllMocks();
+  });
+
+  beforeEach(() => {
+    mockedCreateFileInput.mockResolvedValue(<p>Mocked input</p>);
   });
 
   it("Should render", () => {
