@@ -45,7 +45,7 @@ function createWindow() {
 
   // Test active push message to Renderer-process.
   win.webContents.on("did-finish-load", () => {
-    win.webContents.send("main-process-message", new Date().toLocaleString());
+    win?.webContents.send("main-process-message", new Date().toLocaleString());
   });
 
   remote.enable(win.webContents);
@@ -66,7 +66,8 @@ function createWindow() {
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
-    win = undefined;
+    // eslint-disable-next-line unicorn/no-null
+    win = null;
   }
 });
 
