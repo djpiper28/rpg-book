@@ -1,16 +1,18 @@
 import { Button, Table } from "@mantine/core";
 import dayjs from "dayjs";
+import { Github } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { H2 } from "@/components/typography/H2";
+import { Link } from "@/components/typography/Link";
 import { P } from "@/components/typography/P";
 import { bytesToFriendly } from "@/lib/fileSizeHelpers";
 import { projectClient } from "@/lib/grpcClient/client";
 import { type RecentProjectsResp } from "@/lib/grpcClient/pb/project";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
+import { useProjectStore } from "@/stores/projectStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useTabStore } from "@/stores/tabStore";
-import { useProjectStore } from "@/stores/projectStore";
 
 export function IndexPage() {
   const [recentProjects, setRecentProjects] = useState<RecentProjectsResp>({
@@ -98,6 +100,14 @@ export function IndexPage() {
           );
         })}
       </Table>
+      <div className="flex flex-row gap-2">
+        <Github />
+        <P>
+          View this project on
+          <Link href="https://github.com/djpiper28/rpg-book">Github</Link>. Made
+          by Danny Piper (djpiper28).
+        </P>
+      </div>
       {settings.devMode ? (
         <>
           <Button
