@@ -103,7 +103,7 @@ export function IndexPage() {
       <div className="flex flex-row gap-2">
         <Github />
         <P>
-          View this project on
+          View this project on{" "}
           <Link href="https://github.com/djpiper28/rpg-book">Github</Link>. Made
           by Danny Piper (djpiper28).
         </P>
