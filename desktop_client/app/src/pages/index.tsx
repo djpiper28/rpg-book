@@ -100,31 +100,33 @@ export function IndexPage() {
           );
         })}
       </Table>
-      <div className="flex flex-row gap-2">
-        <Github />
-        <P>
-          View this project on{" "}
-          <Link href="https://github.com/djpiper28/rpg-book">Github</Link>. Made
-          by Danny Piper (djpiper28).
-        </P>
+      <div className="flex flex-col gap-5 py-10">
+        <div className="flex flex-row gap-2">
+          <Github />
+          <P>
+            View this project on{" "}
+            <Link href="https://github.com/djpiper28/rpg-book">Github</Link>.
+            Made by Danny Piper (djpiper28).
+          </P>
+        </div>
+        {settings.devMode ? (
+          <>
+            <Button
+              color="red"
+              onClick={() => {
+                setError({
+                  body: "Test Error Message.",
+                  title: "Dev Mode Test Error",
+                });
+              }}
+            >
+              Force Error
+            </Button>
+          </>
+        ) : (
+          ""
+        )}
       </div>
-      {settings.devMode ? (
-        <>
-          <Button
-            color="red"
-            onClick={() => {
-              setError({
-                body: "Test Error Message.",
-                title: "Dev Mode Test Error",
-              });
-            }}
-          >
-            Force Error
-          </Button>
-        </>
-      ) : (
-        ""
-      )}
     </>
   );
 }
