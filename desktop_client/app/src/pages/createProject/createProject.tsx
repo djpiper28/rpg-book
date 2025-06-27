@@ -79,7 +79,7 @@ export function CreateProjectPage() {
           setSaveLocation(f);
         }}
         placeholder="Save location"
-        rightSection={<FileIcon />}
+        // rightSection={<FileIcon />}
         value={saveLocation ?? ""}
         withAsterisk={true}
       />

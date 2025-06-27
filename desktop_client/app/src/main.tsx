@@ -14,7 +14,6 @@ ReactDOM.createRoot(document.querySelector("#root")).render(
 );
 
 // Use contextBridge
-// eslint-disable-next-line
 globalThis.ipcRenderer.on("main-process-message", (_event, message) => {
   console.log(message);
 });

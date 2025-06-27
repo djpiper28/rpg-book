@@ -7,7 +7,7 @@ const nouns = [
   "Adventurers",
   "Priests",
   "Fools",
-  "Rascles",
+  "Rascls",
   "Mercenaries",
   "Dwarves",
   "Grots",

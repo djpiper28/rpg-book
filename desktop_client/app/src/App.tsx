@@ -43,9 +43,9 @@ function App() {
   return (
     <MantineProvider
       forceColorScheme={settings.darkMode ? "dark" : "light"}
-      withCSSVariables
-      withGlobalStyles
-      withNormalizeCSS
+      // withCSSVariables
+      // withGlobalStyles
+      // withNormalizeCSS
     >
       <ErrorModal
         close={close}
