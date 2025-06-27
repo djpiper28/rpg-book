@@ -5,15 +5,10 @@ import App from "./App.tsx";
 import "@mantine/core/styles.css";
 import "./index.css";
 
-ReactDOM.createRoot(document.querySelector("#root")).render(
+ReactDOM.createRoot(document.querySelector("#root")!).render(
   <React.StrictMode>
     <BrowserRouter>
       <App />
     </BrowserRouter>
   </React.StrictMode>,
 );
-
-// Use contextBridge
-globalThis.ipcRenderer.on("main-process-message", (_event, message) => {
-  console.log(message);
-});
