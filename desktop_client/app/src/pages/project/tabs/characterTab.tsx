@@ -47,6 +47,12 @@ export function CharacterTab() {
                 })
                 .then((resp) => {
                   console.log("Created a player", resp.response);
+
+                  projectStore.addCharacter(projectHandle, {
+                    handle: resp.response,
+                    name: characterName,
+                  });
+
                   close();
                 })
                 .catch((error: unknown) => {
