@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Modal } from "@/components/modal/modal";
 import { projectClient } from "@/lib/grpcClient/client";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
+import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
 
 export function CharacterTab() {
@@ -16,10 +17,13 @@ export function CharacterTab() {
 
   const { setError } = useGlobalErrorStore((x) => x);
   const projectHandle = useTabStore((x) => x.selectedTab);
+  const projectStore = useProjectStore((x) => x);
 
   if (!projectHandle) {
     return "No project selected";
   }
+
+  const thisProject = projectStore.getProject(projectHandle);
 
   return (
     <>
@@ -71,6 +75,12 @@ export function CharacterTab() {
             <Table.Th>Name</Table.Th>
             <Table.Th>Factions</Table.Th>
           </Table.Tr>
+          {thisProject.project.characters.map((character) => (
+            <Table.Tr key={character.handle?.id}>
+              <Table.Th>{character.name}</Table.Th>
+              <Table.Th>TODO: Change me</Table.Th>
+            </Table.Tr>
+          ))}
         </Table.Thead>
       </Table>
     </>

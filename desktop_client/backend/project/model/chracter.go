@@ -3,6 +3,7 @@ package model
 import (
 	"time"
 
+	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_project_character"
 	"github.com/google/uuid"
 )
 
@@ -19,5 +20,14 @@ func NewCharacter(name string) *Character {
 		Id:      uuid.New(),
 		Name:    name,
 		Created: time.Now().String(),
+	}
+}
+
+func (c *Character) ToPb() *pb_project_character.BasicCharacterDetails {
+	return &pb_project_character.BasicCharacterDetails{
+		Handle: &pb_project_character.ChracterHandle{
+			Id: c.Id.String(),
+		},
+		Name: c.Name,
 	}
 }

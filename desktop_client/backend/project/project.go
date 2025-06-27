@@ -43,7 +43,7 @@ func Open(filename string) (*Project, error) {
 
 	var settings model.ProjectSettings
 	rows := db.Db.QueryRowx("SELECT * FROM project_settings;")
-	// TODO: cahnge to full struct scan when there are more than one fields
+	// TODO: change to full struct scan when there are more than one fields
 	err = rows.Scan(&settings.Name)
 	if err != nil {
 		return nil, errors.Join(errors.New("Cannot get project settings"), err)
@@ -99,6 +99,27 @@ func (p *Project) CreateCharacter(name string) (*model.Character, error) {
 	}
 
 	return character, nil
+}
+
+func (p *Project) GetCharacters() ([]*model.Character, error) {
+	rows, err := p.db.Db.Queryx(`SELECT * FROM characters;`)
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot query characters"), err)
+	}
+
+	characters := make([]*model.Character, 0)
+
+	for rows.Next() {
+		var character model.Character
+		err := rows.StructScan(&character)
+		if err != nil {
+			return nil, errors.Join(errors.New("Cannot scan characters"), err)
+		}
+
+		characters = append(characters, &character)
+	}
+
+	return characters, nil
 }
 
 func (p *Project) Close() {

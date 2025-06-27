@@ -87,7 +87,7 @@ func TestProjectSvc(t *testing.T) {
 		require.NoError(t, err)
 		closeProjectWithoutDelete(t, filename, handle)
 
-    resp, err := svc.OpenProject(context.Background(), &pb_project.OpenProjectReq{
+		resp, err := svc.OpenProject(context.Background(), &pb_project.OpenProjectReq{
 			FileName: filename,
 		})
 		require.NoError(t, err)
@@ -103,7 +103,7 @@ func TestProjectSvc(t *testing.T) {
 		require.Equal(t, name, dbName)
 	})
 
-	t.Run("Test close proejct that does not exist", func(t *testing.T) {
+	t.Run("Test close projet that does not exist", func(t *testing.T) {
 		_, err := svc.CloseProject(context.Background(), &pb_project.ProjectHandle{
 			Id: uuid.NewString(),
 		})
@@ -146,7 +146,6 @@ func TestProjectSvc(t *testing.T) {
 			ProjectName: projectName,
 		})
 		require.NoError(t, err)
-		defer closeProject(t, filename, projectHandle)
 
 		character, err := svc.CreateCharacter(context.Background(), &pb_project.CreateCharacterReq{
 			Name:    characterName,
@@ -155,5 +154,14 @@ func TestProjectSvc(t *testing.T) {
 
 		require.NoError(t, err)
 		require.NotEmpty(t, character.Id)
+
+		_, err = svc.CloseProject(context.Background(), projectHandle)
+		require.NoError(t, err)
+
+		project, err := svc.OpenProject(context.Background(), &pb_project.OpenProjectReq{
+			FileName: filename,
+		})
+		defer closeProject(t, filename, project.Handle)
+		require.Len(t, project.Characters, 1)
 	})
 }

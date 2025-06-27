@@ -10,6 +10,7 @@ import { type RecentProjectsResp } from "@/lib/grpcClient/pb/project";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useTabStore } from "@/stores/tabStore";
+import { useProjectStore } from "@/stores/projectStore";
 
 export function IndexPage() {
   const [recentProjects, setRecentProjects] = useState<RecentProjectsResp>({
@@ -17,6 +18,7 @@ export function IndexPage() {
   });
 
   const tabs = useTabStore((x) => x);
+  const projects = useProjectStore((x) => x);
   const navigate = useNavigate();
   const { setError } = useGlobalErrorStore((x) => x);
   const settings = useSettingsStore((x) => x.settings);
@@ -59,13 +61,22 @@ export function IndexPage() {
                 projectClient
                   .openProject({ fileName: x.fileName })
                   .then(async (resp) => {
+                    if (!resp.response.handle) {
+                      setError({
+                        body: "Invalid project returned by server - no handle",
+                      });
+
+                      return;
+                    }
+
                     tabs.addTab(
                       {
-                        id: resp.response.handle?.id ?? "",
+                        id: resp.response.handle.id,
                       },
                       x.projectName,
                     );
 
+                    projects.newProject(resp.response.handle, resp.response);
                     await navigate("/project");
                   })
                   .catch((error: unknown) => {
