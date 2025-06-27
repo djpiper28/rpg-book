@@ -8,9 +8,9 @@ export function wrappedRender(node: ReactNode) {
     <BrowserRouter>
       <MantineProvider
         forceColorScheme="dark"
-        withCSSVariables
-        withGlobalStyles
-        withNormalizeCSS
+        // withCSSVariables
+        // withGlobalStyles
+        // withNormalizeCSS
       >
         {node}
       </MantineProvider>

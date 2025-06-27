@@ -1,5 +1,5 @@
 import { Button, TextInput } from "@mantine/core";
-import { File as FileIcon, Plus, Text } from "lucide-react";
+import { Plus, Text } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { CreateFileInput } from "@/components/input/createFileInput";
