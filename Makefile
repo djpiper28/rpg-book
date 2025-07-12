@@ -1,7 +1,7 @@
 .PHONY: all
 all: desktop-client
 
-DESKTOP_APP=$(shell pwd)/desktop_client/app/
+DESKTOP_APP="$(shell pwd)/desktop_client/app/"
 
 .PHONY: desktop-client-deps
 desktop-client-deps:
