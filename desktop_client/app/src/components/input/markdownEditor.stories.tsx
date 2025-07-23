@@ -10,6 +10,10 @@ type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
   args: {
+    label: "Test",
+    setValue: (value: string) => {
+      console.log(value);
+    },
     value: `# Testing 123
 ## This is a test
 Hello world !!!
