@@ -7,7 +7,7 @@
     "__dev": "vite",
     "__build_launcher": "cd ../../ && make desktop-client-backend -j",
     "dev": "pnpm __build_launcher && cd ../launcher/ && ./launcher --working-dir ../app/ -- pnpm __dev",
-    "build": "tsc && vite build && electron-builder",
+    "build": "tsc && vite build && npx electron-builder",
     "lint": "eslint ./vite.config.ts ./src ./electron",
     "test": "vitest",
     "preview": "vite preview",
