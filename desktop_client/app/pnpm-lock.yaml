@@ -54,8 +54,8 @@ importers:
         specifier: ^7.17.4
         version: 7.17.4(@mantine/core@7.17.4(@mantine/hooks@7.17.4(react@19.1.0))(@types/react@18.3.20)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(@mantine/hooks@7.17.4(react@19.1.0))(@tiptap/extension-link@2.11.7(@tiptap/core@2.11.7(@tiptap/pm@2.11.7))(@tiptap/pm@2.11.7))(@tiptap/react@2.11.7(@tiptap/core@2.11.7(@tiptap/pm@2.11.7))(@tiptap/pm@2.11.7)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@protobuf-ts/grpcweb-transport':
-        specifier: ^2.9.6
-        version: 2.9.6
+        specifier: ^2.11.1
+        version: 2.11.1
       '@protobuf-ts/plugin':
         specifier: ^2.9.6
         version: 2.9.6
@@ -1043,8 +1043,8 @@ packages:
   '@popperjs/core@2.11.8':
     resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
 
-  '@protobuf-ts/grpcweb-transport@2.9.6':
-    resolution: {integrity: sha512-TDBLxRkPSe/2daIlEpNEGQKDikBPtl4gUqYx7ap+b69YUkCcYH08w/12VuuA+uvnWdEEbS0DSxsJQZQyhptZHA==}
+  '@protobuf-ts/grpcweb-transport@2.11.1':
+    resolution: {integrity: sha512-1W4utDdvOB+RHMFQ0soL4JdnxjXV+ddeGIUg08DvZrA8Ms6k5NN6GBFU2oHZdTOcJVpPrDJ02RJlqtaoCMNBtw==}
 
   '@protobuf-ts/plugin-framework@2.9.6':
     resolution: {integrity: sha512-w7A1RXrDCiVzcaRE6YJP7FCARuAFe/Vc4SNQnHAi4CF0V6mEtyjAYEIC5BNYgIRaJEqB26zzsBQjIem3R02SCA==}
@@ -1060,8 +1060,14 @@ packages:
   '@protobuf-ts/runtime-rpc@2.10.0':
     resolution: {integrity: sha512-8CS/XPv3+pMK4v8UKhtCdvbS4h9l7aqlteKdRt0/UbIKZ8n0qHj6hX8cBhz2ngvohxCOS0N08zPr9aCLBNhW3Q==}
 
+  '@protobuf-ts/runtime-rpc@2.11.1':
+    resolution: {integrity: sha512-4CqqUmNA+/uMz00+d3CYKgElXO9VrEbucjnBFEjqI4GuDrEQ32MaI3q+9qPBvIGOlL4PmHXrzM32vBPWRhQKWQ==}
+
   '@protobuf-ts/runtime@2.10.0':
     resolution: {integrity: sha512-ypYwGg9Pn3W/2lZ7/HW60hONGuSdzphvOY8Dq7LeNttymDe0y3LaTUUMRpuGqOT6FfrWEMnfQbyqU8AAreo8wA==}
+
+  '@protobuf-ts/runtime@2.11.1':
+    resolution: {integrity: sha512-KuDaT1IfHkugM2pyz+FwiY80ejWrkH1pAtOBOZFuR6SXEFTsnb/jiQWQ1rCIrcKx2BtyxnxW6BWwsVSA/Ie+WQ==}
 
   '@protobuf-ts/runtime@2.9.6':
     resolution: {integrity: sha512-C0CfpKx4n4LBbUrajOdRj2BTbd3qBoK0SiKWLq7RgCoU6xiN4wesBMFHUOBp3fFzKeZwgU8Q2KtzaqzIvPLRXg==}
@@ -6369,14 +6375,14 @@ snapshots:
 
   '@popperjs/core@2.11.8': {}
 
-  '@protobuf-ts/grpcweb-transport@2.9.6':
+  '@protobuf-ts/grpcweb-transport@2.11.1':
     dependencies:
-      '@protobuf-ts/runtime': 2.9.6
-      '@protobuf-ts/runtime-rpc': 2.10.0
+      '@protobuf-ts/runtime': 2.11.1
+      '@protobuf-ts/runtime-rpc': 2.11.1
 
   '@protobuf-ts/plugin-framework@2.9.6':
     dependencies:
-      '@protobuf-ts/runtime': 2.10.0
+      '@protobuf-ts/runtime': 2.11.1
       typescript: 3.9.10
 
   '@protobuf-ts/plugin@2.9.6':
@@ -6393,7 +6399,13 @@ snapshots:
     dependencies:
       '@protobuf-ts/runtime': 2.10.0
 
+  '@protobuf-ts/runtime-rpc@2.11.1':
+    dependencies:
+      '@protobuf-ts/runtime': 2.11.1
+
   '@protobuf-ts/runtime@2.10.0': {}
+
+  '@protobuf-ts/runtime@2.11.1': {}
 
   '@protobuf-ts/runtime@2.9.6': {}
 
