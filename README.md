@@ -1,9 +1,12 @@
 # RPG Book
 
+This is a work in progress, stayed tuned for updates.
+
 > An all in one tool for tabletop RPG DM-ing.
 
 [![test](https://github.com/djpiper28/rpg-book/actions/workflows/test.yml/badge.svg)](https://github.com/djpiper28/rpg-book/actions/workflows/test.yml)
 [![build](https://github.com/djpiper28/rpg-book/actions/workflows/build.yml/badge.svg)](https://github.com/djpiper28/rpg-book/actions/workflows/build.yml)
+[![release](https://github.com/djpiper28/rpg-book/actions/workflows/release.yml/badge.svg)](https://github.com/djpiper28/rpg-book/actions/workflows/release.yml)
 
 ## Architecture
 
