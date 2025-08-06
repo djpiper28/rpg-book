@@ -25,7 +25,7 @@ desktop-client-backend: go-core
 
 .PHONY: go-generate
 go-generate: desktop-client-deps
-	cd $(DESKTOP_APP) && go run generate-proto.go
+	go generate ./...
 
 .PHONY: go-core
 go-core: go-generate

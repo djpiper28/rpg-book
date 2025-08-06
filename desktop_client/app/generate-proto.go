@@ -6,6 +6,9 @@ import (
 	"os/exec"
 	"path/filepath"
 	runtime "runtime"
+
+	"github.com/charmbracelet/log"
+	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
 )
 
 func main() {
@@ -14,11 +17,11 @@ func main() {
 	// Expand the glob pattern for proto files
 	protoFiles, err := filepath.Glob("../protos/*.proto")
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error expanding proto file glob: %v\n", err)
+		log.Error(os.Stderr, "Error expanding proto file glob", loggertags.TagError, err)
 		os.Exit(1)
 	}
 	if len(protoFiles) == 0 {
-		fmt.Fprintln(os.Stderr, "No proto files found in ../protos/")
+		log.Error(os.Stderr, "No proto files found in ../protos/")
 		os.Exit(1)
 	}
 
@@ -35,7 +38,7 @@ func main() {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	fmt.Printf("Running command: protoc %v\n", cmdArgs)
+	log.Info("Running command protoc", "args", cmdArgs)
 
 	if err := cmd.Run(); err != nil {
 		fmt.Fprintf(os.Stderr, "protoc command failed: %v\n", err)
