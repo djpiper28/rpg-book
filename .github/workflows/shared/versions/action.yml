@@ -5,3 +5,10 @@ outputs:
   app-version:
     description: "The version of the application"
     value: 1.0.0
+
+runs:
+  using: "composite"
+  steps:
+    - name: Output version
+      shell: bash
+      run: "echo app-version=${{ env.app-version }}"
