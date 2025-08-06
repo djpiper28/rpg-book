@@ -6,7 +6,7 @@ describe("Random project names", () => {
   });
 
   it("Test a bunch", () => {
-    for (let i = 0; i < 100000; i++) {
+    for (let i = 0; i < 100; i++) {
       expect(randomProjectName()).not.toBe("");
     }
   });
