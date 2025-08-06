@@ -66,9 +66,6 @@ func main() {
 		"directory", opts.WorkdingDirectory,
 		"port", server.Port)
 
-	launcherCmd = append(launcherCmd, fmt.Sprintf("--%s=%s", EnvVarCertificate, server.ClientCredentials().CertPem))
-	launcherCmd = append(launcherCmd, fmt.Sprintf("--%s=%d", EnvVarPort, server.ClientCredentials().Port))
-
 	cmd := exec.Command(launcherCmd[0], launcherCmd[1:]...)
 	cmd.Dir = opts.WorkdingDirectory
 	cmd.Stderr = os.Stderr

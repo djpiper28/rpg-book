@@ -90,8 +90,7 @@
   },
   "main": "dist-electron/main.js",
   "devDependencies": {
-    "@testing-library/jest-dom": "^6.6.4",
-    "cross-env": "^7.0.3"
+    "@testing-library/jest-dom": "^6.6.4"
   },
   "pnpm": {
     "overrides": {

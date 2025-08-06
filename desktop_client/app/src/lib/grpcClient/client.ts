@@ -9,7 +9,7 @@ function mustHave(x: string | undefined): string {
     return x;
   }
 
-  throw new Error("Cannot find env vars");
+  throw new Error(`Cannot find env var ${x}`);
 }
 
 export const port = mustHave(process.env[EnvVarPort]);
