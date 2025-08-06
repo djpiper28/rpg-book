@@ -1,0 +1,65 @@
+name: release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/workflows/shared/setup
+
+      - name: Build
+        shell: bash
+        run: make desktop-client -j
+
+      - name: Create Build Info
+        shell: bash
+        run: |
+          echo "Build Date: $(date)" > build_info.txt
+          echo "Git Commit: $GITHUB_SHA" >> build_info.txt
+
+      - name: Package Artifacts (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          mkdir release
+          mv desktop_client/app/release/1.0.0/RPG-Book-Linux-1.0.0.AppImage release/
+          mv desktop_client/launcher/launcher release/
+          cp LICENSE release/
+          cp build_info.txt release/
+          zip -r rpg-book-linux.zip release
+
+      - name: Package Artifacts (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          mkdir release
+          mv desktop_client/app/release/1.0.0/RPG-Book-Windows-1.0.0-Setup.exe release/
+          mv desktop_client/launcher/launcher.exe release/
+          cp LICENSE release/
+          cp build_info.txt release/
+          zip -r rpg-book-windows.zip release
+
+      - name: Package Artifacts (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          mkdir release
+          mv desktop_client/app/release/1.0.0/RPG-Book-Mac-1.0.0-Installer.dmg release/
+          mv desktop_client/launcher/launcher release/
+          cp LICENSE release/
+          cp build_info.txt release/
+          zip -r rpg-book-mac.zip release
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rpg-book-${{ runner.os }}
+          path: rpg-book-*.zip
