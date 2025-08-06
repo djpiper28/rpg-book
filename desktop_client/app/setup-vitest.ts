@@ -12,4 +12,4 @@ afterAll(() => {
   matchMediaMock.clear();
 });
 
-vi.mock("@electron/remote");
+vi.mock("@electron/remote", () => ({ exec: vi.fn() }));
