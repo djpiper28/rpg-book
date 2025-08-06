@@ -60,7 +60,7 @@ func main() {
 	}
 	defer server.Stop()
 
-  // here to stop certificate leak to logs
+	// here to stop certificate leak to logs
 	log.Info("Starting RPG book",
 		"cmd", launcherCmd,
 		"directory", opts.WorkdingDirectory,
