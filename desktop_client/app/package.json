@@ -10,10 +10,8 @@
     "build": "tsc && vite build && npx electron-builder -c.electronVersion 36.2.1",
     "lint": "eslint ./vite.config.ts ./src ./electron",
     "test": "vitest run",
-    "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
-  },
+    "build-storybook": "storybook build" },
   "dependencies": {
     "@chromatic-com/storybook": "^3.2.6",
     "@electron/remote": "^2.1.2",

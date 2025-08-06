@@ -7,9 +7,7 @@
 
 ## Architecture
 
-There is a Go monolith that uses SQLite3 when ran on the desktop app, and Postgres when used in the web app.
-
-The web app will display different addons that can be installed, and handle cloud backups.
+A backend talks to a frontend, for the desktop app that is a Go server talking to an Electron app via gRPC. Data is stored in Sqlite3 files, each project gets its own database, and global settings their own database as well.
 
 ## Folder Structure
 
@@ -17,6 +15,10 @@ The web app will display different addons that can be installed, and handle clou
 
 ### `desktop_client/` contains Typescript code for the desktop app
 
-### `webapp/frontend` contains Typescript code for the web app
+## Building, Testing, and Dev Stuff
 
-### `webapp/backend` contains Go code for the web app
+```sh
+make build -j # Codegen, frontend, and backend builds
+make test -j # Runs the codegen, and tests
+make format -j # Runs all formatter scripts
+```

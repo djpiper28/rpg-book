@@ -1,30 +1,28 @@
-# React + TypeScript + Vite
+# Electron Application For RPG Book
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The "backend" spawns the "frontend" (this Electron app) and hands over details of how to connect via HTTPS to the gRPC server of the backend.
 
-Currently, two official plugins are available:
+## Technology
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- RPG Book's frontend uses Electron, and a Vite single page application (SPA in their docs).
+- `Frontend <== HTTPS / gRPC ==> Backend`
+- Linting is strict and uses Eslint, and a lot of the repodog configs (made by a cool dude I used to work with - check his stuff out!)
+- Pnpm is used, don't use npm
 
-## Expanding the ESLint configuration
+## Building, Testing, and Fun Dev Stuff
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+You can either use the root Makefile, or a few scripts
 
-- Configure the top-level `parserOptions` property like this:
+```sh
+pnpm dev # Starts a dev server (and the backend)
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: "latest",
-    sourceType: "module",
-    project: ["./tsconfig.json", "./tsconfig.node.json"],
-    tsconfigRootDir: __dirname,
-  },
-};
+pnpm test
+
+pnpm lint
+pnpm lint --fix # Tries to fix the errors
+
+pnpm storybook
+pnpm build-storybook
+
+pnpm build # Only builds the electron app image
 ```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
