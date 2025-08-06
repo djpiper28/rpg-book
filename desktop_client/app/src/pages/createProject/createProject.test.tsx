@@ -44,7 +44,7 @@ describe("Create project", () => {
     });
 
     await waitFor(() => {
-      expect(projectNameInput).toHaveValue(testName);
+      expect((projectNameInput as HTMLInputElement).value).toBe(testName);
     });
 
     const createButton = await dom.findByText(/create project/i);
