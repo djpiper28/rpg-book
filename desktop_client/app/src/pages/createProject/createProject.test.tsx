@@ -1,5 +1,4 @@
 import { fireEvent, waitFor } from "@testing-library/react";
-import { act } from "react";
 import { CreateFileInput } from "@/components/input/createFileInput";
 import { DbExtension } from "@/lib/databaseTypes";
 import { projectClient } from "@/lib/grpcClient/client";
