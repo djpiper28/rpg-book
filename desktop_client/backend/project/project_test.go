@@ -70,7 +70,7 @@ func TestCreateCharacter(t *testing.T) {
 	require.NotEmpty(t, c.Created)
 	require.NotEmpty(t, c.Id)
 
-  characters, err := project.GetCharacters()
-  require.NoError(t, err)
-  require.Len(t, characters, 1)
+	characters, err := project.GetCharacters()
+	require.NoError(t, err)
+	require.Len(t, characters, 1)
 }

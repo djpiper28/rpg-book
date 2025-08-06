@@ -134,15 +134,15 @@ func (p *ProjectSvc) OpenProject(ctx context.Context, in *pb_project.OpenProject
 		return nil, err
 	}
 
-  characters := make([]*pb_project_character.BasicCharacterDetails, 0)
-  rawCharacters, err := proj.GetCharacters()
-  if err != nil {
-    return nil, err
-  }
+	characters := make([]*pb_project_character.BasicCharacterDetails, 0)
+	rawCharacters, err := proj.GetCharacters()
+	if err != nil {
+		return nil, err
+	}
 
-  for _, character := range rawCharacters {
-    characters = append(characters, character.ToPb())
-  }
+	for _, character := range rawCharacters {
+		characters = append(characters, character.ToPb())
+	}
 
 	return &pb_project.OpenProjectResp{
 		Handle: &pb_project.ProjectHandle{

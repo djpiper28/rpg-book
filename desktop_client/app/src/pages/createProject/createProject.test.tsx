@@ -24,7 +24,7 @@ describe("Create project", () => {
   });
 
   beforeEach(() => {
-    mockedCreateFileInput.mockResolvedValue(<p>Mocked input</p>);
+    mockedCreateFileInput.mockReturnValue(<p>Mocked input</p>);
   });
 
   it("Should render", () => {
@@ -38,34 +38,25 @@ describe("Create project", () => {
 
     const dom = wrappedRender(<CreateProjectPage />);
     const testName = "Testing The Horrors";
+    const projectNameInput = await dom.findByLabelText(/project name/i);
 
-    await act(async () => {
-      const projectName = await dom.findByLabelText(/project name/i);
-
-      fireEvent.change(projectName, {
-        target: {
-          value: testName,
-        },
-      });
+    fireEvent.change(projectNameInput, {
+      target: { value: testName },
     });
 
-    await waitFor(async () => {
-      const projectNameInput = (await dom.findByLabelText(
-        /project name/i,
-      )) as HTMLInputElement;
-
-      expect(projectNameInput.value).toBe(testName);
+    await waitFor(() => {
+      expect(projectNameInput).toHaveValue(testName);
     });
 
-    await act(async () => {
-      const createButton = await dom.findByText(/create project/i);
-      fireEvent.click(createButton);
-    });
+    const createButton = await dom.findByText(/create project/i);
+    fireEvent.click(createButton);
 
-    //eslint-disable-next-line @typescript-eslint/unbound-method
-    expect(mockedClient.createProject).toHaveBeenCalledWith({
-      fileName: `${testName}${DbExtension}`,
-      projectName: testName,
-    } as CreateProjectReq);
+    await waitFor(() => {
+      //eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockedClient.createProject).toHaveBeenCalledWith({
+        fileName: `${testName}${DbExtension}`,
+        projectName: testName,
+      } as CreateProjectReq);
+    });
   });
 });

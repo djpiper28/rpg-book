@@ -87,5 +87,8 @@
     "electron": "^36.2.1",
     "electron-builder": "^26.0.12"
   },
-  "main": "dist-electron/main.js"
+  "main": "dist-electron/main.js",
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.4"
+  }
 }

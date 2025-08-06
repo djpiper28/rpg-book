@@ -1,3 +1,4 @@
+import "@testing-library/jest-dom/vitest";
 import { EnvVarCertificate, EnvVarPort } from "@/lib/launcherTypes/index.ts";
 import MatchMediaMock from "vitest-matchmedia-mock";
 import * as remote from "@electron/remote";
