@@ -6,6 +6,7 @@ import commonjs from "vite-plugin-commonjs";
 import electron from "vite-plugin-electron/simple";
 
 export default defineConfig({
+  appType: "spa",
   envPrefix: ["VITE_", "RPG_BOOK_"],
   plugins: [
     react(),
