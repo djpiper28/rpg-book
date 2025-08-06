@@ -15,51 +15,69 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/workflows/shared/setup
 
+      - name: Install required build tools (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential protobuf-compiler
+
+      - name: Install required build tools (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          choco install protobuf
+
+      - name: Install required build tools (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          brew install protobuf
+
       - name: Build
         shell: bash
         run: make desktop-client -j
+
+      - uses: ./.github/workflows/shared/versions
+        id: versions
 
       - name: Create Build Info
         shell: bash
         run: |
           echo "Build Date: $(date)" > build_info.txt
           echo "Git Commit: $GITHUB_SHA" >> build_info.txt
+          echo "App Version: ${{ steps.versions.outputs.app-version }}" >> build_info.txt
 
-      - name: Package Artifacts (Linux)
-        if: runner.os == 'Linux'
+      - name: Set Artifact Names
+        id: set_names
+        shell: bash
+        run: |
+          if [[ "${{ runner.os }}" == "Linux" ]]; then
+            echo "app_artifact=desktop_client/app/release/${{ steps.versions.outputs.app-version }}/RPG-Book-Linux-${{ steps.versions.outputs.app-version }}.AppImage" >> $GITHUB_ENV
+            echo "launcher_artifact=desktop_client/launcher/launcher" >> $GITHUB_ENV
+            echo "zip_name=rpg-book-linux.zip" >> $GITHUB_ENV
+          elif [[ "${{ runner.os }}" == "Windows" ]]; then
+            echo "app_artifact=desktop_client/app/release/${{ steps.versions.outputs.app-version }}/RPG-Book-Windows-${{ steps.versions.outputs.app-version }}-Setup.exe" >> $GITHUB_ENV
+            echo "launcher_artifact=desktop_client/launcher/launcher.exe" >> $GITHUB_ENV
+            echo "zip_name=rpg-book-windows.zip" >> $GITHUB_ENV
+          elif [[ "${{ runner.os }}" == "macOS" ]]; then
+            echo "app_artifact=desktop_client/app/release/${{ steps.versions.outputs.app-version }}/RPG-Book-Mac-${{ steps.versions.outputs.app-version }}-Installer.dmg" >> $GITHUB_ENV
+            echo "launcher_artifact=desktop_client/launcher/launcher" >> $GITHUB_ENV
+            echo "zip_name=rpg-book-mac.zip" >> $GITHUB_ENV
+          fi
+
+      - name: Package Artifacts
         shell: bash
         run: |
           mkdir release
-          mv desktop_client/app/release/1.0.0/RPG-Book-Linux-1.0.0.AppImage release/
-          mv desktop_client/launcher/launcher release/
+          mv ${{ env.app_artifact }} release/
+          mv ${{ env.launcher_artifact }} release/
           cp LICENSE release/
           cp build_info.txt release/
-          zip -r rpg-book-linux.zip release
-
-      - name: Package Artifacts (Windows)
-        if: runner.os == 'Windows'
-        shell: bash
-        run: |
-          mkdir release
-          mv desktop_client/app/release/1.0.0/RPG-Book-Windows-1.0.0-Setup.exe release/
-          mv desktop_client/launcher/launcher.exe release/
-          cp LICENSE release/
-          cp build_info.txt release/
-          zip -r rpg-book-windows.zip release
-
-      - name: Package Artifacts (macOS)
-        if: runner.os == 'macOS'
-        shell: bash
-        run: |
-          mkdir release
-          mv desktop_client/app/release/1.0.0/RPG-Book-Mac-1.0.0-Installer.dmg release/
-          mv desktop_client/launcher/launcher release/
-          cp LICENSE release/
-          cp build_info.txt release/
-          zip -r rpg-book-mac.zip release
+          zip -r ${{ env.zip_name }} release
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: rpg-book-${{ runner.os }}
-          path: rpg-book-*.zip
+          path: ${{ env.zip_name }}
