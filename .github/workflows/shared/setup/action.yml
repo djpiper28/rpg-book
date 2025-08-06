@@ -24,7 +24,7 @@ runs:
       if: runner.os == 'Windows'
       shell: bash
       run: |
-        choco install protobuf
+        choco install protoc
 
     - name: Install required build tools (macOS)
       if: runner.os == 'macOS'
