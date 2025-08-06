@@ -25,7 +25,7 @@ desktop-client-backend: go-core
 
 .PHONY: go-generate
 go-generate: desktop-client-deps
-	PATH="$$PATH:$(DESKTOP_APP)/node_modules/.bin" go generate ./...
+	cd $(DESKTOP_APP) && go run generate-proto.go
 
 .PHONY: go-core
 go-core: go-generate
