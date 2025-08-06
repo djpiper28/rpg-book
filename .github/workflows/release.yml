@@ -72,7 +72,7 @@ jobs:
           mkdir release
           mv ${{ env.app_artifact }} release/
           mv ${{ env.launcher_artifact }} release/
-          cp LICENSE release/
+          cp *.md release/
           cp build_info.txt release/
           zip -r ${{ env.zip_name }} release
 
