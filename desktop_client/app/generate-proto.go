@@ -5,7 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	runtime "runtime"
+	"runtime"
 
 	"github.com/charmbracelet/log"
 	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
