@@ -19,6 +19,11 @@ desktop-client-app: desktop-client-codegen
 dev:
 	cd $(DESKTOP_APP) && pnpm dev
 
+# This only works on linux
+.PHONY: release
+release: all
+	./desktop_client/launcher/launcher ./desktop_client/app/release/1.0.0/RPG-Book-Linux-1.0.0.AppImage
+
 .PHONY: desktop-client-backend
 desktop-client-backend: go-core
 	cd ./desktop_client/launcher && go build

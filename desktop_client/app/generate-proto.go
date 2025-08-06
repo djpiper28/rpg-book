@@ -30,7 +30,14 @@ func main() {
 		plugin += ".cmd"
 	}
 
-	cmdArgs := []string{"--plugin=protoc-gen-ts=" + plugin}
+	// Resolve the plugin path to an absolute path
+	absolutePluginPath, err := filepath.Abs(plugin)
+	if err != nil {
+		log.Error(os.Stderr, "Error resolving plugin path", loggertags.TagError, err)
+		os.Exit(1)
+	}
+
+	cmdArgs := []string{"--plugin=protoc-gen-ts=" + absolutePluginPath}
 	cmdArgs = append(cmdArgs, args...)
 	cmdArgs = append(cmdArgs, protoFiles...)
 

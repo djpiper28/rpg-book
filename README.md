@@ -21,7 +21,15 @@ A backend talks to a frontend, for the desktop app that is a Go server talking t
 ## Building, Testing, and Dev Stuff
 
 ```sh
-make build -j # Codegen, frontend, and backend builds
+make -j # Builds the backend and frontend
+# The frontend is in ./desktop_client/app/release/
+# The launcher is in ./desktop_client/launcher/launcher
+# See the release target for how to use this.
+# TODO: create a production ready script for starting the app
+
 make test -j # Runs the codegen, and tests
 make format -j # Runs all formatter scripts
+
+make dev -j # Starts a hot-reloading dev version of the app
+make release -j # Starts a release build of the app
 ```
