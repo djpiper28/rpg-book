@@ -1,7 +1,6 @@
 #!/bin/bash
 
-NODE_MODULES="$(pwd)/node_modules"
-
-cd "$NODE_MODULES/electron/dist/" || exit 1
-rm electron
+pushd "./node_modules/.pnpm/electron@37.2.6/node_modules/electron/dist"
+rm -f electron
 ln -s "$(whereis electron | cut -f 2 -d ' ')"
+popd

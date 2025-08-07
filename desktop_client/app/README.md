@@ -26,3 +26,10 @@ pnpm build-storybook
 
 pnpm build # Only builds the electron app image
 ```
+
+## Updating Electron???
+
+You need to change:
+
+- ./nix-bins.sh
+- ./package.json (deps and scripts)
