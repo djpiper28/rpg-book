@@ -7,6 +7,11 @@ import electron from "vite-plugin-electron/simple";
 
 export default defineConfig({
   appType: "spa",
+  build: {
+    rollupOptions: {
+      treeshake: "smallest",
+    },
+  },
   envPrefix: ["VITE_", "RPG_BOOK_"],
   plugins: [
     react(),
