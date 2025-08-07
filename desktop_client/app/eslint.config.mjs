@@ -22,6 +22,7 @@ export default [
     },
   },
   {
+    files: ["vite.config.ts", "vitest.config.ts"],
     languageOptions: {
       parserOptions: {
         project: "./tsconfig.node.json",

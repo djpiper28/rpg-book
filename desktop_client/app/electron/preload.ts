@@ -27,8 +27,5 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
 });
 
 contextBridge.exposeInMainWorld("process", {
-  env: {
-    RPG_BOOK_PORT: process.env.RPG_BOOK_PORT,
-    RPG_BOOK_CERTIFICATE: process.env.RPG_BOOK_CERTIFICATE,
-  },
+  env: process.env,
 });
