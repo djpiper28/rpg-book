@@ -3,6 +3,8 @@ import { EnvVarCertificate, EnvVarPort } from "../launcherTypes";
 const baseEnv = {
   APP_ROOT: "",
   VITE_PUBLIC: "",
+  RPG_BOOK_PORT: "",
+  RPG_BOOK_CERTIFICATE: "",
 };
 
 describe("client", () => {

@@ -18,6 +18,8 @@ declare namespace NodeJS {
     APP_ROOT: string;
     /** /dist/ or /public/ */
     VITE_PUBLIC: string;
+    RPG_BOOK_PORT: string;
+    RPG_BOOK_CERTIFICATE: string;
   }
 }
 
