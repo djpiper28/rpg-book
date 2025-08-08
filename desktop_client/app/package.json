@@ -1,9 +1,6 @@
 {
   "name": "app",
   "author": "Danny Piper (djpiper28)",
-  "build": {
-    "appId": "com.github.djpiper28.rpgbook"
-  },
   "private": true,
   "version": "1.0.0",
   "type": "module",
