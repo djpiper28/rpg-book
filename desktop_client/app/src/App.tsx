@@ -144,10 +144,10 @@ function App() {
 
         <div className="flex flex-col gap-3 p-2">
           <Routes>
-            <Route element={<IndexPage />} path="/" />
-            <Route element={<SettingsPage />} path="/settings" />
-            <Route element={<ProjectPage />} path="/project" />
-            <Route element={<CreateProjectPage />} path="/create-project" />
+            <Route Component={IndexPage} path="/" />
+            <Route Component={SettingsPage} path="/settings" />
+            <Route Component={ProjectPage} path="/project" />
+            <Route Component={CreateProjectPage} path="/create-project" />
           </Routes>
         </div>
       </div>
