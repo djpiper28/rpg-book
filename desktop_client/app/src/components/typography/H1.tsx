@@ -1,5 +1,7 @@
+import { type ReactNode } from "react";
+
 interface Props {
-  children?: string;
+  children?: string | ReactNode;
 }
 
 export function H1(props: Readonly<Props>) {

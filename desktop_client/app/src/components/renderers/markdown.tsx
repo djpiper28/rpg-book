@@ -12,7 +12,11 @@ interface SafeLinkProps {
 }
 
 function SafeLink(props: Readonly<SafeLinkProps>) {
-  return <Link href={props.href ?? ""}>{props.children ?? ""}</Link>;
+  return (
+    <Link href={props.href ?? ""} newWindow={true}>
+      {props.children ?? ""}
+    </Link>
+  );
 }
 
 interface Props {
@@ -24,10 +28,10 @@ export default function MarkdownRenderer(props: Readonly<Props>) {
     <div className="border border-gray-500 rounded-lg p-2 min-w-50 min-h-10">
       <Markdown
         components={{
-          H3,
           a: SafeLink,
           h1: H1,
           h2: H2,
+          h3: H3,
           p: P,
         }}
         skipHtml={true}
