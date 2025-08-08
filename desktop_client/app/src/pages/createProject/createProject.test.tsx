@@ -8,7 +8,7 @@ import {
 } from "@/lib/grpcClient/pb/project";
 import { newResult } from "@/lib/testUtils/grpcTestUtils";
 import { wrappedRender } from "@/lib/testUtils/wrappedRender";
-import { CreateProjectPage } from "./createProject";
+import { Component as Page } from "./createProject";
 
 vi.mock("../../lib/grpcClient/client.ts");
 const mockedClient = vi.mocked(projectClient);
@@ -27,7 +27,7 @@ describe("Create project", () => {
   });
 
   it("Should render", () => {
-    expect(wrappedRender(<CreateProjectPage />)).toBeDefined();
+    expect(wrappedRender(<Page />)).toBeDefined();
   });
 
   it("Should create a project with the provided settings", async () => {
@@ -35,7 +35,7 @@ describe("Create project", () => {
       newResult({} as CreateProjectReq, { id } as ProjectHandle),
     );
 
-    const dom = wrappedRender(<CreateProjectPage />);
+    const dom = wrappedRender(<Page />);
     const testName = "Testing The Horrors";
     const projectNameInput = await dom.findByLabelText(/project name/i);
 
