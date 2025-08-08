@@ -2,6 +2,8 @@ import { EnvVarCertificate, EnvVarPort } from "../launcherTypes";
 
 const baseEnv = {
   APP_ROOT: "",
+  RPG_BOOK_CERTIFICATE: "",
+  RPG_BOOK_PORT: "123",
   VITE_PUBLIC: "",
 };
 

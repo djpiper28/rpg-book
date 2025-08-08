@@ -78,8 +78,7 @@ app.on("activate", () => {
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises,unicorn/prefer-top-level-await
 app.whenReady().then(() => {
-  // TODO: use the generated const, but things are broken and I no longer care and I want a pint
-  const certificate = process.env.RPG_BOOK_CERTIFICATE ?? "";
+  const certificate = process.env.RPG_BOOK_CERTIFICATE;
 
   session.defaultSession.setCertificateVerifyProc((request, callback) => {
     try {
