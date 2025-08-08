@@ -3,7 +3,6 @@ import { useDisclosure } from "@mantine/hooks";
 import { Plus, Settings, X } from "lucide-react";
 import { useEffect } from "react";
 import {
-  type LayoutRouteProps,
   Outlet,
   RouterProvider,
   createBrowserRouter,
@@ -58,7 +57,7 @@ const router = createBrowserRouter([
   },
 ]);
 
-function Layout(props: Readonly<LayoutRouteProps>) {
+function Layout() {
   const { setSettings } = useSettingsStore((s) => s);
   const tabs = useTabStore((x) => x);
   const navigate = useNavigate();
