@@ -1,6 +1,6 @@
+import { SiGithub } from "@icons-pack/react-simple-icons";
 import { Button, Table } from "@mantine/core";
 import dayjs from "dayjs";
-import { Github } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { H2 } from "@/components/typography/H2";
@@ -93,7 +93,7 @@ export function IndexPage() {
               <Table.Tr>
                 <Table.Th>{x.projectName}</Table.Th>
                 <Table.Th>{time.format()}</Table.Th>
-                <Table.Th>{size.toString()}</Table.Th>
+                <Table.Th>{size}</Table.Th>
                 <Table.Th>{x.fileName}</Table.Th>
               </Table.Tr>
             </Table.Tbody>
@@ -102,7 +102,7 @@ export function IndexPage() {
       </Table>
       <div className="flex flex-col gap-5 py-10">
         <div className="flex flex-row gap-2">
-          <Github />
+          <SiGithub />
           <P>
             View this project on{" "}
             <Link href="https://github.com/djpiper28/rpg-book">Github</Link>.

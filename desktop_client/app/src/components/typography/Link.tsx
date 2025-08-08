@@ -1,6 +1,7 @@
 import { shell } from "@electron/remote";
 import { Button } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { TriangleAlert } from "lucide-react";
 import { URL } from "node:url";
 import { type ReactNode } from "react";
 import { logger } from "@/lib/grpcClient/client";
@@ -49,6 +50,7 @@ export function Link(props: Readonly<Props>) {
         title="Opening External Links Can Be Dangerous"
       >
         <P>
+          <TriangleAlert />
           You are about to open an external link, this can be dangerous. Make
           sure you are happy with the website before opening it. ({url.href})
         </P>
