@@ -11,7 +11,6 @@ import {
 import { ErrorModal } from "./components/modal/errorModal";
 import { P } from "./components/typography/P";
 import { projectClient, systemClient } from "./lib/grpcClient/client";
-import { IndexPage } from "./pages";
 import { createProjectPath } from "./pages/createProject/path.ts";
 import { indexPath, withLayoutPath } from "./pages/path.ts";
 import { projectPath } from "./pages/project/path.ts";
@@ -32,7 +31,7 @@ const router = createBrowserRouter([
   {
     children: [
       {
-        element: <IndexPage />,
+        lazy: () => import("./pages/index.tsx"),
         path: "index",
       },
       {
