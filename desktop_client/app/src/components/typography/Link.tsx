@@ -11,8 +11,11 @@ import { P } from "./P";
 interface Props {
   children: ReactNode;
   href: string;
+  // Opens in a new electron window
   newWindow?: boolean;
   openInBrowser?: boolean;
+  // Set if using openInBrowser and the URL is known safe
+  safe?: boolean;
 }
 
 export function Link(props: Readonly<Props>) {
@@ -41,6 +44,16 @@ export function Link(props: Readonly<Props>) {
     return <p className={style}>Invalid URL</p>;
   }
 
+  const openUrl = () => {
+    shell
+      .openExternal(props.href)
+      .then()
+      .catch((error: unknown) => {
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        logger.error("Cannot open link", { error: `${error}` });
+      });
+  };
+
   return (
     <>
       <Modal
@@ -56,13 +69,7 @@ export function Link(props: Readonly<Props>) {
         </P>
         <Button
           onClick={() => {
-            shell
-              .openExternal(props.href)
-              .then()
-              .catch((error: unknown) => {
-                // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                logger.error("Cannot open link", { error: `${error}` });
-              });
+            openUrl();
           }}
         >
           Open Anyway
@@ -71,7 +78,11 @@ export function Link(props: Readonly<Props>) {
       <button
         className={`${style} cursor-grab`}
         onClick={() => {
-          open();
+          if (props.safe) {
+            openUrl();
+          } else {
+            open();
+          }
         }}
       >
         {props.children}
