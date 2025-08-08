@@ -23,8 +23,11 @@ import { useTabStore } from "./stores/tabStore";
 
 function IndexRedirect() {
   const navigate = useNavigate();
-  // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  navigate(indexPath);
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    navigate(indexPath);
+  }, [navigate]);
 
   return (
     <div className="flex justify-center items-center h-screen">
@@ -158,6 +161,10 @@ function ErrorPage() {
           <Table.Tr>
             <Table.Th>Backend Call Error</Table.Th>
             <Table.Th>{error}</Table.Th>
+          </Table.Tr>
+          <Table.Tr>
+            <Table.Th>System Version</Table.Th>
+            <Table.Th>{process.getSystemVersion()}</Table.Th>
           </Table.Tr>
         </Table.Tbody>
       </Table>
