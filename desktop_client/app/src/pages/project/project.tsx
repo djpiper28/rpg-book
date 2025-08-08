@@ -2,15 +2,16 @@ import { Tabs } from "@mantine/core";
 import { useNavigate } from "react-router";
 import { H2 } from "@/components/typography/H2";
 import { useTabStore } from "@/stores/tabStore";
+import { indexPath } from "../path";
 import { CharacterTab } from "./tabs/characterTab";
 
-export function ProjectPage() {
+export function Component() {
   const navigate = useNavigate();
   const tabs = useTabStore();
 
   if (!tabs.selectedTab) {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    navigate("/");
+    navigate(indexPath);
     return;
   }
 

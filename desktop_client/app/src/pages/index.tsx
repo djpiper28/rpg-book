@@ -1,3 +1,4 @@
+import { SiGithub } from "@icons-pack/react-simple-icons";
 import { Button, Table } from "@mantine/core";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
@@ -12,7 +13,7 @@ import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useTabStore } from "@/stores/tabStore";
-import { SiGithub } from "@icons-pack/react-simple-icons";
+import { projectPath } from "./project/path";
 
 export function IndexPage() {
   const [recentProjects, setRecentProjects] = useState<RecentProjectsResp>({
@@ -79,7 +80,7 @@ export function IndexPage() {
                     );
 
                     projects.newProject(resp.response.handle, resp.response);
-                    await navigate("/project");
+                    await navigate(projectPath);
                   })
                   .catch((error: unknown) => {
                     setError({

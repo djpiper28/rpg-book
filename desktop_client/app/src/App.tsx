@@ -2,20 +2,64 @@ import { Button, MantineProvider, Tabs, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Plus, Settings, X } from "lucide-react";
 import { useEffect } from "react";
-import { Route, Routes, useNavigate } from "react-router";
+import {
+  type LayoutRouteProps,
+  Outlet,
+  RouterProvider,
+  createBrowserRouter,
+  useNavigate,
+} from "react-router";
 import { ErrorModal } from "./components/modal/errorModal";
 import { P } from "./components/typography/P";
 import { projectClient, systemClient } from "./lib/grpcClient/client";
 import { IndexPage } from "./pages";
-import { CreateProjectPage } from "./pages/createProject/createProject";
-import { ProjectPage } from "./pages/project/project";
-import { SettingsPage } from "./pages/settings/settings";
+import { createProjectPath } from "./pages/createProject/path.ts";
+import { indexPath, withLayoutPath } from "./pages/path.ts";
+import { projectPath } from "./pages/project/path.ts";
+import { settingsPath } from "./pages/settings/path.ts";
 import { useGlobalErrorStore } from "./stores/globalErrorStore";
 import { useSettingsStore } from "./stores/settingsStore";
 import { useTabStore } from "./stores/tabStore";
 
-function App() {
-  const { setSettings, settings } = useSettingsStore((s) => s);
+function IndexRedirect() {
+  const navigate = useNavigate();
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  navigate(indexPath);
+
+  return "Almost ready!";
+}
+
+const router = createBrowserRouter([
+  {
+    children: [
+      {
+        element: <IndexPage />,
+        path: "index",
+      },
+      {
+        lazy: () => import("./pages/settings/settings.tsx"),
+        path: "settings",
+      },
+      {
+        lazy: () => import("./pages/project/project.tsx"),
+        path: "project",
+      },
+      {
+        lazy: () => import("./pages/createProject/createProject.tsx"),
+        path: "create-project",
+      },
+    ],
+    element: <Layout />,
+    path: withLayoutPath,
+  },
+  {
+    element: <IndexRedirect />,
+    path: "/",
+  },
+]);
+
+function Layout(props: Readonly<LayoutRouteProps>) {
+  const { setSettings } = useSettingsStore((s) => s);
   const tabs = useTabStore((x) => x);
   const navigate = useNavigate();
   const [opened, { close, open }] = useDisclosure(false);
@@ -41,12 +85,7 @@ function App() {
   }, [setSettings, setError]);
 
   return (
-    <MantineProvider
-      forceColorScheme={settings.darkMode ? "dark" : "light"}
-      // withCSSVariables
-      // withGlobalStyles
-      // withNormalizeCSS
-    >
+    <>
       <ErrorModal
         close={close}
         opened={opened}
@@ -64,7 +103,7 @@ function App() {
               className="cursor-pointer"
               onClick={() => {
                 // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                navigate("/");
+                navigate(indexPath);
               }}
               role="button"
             >
@@ -79,7 +118,7 @@ function App() {
                 tabs.setSelectedTab({ id: x });
 
                 // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                navigate("/project");
+                navigate(projectPath);
               }}
               value={tabs.selectedTab?.id}
               variant="outline"
@@ -101,7 +140,7 @@ function App() {
 
                                 // TODO: figure out why this logic is not working
                                 // if (tabs.selectedTab === tab.handle) {
-                                await navigate("/");
+                                await navigate(indexPath);
                                 // }
                               })
                               .catch(console.error);
@@ -123,7 +162,7 @@ function App() {
               aria-label="Create project"
               onClick={() => {
                 // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                navigate("/create-project");
+                navigate(createProjectPath);
               }}
               variant="subtle"
             >
@@ -133,7 +172,7 @@ function App() {
               aria-label="Open settings"
               onClick={() => {
                 // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                navigate("/settings");
+                navigate(settingsPath);
               }}
               variant="subtle"
             >
@@ -143,14 +182,24 @@ function App() {
         </div>
 
         <div className="flex flex-col gap-3 p-2">
-          <Routes>
-            <Route Component={IndexPage} path="/" />
-            <Route Component={SettingsPage} path="/settings" />
-            <Route Component={ProjectPage} path="/project" />
-            <Route Component={CreateProjectPage} path="/create-project" />
-          </Routes>
+          <Outlet />
         </div>
       </div>
+    </>
+  );
+}
+
+function App() {
+  const { settings } = useSettingsStore((s) => s);
+
+  return (
+    <MantineProvider
+      forceColorScheme={settings.darkMode ? "dark" : "light"}
+      // withCSSVariables
+      // withGlobalStyles
+      // withNormalizeCSS
+    >
+      <RouterProvider router={router} />
     </MantineProvider>
   );
 }

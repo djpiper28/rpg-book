@@ -10,6 +10,7 @@ import { projectClient } from "@/lib/grpcClient/client";
 import { randomPlace } from "@/lib/random/randomProjectName";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useTabStore } from "@/stores/tabStore";
+import { projectPath } from "../project/path";
 
 function validateProjectName(rawName: string): string {
   const name = rawName.trim().normalize("NFC");
@@ -21,7 +22,7 @@ function validateProjectName(rawName: string): string {
   return "";
 }
 
-export function CreateProjectPage() {
+export function Component() {
   const tabs = useTabStore((x) => x);
   const navigate = useNavigate();
   const [projectName, setProjectName] = useState<string>(randomPlace());
@@ -101,7 +102,7 @@ export function CreateProjectPage() {
             })
             .then(async (resp) => {
               tabs.addTab({ id: resp.response.id }, projectName);
-              await navigate("/project");
+              await navigate(projectPath);
             })
             .catch((error: unknown) => {
               setError({
