@@ -1,5 +1,5 @@
 interface Props {
-  children: string;
+  children?: string;
 }
 
 export function H2(props: Readonly<Props>) {

@@ -7,7 +7,7 @@ export function Modal(props: Readonly<ModalProps>) {
       centered
       onClose={props.close}
       opened={props.opened}
-      size="auto"
+      size="xl"
       title={props.title}
     >
       {props.children}

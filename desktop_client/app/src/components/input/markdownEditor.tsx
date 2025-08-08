@@ -17,7 +17,7 @@ export function MarkdownEditor(props: Readonly<Props>) {
       <div className="flex flex-col gap-1">
         <Textarea
           autosize
-          className="grow min-w-100"
+          className="grow min-w-50"
           label={props.label}
           minRows={10}
           onChange={(event) => {
