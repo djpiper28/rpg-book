@@ -9,13 +9,13 @@ const baseEnv = {
 
 describe("client", () => {
   it("should fail if it cannot load port and certificate", async () => {
-    process.env = { ...baseEnv } as any;
+    globalThis.process.env = { ...baseEnv } as any;
     const res = import("./client.ts");
     await expect(res).rejects.toThrowError();
   });
 
   it("should fail if it cannot connect to the server", async () => {
-    process.env = {
+    globalThis.process.env = {
       [EnvVarPort]: "9000",
       [EnvVarCertificate]: "Testing-cert",
       ...baseEnv,

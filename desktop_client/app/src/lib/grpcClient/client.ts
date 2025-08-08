@@ -4,15 +4,17 @@ import { LogLevel, LogProperty, LogRequest } from "./pb/system";
 import { SystemSvcClient } from "./pb/system.client";
 import { GrpcWebFetchTransport } from "@protobuf-ts/grpcweb-transport";
 
-function mustHave(x: string | undefined): string {
-  if (x) {
-    return x;
+function mustHaveEnv(key: string): string {
+  const val = globalThis.process.env[key];
+
+  if (val) {
+    return val;
   }
 
-  throw new Error(`Cannot find env var ${x}`);
+  throw new Error(`Cannot find env var ${key} - ${val} - ${JSON.stringify(globalThis.process.env)}`);
 }
 
-export const port = mustHave(process.env[EnvVarPort]);
+export const port = mustHaveEnv(EnvVarPort);
 const transport = new GrpcWebFetchTransport({
   baseUrl: `https://127.0.0.1:${port}`,
   fetchInit: {
