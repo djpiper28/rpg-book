@@ -1,6 +1,11 @@
 import { shell } from "@electron/remote";
+import { Button } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { URL } from "node:url";
 import { type ReactNode } from "react";
 import { logger } from "@/lib/grpcClient/client";
+import { Modal } from "../modal/modal";
+import { P } from "./P";
 
 interface Props {
   children: ReactNode;
@@ -10,31 +15,65 @@ interface Props {
 }
 
 export function Link(props: Readonly<Props>) {
+  const [opened, { close, open }] = useDisclosure(false);
   const style = "text-blue-500 hover:text-blue-600 underline";
 
-  return props.openInBrowser ? (
-    <button
-      className={`${style} cursor-grab`}
-      onClick={() => {
-        shell
-          .openExternal(props.href)
-          .then()
-          .catch((error: unknown) => {
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-            logger.error("Cannot open link", { error: `${error}` });
-          });
-      }}
-    >
-      {props.children}
-    </button>
-  ) : (
-    <a
-      className={style}
-      href={props.href}
-      rel={props.newWindow ? "noreferrer" : ""}
-      target={props.newWindow ? "_blank" : ""}
-    >
-      {props.children}
-    </a>
+  if (!props.openInBrowser) {
+    return (
+      <a
+        className={style}
+        href={props.href}
+        rel={props.newWindow ? "noreferrer" : ""}
+        target={props.newWindow ? "_blank" : ""}
+      >
+        {props.children}
+      </a>
+    );
+  }
+
+  let url: URL | undefined;
+
+  try {
+    url = new URL(props.href);
+  } catch (error: unknown) {
+    console.error(error);
+    return <p className={style}>Invalid URL</p>;
+  }
+
+  return (
+    <>
+      <Modal
+        close={close}
+        opened={opened}
+        size="auto"
+        title="Opening External Links Can Be Dangerous"
+      >
+        <P>
+          You are about to open an external link, this can be dangerous. Make
+          sure you are happy with the website before opening it. ({url.href})
+        </P>
+        <Button
+          onClick={() => {
+            shell
+              .openExternal(props.href)
+              .then()
+              .catch((error: unknown) => {
+                // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                logger.error("Cannot open link", { error: `${error}` });
+              });
+          }}
+        >
+          Open Anyway
+        </Button>
+      </Modal>
+      <button
+        className={`${style} cursor-grab`}
+        onClick={() => {
+          open();
+        }}
+      >
+        {props.children}
+      </button>
+    </>
   );
 }

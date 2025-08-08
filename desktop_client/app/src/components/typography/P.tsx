@@ -6,5 +6,6 @@ interface Props {
 }
 
 export function P(props: Readonly<Props>) {
-  return <p className="text-lg ${props.className}">{props.children}</p>;
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-template-expression
+  return <p className={`${props.className ?? ""}`}>{props.children}</p>;
 }

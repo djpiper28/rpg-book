@@ -7,10 +7,10 @@ export function Modal(props: Readonly<ModalProps>) {
       centered
       onClose={props.close}
       opened={props.opened}
-      size="xl"
+      size={props.size ?? "xl"}
       title={props.title}
     >
-      {props.children}
+      <div className="flex flex-col gap-2">{props.children}</div>
     </MantineModal>
   );
 }

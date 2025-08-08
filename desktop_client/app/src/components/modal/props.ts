@@ -6,5 +6,6 @@ export interface ModalProps {
   close: () => void;
   // useDisclosure() from mantine/hooks to get this
   opened: boolean;
+  size?: string;
   title: string;
 }

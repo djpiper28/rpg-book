@@ -14,7 +14,7 @@ interface SafeLinkProps {
 function SafeLink(props: Readonly<SafeLinkProps>) {
   return (
     <Link href={props.href ?? ""} openInBrowser={true}>
-      {props.children ?? ""} ({props.href})
+      {props.children ?? ""}
     </Link>
   );
 }
