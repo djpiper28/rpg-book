@@ -7,7 +7,7 @@ import { H2 } from "@/components/typography/H2";
 import { Link } from "@/components/typography/Link";
 import { P } from "@/components/typography/P";
 import { bytesToFriendly } from "@/lib/fileSizeHelpers";
-import { projectClient } from "@/lib/grpcClient/client";
+import { logger, projectClient } from "@/lib/grpcClient/client";
 import { type RecentProjectsResp } from "@/lib/grpcClient/pb/project";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useProjectStore } from "@/stores/projectStore";
@@ -121,13 +121,42 @@ export function Component() {
             <Button
               color="red"
               onClick={() => {
+                logger.info("Causing a handled error on purpose", {});
+
                 setError({
                   body: "Test Error Message.",
                   title: "Dev Mode Test Error",
                 });
               }}
             >
-              Force Error
+              Force handled error
+            </Button>
+            <Button
+              color="red"
+              onClick={() => {
+                logger.info("Causing an unhandled error on purpose", {});
+                throw new Error("Test");
+              }}
+            >
+              Force unhandled error
+            </Button>
+            <Button
+              color="red"
+              onClick={() => {
+                logger.info("Going to an error boundary page on purpose", {});
+                // eslint-disable-next-line @typescript-eslint/no-floating-promises
+                navigate("/dev/not-found");
+              }}
+            >
+              Error Boundary Page
+            </Button>
+            <Button
+              onClick={() => {
+                // eslint-disable-next-line @typescript-eslint/no-floating-promises
+                navigate("/dev/loading");
+              }}
+            >
+              Loading Page
             </Button>
           </>
         ) : (
