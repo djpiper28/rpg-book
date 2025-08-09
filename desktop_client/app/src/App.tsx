@@ -7,6 +7,7 @@ import {
   RouterProvider,
   createHashRouter,
   useNavigate,
+  useRouteError,
 } from "react-router";
 import { ErrorModal } from "./components/modal/errorModal";
 import { H1 } from "./components/typography/H1.tsx";
@@ -101,8 +102,9 @@ function Loader() {
 
 function ErrorPage() {
   const navigate = useNavigate();
+  const routeError = useRouteError();
   const [version, setVersion] = useState(<></>);
-  const [error, setError] = useState("");
+  const [backendError, setBackendError] = useState("");
 
   useEffect(() => {
     getSystemClient()
@@ -125,12 +127,15 @@ function ErrorPage() {
       })
       .catch((error_: unknown) => {
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        setError(`${error_}`);
+        setBackendError(`${error_}`);
       });
-  }, [setError]);
+  }, []);
 
   getLogger().error("Error boundary triggered", {
+    backendError,
     location: globalThis.location.href,
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    routeError: `${routeError}`,
   });
 
   return (
@@ -161,12 +166,18 @@ function ErrorPage() {
             <Table.Th>{globalThis.location.href}</Table.Th>
           </Table.Tr>
           <Table.Tr>
-            <Table.Th>Version</Table.Th>
-            <Table.Th>{version}</Table.Th>
+            <Table.Th>Route Error</Table.Th>
+            <Table.Th>
+              <pre>{JSON.stringify(routeError)}</pre>
+            </Table.Th>
           </Table.Tr>
           <Table.Tr>
             <Table.Th>Backend Call Error</Table.Th>
-            <Table.Th>{error}</Table.Th>
+            <Table.Th>{backendError}</Table.Th>
+          </Table.Tr>
+          <Table.Tr>
+            <Table.Th>Version</Table.Th>
+            <Table.Th>{version}</Table.Th>
           </Table.Tr>
           <Table.Tr>
             <Table.Th>System Version</Table.Th>
@@ -309,7 +320,7 @@ function Layout() {
   );
 }
 
-function App() {
+export default function App() {
   const { settings } = useSettingsStore((s) => s);
 
   useEffect(() => {
@@ -327,5 +338,3 @@ function App() {
     </MantineProvider>
   );
 }
-
-export default App;
