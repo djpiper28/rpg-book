@@ -1,7 +1,7 @@
 import { fireEvent, waitFor } from "@testing-library/react";
 import { CreateFileInput } from "@/components/input/createFileInput";
 import { DbExtension } from "@/lib/databaseTypes";
-import { projectClient } from "@/lib/grpcClient/client";
+import { getProjectClient } from "@/lib/grpcClient/client";
 import {
   type CreateProjectReq,
   type ProjectHandle,
@@ -11,7 +11,7 @@ import { wrappedRender } from "@/lib/testUtils/wrappedRender";
 import { Component as Page } from "./createProject";
 
 vi.mock("../../lib/grpcClient/client.ts");
-const mockedClient = vi.mocked(projectClient);
+const mockedClient = vi.mocked(getProjectClient());
 const id = "f23c1618-39c3-4368-a66b-c50ed7187ea6";
 
 vi.mock("../../components/input/createFileInput.tsx");
@@ -52,7 +52,7 @@ describe("Create project", () => {
 
     await waitFor(() => {
       //eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(mockedClient.createProject).toHaveBeenCalledWith({
+      expect(getProjectClient().createProject).toHaveBeenCalledWith({
         fileName: `${testName}${DbExtension}`,
         projectName: testName,
       } as CreateProjectReq);

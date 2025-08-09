@@ -1,10 +1,10 @@
-import { shell } from "@electron/remote";
 import { Button } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { TriangleAlert } from "lucide-react";
 import { URL } from "node:url";
 import { type ReactNode } from "react";
-import { logger } from "@/lib/grpcClient/client";
+import { electronShell as shell } from "@/lib/electron";
+import { getLogger } from "@/lib/grpcClient/client";
 import { Modal } from "../modal/modal";
 import { P } from "./P";
 
@@ -50,7 +50,7 @@ export function Link(props: Readonly<Props>) {
       .then()
       .catch((error: unknown) => {
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        logger.error("Cannot open link", { error: `${error}` });
+        getLogger().error("Cannot open link", { error: `${error}` });
       });
   };
 

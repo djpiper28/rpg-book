@@ -1,7 +1,7 @@
 import { Button, TextInput } from "@mantine/core";
 import { useState } from "react";
 import { MarkdownEditor } from "@/components/input/markdownEditor";
-import { projectClient } from "@/lib/grpcClient/client";
+import { getProjectClient } from "@/lib/grpcClient/client";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
@@ -37,7 +37,7 @@ export default function CreateCharacterModal() {
       />
       <Button
         onClick={() => {
-          projectClient
+          getProjectClient()
             .createCharacter({
               name: characterName,
               project: projectHandle,

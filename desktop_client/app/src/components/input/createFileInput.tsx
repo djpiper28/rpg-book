@@ -1,6 +1,6 @@
-import * as remote from "@electron/remote";
 import { Input, type InputVariant, InputWrapper } from "@mantine/core";
 import { FileIcon } from "lucide-react";
+import { electronDialog as dialog } from "@/lib/electron";
 
 interface Props {
   buttonLabel?: string;
@@ -32,13 +32,13 @@ export function CreateFileInput(props: Readonly<Props>) {
         rightSection={
           <button
             onClick={() => {
-              remote.dialog
-                .showSaveDialog(remote.getCurrentWindow(), {
+              dialog
+                .showSaveDialog({
                   buttonLabel: props.buttonLabel,
                   filters: props.filters,
                   title: props.title,
                 })
-                .then((result) => {
+                .then((result: Electron.SaveDialogReturnValue) => {
                   if (result.canceled) {
                     return;
                   }

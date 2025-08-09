@@ -6,7 +6,7 @@ import { CreateFileInput } from "@/components/input/createFileInput";
 import { H2 } from "@/components/typography/H2";
 import { H3 } from "@/components/typography/H3";
 import { DbExtension } from "@/lib/databaseTypes";
-import { projectClient } from "@/lib/grpcClient/client";
+import { getProjectClient } from "@/lib/grpcClient/client";
 import { randomPlace } from "@/lib/random/randomProjectName";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useTabStore } from "@/stores/tabStore";
@@ -95,7 +95,7 @@ export function Component() {
             return;
           }
 
-          projectClient
+          getProjectClient()
             .createProject({
               fileName: saveLocation,
               projectName,

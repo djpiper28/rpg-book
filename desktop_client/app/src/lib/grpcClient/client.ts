@@ -1,11 +1,54 @@
 import { EnvVarPort } from "../launcherTypes";
-import { ProjectSvcClient } from "./pb/project.client";
 import { LogLevel, LogProperty, LogRequest } from "./pb/system";
+import { ProjectSvcClient } from "./pb/project.client";
 import { SystemSvcClient } from "./pb/system.client";
 import { GrpcWebFetchTransport } from "@protobuf-ts/grpcweb-transport";
+import { env } from "../electron";
+
+
+let projectClient: ProjectSvcClient | undefined;
+let systemClient: SystemSvcClient | undefined;
+
+type logFunc = (msg: string, props: Record<string, string>) => void;
+
+let logger: {
+  info: logFunc;
+  warn: logFunc;
+  error: logFunc;
+  fatal: logFunc;
+} | undefined;
+
+export function getProjectClient(): ProjectSvcClient {
+  if (!projectClient) {
+    throw new Error("ProjectClient not initialized");
+  }
+
+  return projectClient;
+}
+
+export function getSystemClient(): SystemSvcClient {
+  if (!systemClient) {
+    throw new Error("SystemClient not initialized");
+  }
+
+  return systemClient;
+}
+
+export function getLogger(): {
+  info: logFunc;
+  warn: logFunc;
+  error: logFunc;
+  fatal: logFunc;
+} {
+  if (!logger) {
+    throw new Error("Logger not initialized");
+  }
+
+  return logger;
+}
 
 function mustHaveEnv(key: string): string {
-  const val = globalThis.process.env[key];
+  const val = env[key];
 
   if (val) {
     return val;
@@ -14,33 +57,34 @@ function mustHaveEnv(key: string): string {
   throw new Error(`Cannot find env var ${key} - ${val} - ${JSON.stringify(globalThis.process.env)}`);
 }
 
-export const port = mustHaveEnv(EnvVarPort);
-const transport = new GrpcWebFetchTransport({
-  baseUrl: `https://127.0.0.1:${port}`,
-  fetchInit: {
-    keepalive: true,
-    redirect: "error",
-    cache: "no-cache",
-  },
-  format: "binary",
-  timeout: 5_000,
-});
+export function initializeClients() {
+  const port = mustHaveEnv(EnvVarPort);
+  const transport = new GrpcWebFetchTransport({
+    baseUrl: `https://127.0.0.1:${port}`,
+    fetchInit: {
+      keepalive: true,
+      redirect: "error",
+      cache: "no-cache",
+    },
+    format: "binary",
+    timeout: 5_000,
+  });
 
-export const systemClient = new SystemSvcClient(transport);
-export const projectClient = new ProjectSvcClient(transport);
-export const logger = {
-  info: (msg: string, props: Record<string, string>) =>
-    logAtLevel(LogLevel.INFO, msg, props),
-  warn: (msg: string, props: Record<string, string>) =>
-    logAtLevel(LogLevel.WARNING, msg, props),
-  error: (msg: string, props: Record<string, string>) =>
-    logAtLevel(LogLevel.ERROR, msg, props),
-  fatal: (msg: string, props: Record<string, string>) =>
-    logAtLevel(LogLevel.FATAL, msg, props),
-};
+  systemClient = new SystemSvcClient(transport);
+  projectClient = new ProjectSvcClient(transport);
+  logger = {
+    info: (msg: string, props: Record<string, string>) =>
+      logAtLevel(LogLevel.INFO, msg, props),
+    warn: (msg: string, props: Record<string, string>) =>
+      logAtLevel(LogLevel.WARNING, msg, props),
+    error: (msg: string, props: Record<string, string>) =>
+      logAtLevel(LogLevel.ERROR, msg, props),
+    fatal: (msg: string, props: Record<string, string>) =>
+      logAtLevel(LogLevel.FATAL, msg, props),
+  };
+}
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function logAtLevel(level: any, msg: string, props: Record<string, string>) {
+function logAtLevel(level: LogLevel, msg: string, props: Record<string, string>) {
   const properties = [];
   for (const key of Object.keys(props)) {
     const item = LogProperty.create({
@@ -59,7 +103,7 @@ function logAtLevel(level: any, msg: string, props: Record<string, string>) {
   });
 
   console.log(`${level} - ${msg} - ${props}`);
-  systemClient
+  getSystemClient()
     .log(req)
     .then(() => {})
     .catch((e) => {

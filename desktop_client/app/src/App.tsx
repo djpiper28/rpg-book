@@ -5,14 +5,19 @@ import { useEffect, useState } from "react";
 import {
   Outlet,
   RouterProvider,
-  createBrowserRouter,
+  createHashRouter,
   useNavigate,
 } from "react-router";
 import { ErrorModal } from "./components/modal/errorModal";
 import { H1 } from "./components/typography/H1.tsx";
 import { H2 } from "./components/typography/H2.tsx";
 import { P } from "./components/typography/P";
-import { logger, projectClient, systemClient } from "./lib/grpcClient/client";
+import {
+  getLogger,
+  getProjectClient,
+  getSystemClient,
+  initializeClients,
+} from "./lib/grpcClient/client";
 import { createProjectPath } from "./pages/createProject/path.ts";
 import { indexPath, withLayoutPath } from "./pages/path.ts";
 import { projectPath } from "./pages/project/path.ts";
@@ -20,6 +25,7 @@ import { settingsPath } from "./pages/settings/path.ts";
 import { useGlobalErrorStore } from "./stores/globalErrorStore";
 import { useSettingsStore } from "./stores/settingsStore";
 import { useTabStore } from "./stores/tabStore";
+import { getSystemVersion } from "./lib/electron/index.ts";
 
 function IndexRedirect() {
   const navigate = useNavigate();
@@ -41,7 +47,7 @@ const routesCommon = {
   loader: Loader,
 };
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     children: [
       {
@@ -99,7 +105,7 @@ function ErrorPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    systemClient
+    getSystemClient()
       .getVersion({})
       .then((resp) => {
         setVersion(
@@ -123,7 +129,7 @@ function ErrorPage() {
       });
   }, [setError]);
 
-  logger.error("Error boundary triggered", {
+  getLogger().error("Error boundary triggered", {
     location: globalThis.location.href,
   });
 
@@ -164,7 +170,7 @@ function ErrorPage() {
           </Table.Tr>
           <Table.Tr>
             <Table.Th>System Version</Table.Th>
-            <Table.Th>{process.getSystemVersion()}</Table.Th>
+            <Table.Th>{getSystemVersion()}</Table.Th>
           </Table.Tr>
         </Table.Tbody>
       </Table>
@@ -186,7 +192,7 @@ function Layout() {
   }, [currentError, open]);
 
   useEffect(() => {
-    systemClient
+    getSystemClient()
       .getSettings({})
       .then((x) => {
         setSettings(x.response);
@@ -247,7 +253,7 @@ function Layout() {
                           className="cursor-pointer z-10"
                           color="red"
                           onClick={() => {
-                            projectClient
+                            getProjectClient()
                               .closeProject(tab.handle)
                               .then(async () => {
                                 tabs.removeTab(tab.handle);
@@ -305,6 +311,10 @@ function Layout() {
 
 function App() {
   const { settings } = useSettingsStore((s) => s);
+
+  useEffect(() => {
+    initializeClients();
+  }, []);
 
   return (
     <MantineProvider

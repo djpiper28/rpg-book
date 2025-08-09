@@ -1,8 +1,9 @@
 import { Button, Checkbox, InputDescription } from "@mantine/core";
 import { Settings, TriangleAlert } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { H2 } from "@/components/typography/H2";
-import { systemClient } from "@/lib/grpcClient/client";
+import { getSystemClient } from "@/lib/grpcClient/client";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 
@@ -11,9 +12,10 @@ export function Component() {
   const [dirtySettings, setDirtySettings] = useState(settings);
   const [version, setVersion] = useState(<></>);
   const { setError } = useGlobalErrorStore((x) => x);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    systemClient
+    getSystemClient()
       .getVersion({})
       .then((resp) => {
         setVersion(
@@ -63,7 +65,7 @@ export function Component() {
       <div className="flex flex-row justify-between gap-3">
         <Button
           onClick={() => {
-            globalThis.location.href = "/";
+            navigate("/");
           }}
           variant="default"
         >
@@ -71,11 +73,11 @@ export function Component() {
         </Button>
         <Button
           onClick={() => {
-            systemClient
+            getSystemClient()
               .setSettings(dirtySettings)
               .then(() => {
                 setSettings(dirtySettings);
-                globalThis.location.href = "/";
+                navigate("/");
               })
               .catch((error: unknown) => {
                 setError({

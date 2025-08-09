@@ -7,7 +7,7 @@ import { H2 } from "@/components/typography/H2";
 import { Link } from "@/components/typography/Link";
 import { P } from "@/components/typography/P";
 import { bytesToFriendly } from "@/lib/fileSizeHelpers";
-import { logger, projectClient } from "@/lib/grpcClient/client";
+import { getLogger, getProjectClient } from "@/lib/grpcClient/client";
 import { type RecentProjectsResp } from "@/lib/grpcClient/pb/project";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useProjectStore } from "@/stores/projectStore";
@@ -27,7 +27,7 @@ export function Component() {
   const settings = useSettingsStore((x) => x.settings);
 
   useEffect(() => {
-    projectClient
+    getProjectClient()
       .recentProjects({})
       .then((x) => {
         setRecentProjects(x.response);
@@ -61,7 +61,7 @@ export function Component() {
               className="cursor-pointer"
               key={x.fileName}
               onClick={() => {
-                projectClient
+                getProjectClient()
                   .openProject({ fileName: x.fileName })
                   .then(async (resp) => {
                     if (!resp.response.handle) {
@@ -121,7 +121,7 @@ export function Component() {
             <Button
               color="red"
               onClick={() => {
-                logger.info("Causing a handled error on purpose", {});
+                getLogger().info("Causing a handled error on purpose", {});
 
                 setError({
                   body: "Test Error Message.",
@@ -134,7 +134,7 @@ export function Component() {
             <Button
               color="red"
               onClick={() => {
-                logger.info("Causing an unhandled error on purpose", {});
+                getLogger().info("Causing an unhandled error on purpose", {});
                 throw new Error("Test");
               }}
             >
@@ -143,7 +143,7 @@ export function Component() {
             <Button
               color="red"
               onClick={() => {
-                logger.info("Going to an error boundary page on purpose", {});
+                getLogger().info("Going to an error boundary page on purpose", {});
                 // eslint-disable-next-line @typescript-eslint/no-floating-promises
                 navigate("/dev/not-found");
               }}
