@@ -13,20 +13,24 @@ import { ErrorModal } from "./components/modal/errorModal";
 import { H1 } from "./components/typography/H1.tsx";
 import { H2 } from "./components/typography/H2.tsx";
 import { P } from "./components/typography/P";
+import { getSystemVersion } from "./lib/electron/index.ts";
 import {
   getLogger,
   getProjectClient,
   getSystemClient,
   initializeClients,
 } from "./lib/grpcClient/client";
+import { CreateProjectPage } from "./pages/createProject/createProject.tsx";
 import { createProjectPath } from "./pages/createProject/path.ts";
+import { IndexPage } from "./pages/index.tsx";
 import { indexPath, withLayoutPath } from "./pages/path.ts";
 import { projectPath } from "./pages/project/path.ts";
+import { ProjectPage } from "./pages/project/project.tsx";
 import { settingsPath } from "./pages/settings/path.ts";
+import { SettingsPage } from "./pages/settings/settings.tsx";
 import { useGlobalErrorStore } from "./stores/globalErrorStore";
 import { useSettingsStore } from "./stores/settingsStore";
 import { useTabStore } from "./stores/tabStore";
-import { getSystemVersion } from "./lib/electron/index.ts";
 
 function IndexRedirect() {
   const navigate = useNavigate();
@@ -52,19 +56,19 @@ const router = createHashRouter([
   {
     children: [
       {
-        lazy: () => import("./pages/index.tsx"),
+        element: <IndexPage />,
         path: "index",
       },
       {
-        lazy: () => import("./pages/settings/settings.tsx"),
+        element: <SettingsPage />,
         path: "settings",
       },
       {
-        lazy: () => import("./pages/project/project.tsx"),
+        element: <ProjectPage />,
         path: "project",
       },
       {
-        lazy: () => import("./pages/createProject/createProject.tsx"),
+        element: <CreateProjectPage />,
         path: "create-project",
       },
     ],
@@ -103,6 +107,8 @@ function Loader() {
 function ErrorPage() {
   const navigate = useNavigate();
   const routeError = useRouteError();
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  const routeErrCast = routeError as Error;
   const [version, setVersion] = useState(<></>);
   const [backendError, setBackendError] = useState("");
 
@@ -163,25 +169,33 @@ function ErrorPage() {
         <Table.Tbody>
           <Table.Tr>
             <Table.Th>Current page</Table.Th>
-            <Table.Th>{globalThis.location.href}</Table.Th>
+            <Table.Th>
+              <pre>{globalThis.location.href}</pre>
+            </Table.Th>
           </Table.Tr>
           <Table.Tr>
             <Table.Th>Route Error</Table.Th>
             <Table.Th>
-              <pre>{JSON.stringify(routeError)}</pre>
+              <pre>{JSON.stringify(routeErrCast.message)}</pre>
             </Table.Th>
           </Table.Tr>
           <Table.Tr>
             <Table.Th>Backend Call Error</Table.Th>
-            <Table.Th>{backendError}</Table.Th>
+            <Table.Th>
+              <pre>{backendError}</pre>
+            </Table.Th>
           </Table.Tr>
           <Table.Tr>
             <Table.Th>Version</Table.Th>
-            <Table.Th>{version}</Table.Th>
+            <Table.Th>
+              <pre>{version}</pre>
+            </Table.Th>
           </Table.Tr>
           <Table.Tr>
             <Table.Th>System Version</Table.Th>
-            <Table.Th>{getSystemVersion()}</Table.Th>
+            <Table.Th>
+              <pre>{getSystemVersion()}</pre>
+            </Table.Th>
           </Table.Tr>
         </Table.Tbody>
       </Table>

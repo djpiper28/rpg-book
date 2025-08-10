@@ -7,7 +7,7 @@ import { getSystemClient } from "@/lib/grpcClient/client";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 
-export function Component() {
+export function SettingsPage() {
   const { setSettings, settings } = useSettingsStore((s) => s);
   const [dirtySettings, setDirtySettings] = useState(settings);
   const [version, setVersion] = useState(<></>);

@@ -15,7 +15,7 @@ import { useSettingsStore } from "@/stores/settingsStore";
 import { useTabStore } from "@/stores/tabStore";
 import { projectPath } from "./project/path";
 
-export function Component() {
+export function IndexPage() {
   const [recentProjects, setRecentProjects] = useState<RecentProjectsResp>({
     projects: [],
   });
@@ -143,7 +143,11 @@ export function Component() {
             <Button
               color="red"
               onClick={() => {
-                getLogger().info("Going to an error boundary page on purpose", {});
+                getLogger().info(
+                  "Going to an error boundary page on purpose",
+                  {},
+                );
+
                 // eslint-disable-next-line @typescript-eslint/no-floating-promises
                 navigate("/dev/not-found");
               }}

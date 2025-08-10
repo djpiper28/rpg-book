@@ -1,7 +1,6 @@
 import { Button } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { TriangleAlert } from "lucide-react";
-import { URL } from "node:url";
 import { type ReactNode } from "react";
 import { electronShell as shell } from "@/lib/electron";
 import { getLogger } from "@/lib/grpcClient/client";

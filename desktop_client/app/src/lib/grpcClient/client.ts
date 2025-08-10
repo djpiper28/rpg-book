@@ -102,7 +102,7 @@ function logAtLevel(level: LogLevel, msg: string, props: Record<string, string>)
     properties: properties,
   });
 
-  console.log(`${level} - ${msg} - ${props}`);
+  console.log(`${level} - ${msg} - ${JSON.stringify(props)}`);
   getSystemClient()
     .log(req)
     .then(() => {})

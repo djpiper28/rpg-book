@@ -8,7 +8,7 @@ import {
 } from "@/lib/grpcClient/pb/project";
 import { newResult } from "@/lib/testUtils/grpcTestUtils";
 import { wrappedRender } from "@/lib/testUtils/wrappedRender";
-import { Component as Page } from "./createProject";
+import { CreateProjectPage as Page } from "./createProject";
 
 vi.mock("../../lib/grpcClient/client.ts");
 const mockedClient = vi.mocked(getProjectClient());
