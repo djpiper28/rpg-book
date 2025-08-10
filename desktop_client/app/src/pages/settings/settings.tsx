@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { H2 } from "@/components/typography/H2";
 import { getSystemClient } from "@/lib/grpcClient/client";
+import { mustVoid } from "@/lib/utils/errorHandlers";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 
@@ -65,7 +66,7 @@ export function Component() {
       <div className="flex flex-row justify-between gap-3">
         <Button
           onClick={() => {
-            navigate("/");
+            mustVoid(navigate("/"));
           }}
           variant="default"
         >
@@ -77,7 +78,7 @@ export function Component() {
               .setSettings(dirtySettings)
               .then(() => {
                 setSettings(dirtySettings);
-                navigate("/");
+                mustVoid(navigate("/"));
               })
               .catch((error: unknown) => {
                 setError({

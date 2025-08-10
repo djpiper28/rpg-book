@@ -9,6 +9,7 @@ import { P } from "@/components/typography/P";
 import { bytesToFriendly } from "@/lib/fileSizeHelpers";
 import { getLogger, getProjectClient } from "@/lib/grpcClient/client";
 import { type RecentProjectsResp } from "@/lib/grpcClient/pb/project";
+import { mustVoid } from "@/lib/utils/errorHandlers";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { useSettingsStore } from "@/stores/settingsStore";
@@ -63,7 +64,7 @@ export function Component() {
               onClick={() => {
                 getProjectClient()
                   .openProject({ fileName: x.fileName })
-                  .then(async (resp) => {
+                  .then((resp) => {
                     if (!resp.response.handle) {
                       setError({
                         body: "Invalid project returned by server - no handle",
@@ -80,7 +81,7 @@ export function Component() {
                     );
 
                     projects.newProject(resp.response.handle, resp.response);
-                    await navigate(projectPath);
+                    mustVoid(navigate(projectPath));
                   })
                   .catch((error: unknown) => {
                     setError({
@@ -148,16 +149,14 @@ export function Component() {
                   {},
                 );
 
-                // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                navigate("/dev/not-found");
+                mustVoid(navigate("/dev/not-found"));
               }}
             >
               Error Boundary Page
             </Button>
             <Button
               onClick={() => {
-                // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                navigate("/dev/loading");
+                mustVoid(navigate("/dev/loading"));
               }}
             >
               Loading Page

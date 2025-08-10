@@ -8,6 +8,7 @@ import { H3 } from "@/components/typography/H3";
 import { DbExtension } from "@/lib/databaseTypes";
 import { getProjectClient } from "@/lib/grpcClient/client";
 import { randomPlace } from "@/lib/random/randomProjectName";
+import { mustVoid } from "@/lib/utils/errorHandlers";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useTabStore } from "@/stores/tabStore";
 import { projectPath } from "../project/path";
@@ -100,9 +101,9 @@ export function Component() {
               fileName: saveLocation,
               projectName,
             })
-            .then(async (resp) => {
+            .then((resp) => {
               tabs.addTab({ id: resp.response.id }, projectName);
-              await navigate(projectPath);
+              mustVoid(navigate(projectPath));
             })
             .catch((error: unknown) => {
               setError({

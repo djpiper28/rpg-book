@@ -20,6 +20,7 @@ import {
   getSystemClient,
   initializeClients,
 } from "./lib/grpcClient/client";
+import { mustVoid } from "./lib/utils/errorHandlers.tsx";
 import { createProjectPath } from "./pages/createProject/path.ts";
 import { indexPath, withLayoutPath } from "./pages/path.ts";
 import { projectPath } from "./pages/project/path.ts";
@@ -32,8 +33,7 @@ function IndexRedirect() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    navigate(indexPath);
+    mustVoid(navigate(indexPath));
   }, [navigate]);
 
   return (
@@ -147,8 +147,7 @@ function ErrorPage() {
       <Button
         className="w-min"
         onClick={() => {
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          navigate(indexPath);
+          mustVoid(navigate(indexPath));
         }}
       >
         Try returning to home page
@@ -243,8 +242,7 @@ function Layout() {
             <Title
               className="cursor-pointer"
               onClick={() => {
-                // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                navigate(indexPath);
+                mustVoid(navigate(indexPath));
               }}
               role="button"
             >
@@ -257,9 +255,7 @@ function Layout() {
                 }
 
                 tabs.setSelectedTab({ id: x });
-
-                // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                navigate(projectPath);
+                mustVoid(navigate(projectPath));
               }}
               value={tabs.selectedTab?.id}
               variant="outline"
@@ -276,12 +272,12 @@ function Layout() {
                           onClick={() => {
                             getProjectClient()
                               .closeProject(tab.handle)
-                              .then(async () => {
+                              .then(() => {
                                 tabs.removeTab(tab.handle);
 
                                 // TODO: figure out why this logic is not working
                                 // if (tabs.selectedTab === tab.handle) {
-                                await navigate(indexPath);
+                                mustVoid(navigate(indexPath));
                                 // }
                               })
                               .catch(console.error);
@@ -302,8 +298,7 @@ function Layout() {
             <Button
               aria-label="Create project"
               onClick={() => {
-                // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                navigate(createProjectPath);
+                mustVoid(navigate(createProjectPath));
               }}
               variant="subtle"
             >
@@ -312,8 +307,7 @@ function Layout() {
             <Button
               aria-label="Open settings"
               onClick={() => {
-                // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                navigate(settingsPath);
+                mustVoid(navigate(settingsPath));
               }}
               variant="subtle"
             >
