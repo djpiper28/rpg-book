@@ -4,6 +4,7 @@ import path from "node:path";
 import { defineConfig } from "vite";
 import commonjs from "vite-plugin-commonjs";
 import electron from "vite-plugin-electron/simple";
+import nodePolyfills from "rollup-plugin-node-polyfills";
 
 export default defineConfig({
   appType: "spa",
@@ -13,6 +14,10 @@ export default defineConfig({
     },
   },
   envPrefix: ["VITE_", "RPG_BOOK_"],
+  define: {
+    'global': {},
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+  },
   plugins: [
     react(),
     electron({
@@ -30,12 +35,16 @@ export default defineConfig({
           : {},
     }),
     tailwindcss(),
-    commonjs(),
+    commonjs({
+      include: [/node_modules\/use-callback-ref\//, /node_modules\/react\//],
+    }),
+    nodePolyfills(),
   ],
   resolve: {
     alias: {
       // eslint-disable-next-line unicorn/prefer-module
       "@": path.resolve(__dirname, "./src"),
     },
+    mainFields: ['module', 'jsnext:main', 'jsnext', 'main'],
   },
 });

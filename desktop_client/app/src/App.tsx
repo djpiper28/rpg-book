@@ -131,12 +131,14 @@ function ErrorPage() {
       });
   }, []);
 
-  getLogger().error("Error boundary triggered", {
-    backendError,
-    location: globalThis.location.href,
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    routeError: `${routeError}`,
-  });
+  useEffect(() => {
+    getLogger().error("Error boundary triggered", {
+      backendError,
+      location: globalThis.location.href,
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      routeError: `${routeError}`,
+    });
+  }, [routeError, backendError]);
 
   return (
     <div className="flex flex-col gap-3 p-10">
