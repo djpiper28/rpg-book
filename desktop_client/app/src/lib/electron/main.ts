@@ -10,3 +10,7 @@ export function getSystemVersion() {
 export const env: {[key: string]: string} = {
   RPG_BOOK_PORT: process.env.RPG_BOOK_PORT,
 };
+
+export function getBuildType() {
+  return process.env.VITE_DEV_SERVER_URL ? "Development" : "Production";
+}
