@@ -61,11 +61,13 @@ export function Link(props: Readonly<Props>) {
         size="auto"
         title="Opening External Links Can Be Dangerous"
       >
-        <P>
+        <div className="flex flex-row gap-2">
           <TriangleAlert />
-          You are about to open an external link, this can be dangerous. Make
-          sure you are happy with the website before opening it. ({url.href})
-        </P>
+          <P>
+            You are about to open an external link, this can be dangerous. Make
+            sure you are happy with the website before opening it. ({url.href})
+          </P>
+        </div>
         <Button
           onClick={() => {
             openUrl();
