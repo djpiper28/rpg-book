@@ -1,3 +1,4 @@
+// eslint-disable-next-line import-x/no-unresolved
 import { contextBridge } from "electron";
 import {
   electronDialog,

@@ -1,4 +1,5 @@
 import * as remote from "@electron/remote/main";
+// eslint-disable-next-line import-x/no-unresolved
 import { BrowserWindow, app, session } from "electron";
 import path from "node:path";
 import { fileURLToPath } from "node:url";

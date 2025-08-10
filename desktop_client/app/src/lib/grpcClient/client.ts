@@ -5,18 +5,19 @@ import { SystemSvcClient } from "./pb/system.client";
 import { GrpcWebFetchTransport } from "@protobuf-ts/grpcweb-transport";
 import { env } from "../electron";
 
-
 let projectClient: ProjectSvcClient | undefined;
 let systemClient: SystemSvcClient | undefined;
 
 type logFunc = (msg: string, props: Record<string, string>) => void;
 
-let logger: {
-  info: logFunc;
-  warn: logFunc;
-  error: logFunc;
-  fatal: logFunc;
-} | undefined;
+let logger:
+  | {
+      info: logFunc;
+      warn: logFunc;
+      error: logFunc;
+      fatal: logFunc;
+    }
+  | undefined;
 
 export function getProjectClient(): ProjectSvcClient {
   if (!projectClient) {
@@ -54,7 +55,9 @@ function mustHaveEnv(key: string): string {
     return val;
   }
 
-  throw new Error(`Cannot find env var ${key} - ${val} - ${JSON.stringify(globalThis.process.env)}`);
+  throw new Error(
+    `Cannot find env var ${key} - ${val} - ${JSON.stringify(globalThis.process.env)}`,
+  );
 }
 
 export function initializeClients() {
@@ -84,7 +87,11 @@ export function initializeClients() {
   };
 }
 
-function logAtLevel(level: LogLevel, msg: string, props: Record<string, string>) {
+function logAtLevel(
+  level: LogLevel,
+  msg: string,
+  props: Record<string, string>,
+) {
   const properties = [];
   for (const key of Object.keys(props)) {
     const item = LogProperty.create({

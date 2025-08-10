@@ -7,7 +7,7 @@ export function getSystemVersion() {
   return process.getSystemVersion();
 }
 
-export const env: {[key: string]: string} = {
+export const env: { [key: string]: string } = {
   RPG_BOOK_PORT: process.env.RPG_BOOK_PORT,
 };
 
