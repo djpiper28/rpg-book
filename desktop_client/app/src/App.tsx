@@ -20,14 +20,10 @@ import {
   getSystemClient,
   initializeClients,
 } from "./lib/grpcClient/client";
-import { CreateProjectPage } from "./pages/createProject/createProject.tsx";
 import { createProjectPath } from "./pages/createProject/path.ts";
-import { IndexPage } from "./pages/index.tsx";
 import { indexPath, withLayoutPath } from "./pages/path.ts";
 import { projectPath } from "./pages/project/path.ts";
-import { ProjectPage } from "./pages/project/project.tsx";
 import { settingsPath } from "./pages/settings/path.ts";
-import { SettingsPage } from "./pages/settings/settings.tsx";
 import { useGlobalErrorStore } from "./stores/globalErrorStore";
 import { useSettingsStore } from "./stores/settingsStore";
 import { useTabStore } from "./stores/tabStore";
@@ -56,19 +52,19 @@ const router = createHashRouter([
   {
     children: [
       {
-        element: <IndexPage />,
+        lazy: () => import("./pages/index.tsx"),
         path: "index",
       },
       {
-        element: <SettingsPage />,
+        lazy: () => import("./pages/settings/settings.tsx"),
         path: "settings",
       },
       {
-        element: <ProjectPage />,
+        lazy: () => import("./pages/project/project.tsx"),
         path: "project",
       },
       {
-        element: <CreateProjectPage />,
+        lazy: () => import("./pages/createProject/createProject.tsx"),
         path: "create-project",
       },
     ],

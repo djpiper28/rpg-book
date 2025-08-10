@@ -22,7 +22,7 @@ function validateProjectName(rawName: string): string {
   return "";
 }
 
-export function CreateProjectPage() {
+export function Component() {
   const tabs = useTabStore((x) => x);
   const navigate = useNavigate();
   const [projectName, setProjectName] = useState<string>(randomPlace());

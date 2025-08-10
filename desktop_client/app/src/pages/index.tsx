@@ -15,7 +15,7 @@ import { useSettingsStore } from "@/stores/settingsStore";
 import { useTabStore } from "@/stores/tabStore";
 import { projectPath } from "./project/path";
 
-export function IndexPage() {
+export function Component() {
   const [recentProjects, setRecentProjects] = useState<RecentProjectsResp>({
     projects: [],
   });

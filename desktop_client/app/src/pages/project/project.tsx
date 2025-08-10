@@ -5,7 +5,7 @@ import { useTabStore } from "@/stores/tabStore";
 import { indexPath } from "../path";
 import { CharacterTab } from "./tabs/characterTab";
 
-export function ProjectPage() {
+export function Component() {
   const navigate = useNavigate();
   const tabs = useTabStore();
 
