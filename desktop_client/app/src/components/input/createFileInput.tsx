@@ -1,6 +1,6 @@
 import { Input, type InputVariant, InputWrapper } from "@mantine/core";
 import { FileIcon } from "lucide-react";
-import { electronDialog as dialog } from "@/lib/electron";
+import { electronDialog } from "@/lib/electron";
 
 interface Props {
   buttonLabel?: string;
@@ -32,7 +32,7 @@ export function CreateFileInput(props: Readonly<Props>) {
         rightSection={
           <button
             onClick={() => {
-              dialog
+              electronDialog
                 .showSaveDialog({
                   buttonLabel: props.buttonLabel,
                   filters: props.filters,

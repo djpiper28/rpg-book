@@ -2,7 +2,7 @@ import { Button } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { TriangleAlert } from "lucide-react";
 import { type ReactNode } from "react";
-import { electronShell as shell } from "@/lib/electron";
+import { electronShell } from "@/lib/electron";
 import { getLogger } from "@/lib/grpcClient/client";
 import { Modal } from "../modal/modal";
 import { P } from "./P";
@@ -44,7 +44,7 @@ export function Link(props: Readonly<Props>) {
   }
 
   const openUrl = () => {
-    shell
+    electronShell
       .openExternal(props.href)
       .then()
       .catch((error: unknown) => {
