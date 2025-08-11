@@ -38,7 +38,8 @@ describe("Create project", () => {
   });
 
   it("Should create a project with the provided settings", async () => {
-    mockedClient.createProject.mockResolvedValueOnce(
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    mockedClient.createProject!.mockResolvedValueOnce(
       newResult({} as CreateProjectReq, { id } as ProjectHandle),
     );
 

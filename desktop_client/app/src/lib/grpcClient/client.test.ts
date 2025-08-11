@@ -25,7 +25,9 @@ describe("client", () => {
     await expect(async () => {
       initializeClients();
       const version = getSystemClient().getVersion({});
-      console.log(`The above call should have failed ${JSON.stringify(version)}`);
+      console.log(
+        `The above call should have failed ${JSON.stringify(version)}`,
+      );
     }).rejects.toThrowError();
   });
 });

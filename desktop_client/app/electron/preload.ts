@@ -3,8 +3,8 @@ import { contextBridge } from "electron";
 import {
   electronDialog,
   electronShell,
-  getEnv,
   getBuildType,
+  getEnv,
   getSystemVersion,
 } from "../src/lib/electron/main";
 
