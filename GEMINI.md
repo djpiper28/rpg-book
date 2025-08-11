@@ -6,6 +6,20 @@ This app uses Github Actions, Vite, Vitest Go, Electron, Electron Builder, Types
 
 - Always use the makefile to execute commands (see makefile and readme)
 
+```sh
+make -j # Builds the backend and frontend
+# The frontend is in ./desktop_client/app/release/
+# The launcher is in ./desktop_client/launcher/launcher
+# See the release target for how to use this.
+# TODO: create a production ready script for starting the app
+
+make test -j # Runs the codegen, and tests
+make format -j # Runs all formatter scripts
+
+make dev -j # Starts a hot-reloading dev version of the app
+make release -j # Starts a release build of the app
+```
+
 # RPG Book take code and architecture quality seriously
 
 1. Comments that point out the obvious are banned
@@ -30,6 +44,12 @@ log.Info("Something has happened", "what", "a man fell into the river in lego ci
 4. Do not touch things that you do not need to
 
 5. Run `make format -j` when you are done with things
+
+6. Run `make test -j` whenever you think something may be broken
+
+7. Do not ramble in commit messages. Use conventional commits and NEVER PUSH. (also never commit and try to force users to do actual code review)
+
+8. Do basic security. SQL injection, never trust what the user inputs, no exec, etc...
 
 # Installing new packages
 
