@@ -1,26 +1,31 @@
+import { getEnv } from "@/lib/electron";
+import { getSystemClient, initializeClients } from "./client.ts";
+import { vi } from "vitest";
 import { EnvVarCertificate, EnvVarPort } from "../launcherTypes";
 
-const baseEnv = {
-  APP_ROOT: "",
-  RPG_BOOK_CERTIFICATE: undefined,
-  RPG_BOOK_PORT: undefined,
-  VITE_PUBLIC: "",
-};
+const mockedGetEnv = vi.mocked(getEnv);
+vi.unmock("./client.ts");
 
 describe("client", () => {
+  beforeEach(() => {
+    mockedGetEnv.mockClear();
+  });
+
   it("should fail if it cannot load port and certificate", async () => {
-    globalThis.process.env = { ...baseEnv } as any;
-    const res = import("./client.ts");
-    await expect(res).rejects.toThrowError();
+    mockedGetEnv.mockReturnValueOnce({} as any);
+    await expect(async () => initializeClients()).rejects.toThrowError();
   });
 
   it("should fail if it cannot connect to the server", async () => {
-    globalThis.process.env = {
+    mockedGetEnv.mockReturnValueOnce({
       [EnvVarPort]: "9000",
       [EnvVarCertificate]: "Testing-cert",
-      ...baseEnv,
-    } as any;
-    const res = import("./client.ts");
-    await expect(res).rejects.toThrowError();
+    });
+
+    await expect(async () => {
+      initializeClients();
+      const version = getSystemClient().getVersion({});
+      console.log(`The above call should have failed ${JSON.stringify(version)}`);
+    }).rejects.toThrowError();
   });
 });

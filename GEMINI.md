@@ -51,6 +51,8 @@ log.Info("Something has happened", "what", "a man fell into the river in lego ci
 
 8. Do basic security. SQL injection, never trust what the user inputs, no exec, etc...
 
+9. Read config and setup files before doing stuff.
+
 # Installing new packages
 
 Check for malware!!! There are a lot of malicious packages IN ALL ECO-SYSTEMS at the moment. They use similar names to useful packages i.e: `core-js-patched`. They may crypto mine, delete things, be ransomware, steal cookies, rootkits, etc...

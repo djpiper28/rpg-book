@@ -1,17 +1,22 @@
 import { fireEvent, waitFor } from "@testing-library/react";
 import { CreateFileInput } from "@/components/input/createFileInput";
 import { DbExtension } from "@/lib/databaseTypes";
-import { getProjectClient } from "@/lib/grpcClient/client";
+import { getProjectClient, initializeClients } from "@/lib/grpcClient/client";
 import {
   type CreateProjectReq,
   type ProjectHandle,
 } from "@/lib/grpcClient/pb/project";
+import { type ProjectSvcClient } from "@/lib/grpcClient/pb/project.client";
 import { newResult } from "@/lib/testUtils/grpcTestUtils";
 import { wrappedRender } from "@/lib/testUtils/wrappedRender";
 import { Component as Page } from "./createProject";
 
-vi.mock("../../lib/grpcClient/client.ts");
-const mockedClient = vi.mocked(getProjectClient());
+const mockedGetProjectClient = vi.mocked(getProjectClient);
+
+const mockedClient = {
+  createProject: vi.fn(),
+} as Partial<ProjectSvcClient>;
+
 const id = "f23c1618-39c3-4368-a66b-c50ed7187ea6";
 
 vi.mock("../../components/input/createFileInput.tsx");
@@ -23,6 +28,8 @@ describe("Create project", () => {
   });
 
   beforeEach(() => {
+    initializeClients();
+    mockedGetProjectClient.mockReturnValue(mockedClient);
     mockedCreateFileInput.mockReturnValue(<p>Mocked input</p>);
   });
 
@@ -52,7 +59,7 @@ describe("Create project", () => {
 
     await waitFor(() => {
       //eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(getProjectClient().createProject).toHaveBeenCalledWith({
+      expect(mockedClient.createProject).toHaveBeenCalledWith({
         fileName: `${testName}${DbExtension}`,
         projectName: testName,
       } as CreateProjectReq);

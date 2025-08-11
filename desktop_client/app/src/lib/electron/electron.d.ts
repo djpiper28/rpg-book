@@ -5,7 +5,7 @@ interface Window {
     getSystemVersion: () => string;
     getBuildType: () => string;
   };
-  env: {
+  getEnv: () => {
     [key: string]: string;
   };
 }

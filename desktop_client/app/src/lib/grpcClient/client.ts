@@ -3,10 +3,49 @@ import { LogLevel, LogProperty, LogRequest } from "./pb/system";
 import { ProjectSvcClient } from "./pb/project.client";
 import { SystemSvcClient } from "./pb/system.client";
 import { GrpcWebFetchTransport } from "@protobuf-ts/grpcweb-transport";
-import { env } from "../electron";
+import { getEnv } from "../electron";
 
 let projectClient: ProjectSvcClient | undefined;
 let systemClient: SystemSvcClient | undefined;
+
+function mustHaveEnv(key: string): string {
+  const val = getEnv()[key];
+
+  if (!val) {
+    throw new Error(
+      `Cannot find env var ${key} - ${val} - ${JSON.stringify(globalThis.process.env)}`,
+    );
+  }
+
+  return val;
+}
+
+export function initializeClients() {
+  const port = mustHaveEnv(EnvVarPort);
+  const transport = new GrpcWebFetchTransport({
+    baseUrl: `https://127.0.0.1:${port}`,
+    fetchInit: {
+      keepalive: true,
+      redirect: "error",
+      cache: "no-cache",
+    },
+    format: "binary",
+    timeout: 5_000,
+  });
+
+  systemClient = new SystemSvcClient(transport);
+  projectClient = new ProjectSvcClient(transport);
+  logger = {
+    info: (msg: string, props: Record<string, string>) =>
+      logAtLevel(LogLevel.INFO, msg, props),
+    warn: (msg: string, props: Record<string, string>) =>
+      logAtLevel(LogLevel.WARNING, msg, props),
+    error: (msg: string, props: Record<string, string>) =>
+      logAtLevel(LogLevel.ERROR, msg, props),
+    fatal: (msg: string, props: Record<string, string>) =>
+      logAtLevel(LogLevel.FATAL, msg, props),
+  };
+}
 
 type logFunc = (msg: string, props: Record<string, string>) => void;
 
@@ -46,45 +85,6 @@ export function getLogger(): {
   }
 
   return logger;
-}
-
-function mustHaveEnv(key: string): string {
-  const val = env[key];
-
-  if (val) {
-    return val;
-  }
-
-  throw new Error(
-    `Cannot find env var ${key} - ${val} - ${JSON.stringify(globalThis.process.env)}`,
-  );
-}
-
-export function initializeClients() {
-  const port = mustHaveEnv(EnvVarPort);
-  const transport = new GrpcWebFetchTransport({
-    baseUrl: `https://127.0.0.1:${port}`,
-    fetchInit: {
-      keepalive: true,
-      redirect: "error",
-      cache: "no-cache",
-    },
-    format: "binary",
-    timeout: 5_000,
-  });
-
-  systemClient = new SystemSvcClient(transport);
-  projectClient = new ProjectSvcClient(transport);
-  logger = {
-    info: (msg: string, props: Record<string, string>) =>
-      logAtLevel(LogLevel.INFO, msg, props),
-    warn: (msg: string, props: Record<string, string>) =>
-      logAtLevel(LogLevel.WARNING, msg, props),
-    error: (msg: string, props: Record<string, string>) =>
-      logAtLevel(LogLevel.ERROR, msg, props),
-    fatal: (msg: string, props: Record<string, string>) =>
-      logAtLevel(LogLevel.FATAL, msg, props),
-  };
 }
 
 function logAtLevel(

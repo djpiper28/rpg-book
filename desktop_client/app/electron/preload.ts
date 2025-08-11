@@ -3,7 +3,7 @@ import { contextBridge } from "electron";
 import {
   electronDialog,
   electronShell,
-  env,
+  getEnv,
   getBuildType,
   getSystemVersion,
 } from "../src/lib/electron/main";
@@ -15,4 +15,4 @@ contextBridge.exposeInMainWorld("electron", {
   shell: electronShell,
 });
 
-contextBridge.exposeInMainWorld("env", env);
+contextBridge.exposeInMainWorld("getEnv", getEnv);
