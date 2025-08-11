@@ -1,17 +1,17 @@
 .PHONY: all
-all: desktop-client
+all: desktop
 
 DESKTOP_APP="$(shell pwd)/desktop_client/app/"
 
-.PHONY: desktop-client-deps
-desktop-client-deps:
+.PHONY: desktop-deps
+desktop-deps:
 	cd $(DESKTOP_APP) && pnpm i
 
-.PHONY: desktop-client-codegen
-desktop-client-codegen: go-generate
+.PHONY: desktop-codegen
+desktop-codegen: go-generate
 
-.PHONY: desktop-client-app
-desktop-client-app: desktop-client-codegen 
+.PHONY: desktop-app
+desktop-app: desktop-codegen 
 	cd $(DESKTOP_APP) && pnpm build
 
 # Starts a dev electron app (pnpm calls other targets in this, this just makes it simpler to use)
@@ -24,12 +24,12 @@ dev:
 release: all
 	./desktop_client/launcher/launcher ./desktop_client/app/release/1.0.0/RPG-Book-Linux-1.0.0.AppImage
 
-.PHONY: desktop-client-backend
-desktop-client-backend: go-core
+.PHONY: desktop-backend
+desktop-backend: go-core
 	cd ./desktop_client/launcher && go build
 
 .PHONY: go-generate
-go-generate: desktop-client-deps
+go-generate: desktop-deps
 	go generate ./...
 
 .PHONY: go-core
@@ -39,11 +39,11 @@ go-core: go-generate
 go-test: go-core
 	go test ./...
 
-.PHONY: desktop-client
-desktop-client: go-core desktop-client-app desktop-client-backend
+.PHONY: desktop
+desktop: go-core desktop-app desktop-backend
 
-.PHONY: desktop-client-test
-desktop-client-test: desktop-client-codegen 
+.PHONY: desktop-test
+desktop-test: desktop-codegen 
 	cd $(DESKTOP_APP) && pnpm test
 
 .PHONY: go-lint
@@ -51,7 +51,7 @@ go-lint: go-core
 	go vet ./...
 
 .PHONY: test
-test: go-test go-lint desktop-client-test
+test: go-test go-lint desktop-test
 
 .PHONY: go-fmt
 go-fmt:
