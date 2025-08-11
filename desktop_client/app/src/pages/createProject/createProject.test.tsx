@@ -6,16 +6,16 @@ import {
   type CreateProjectReq,
   type ProjectHandle,
 } from "@/lib/grpcClient/pb/project";
-import { type ProjectSvcClient } from "@/lib/grpcClient/pb/project.client";
 import { newResult } from "@/lib/testUtils/grpcTestUtils";
 import { wrappedRender } from "@/lib/testUtils/wrappedRender";
 import { Component as Page } from "./createProject";
+import { ProjectSvcClient } from "@/lib/grpcClient/pb/project.client";
 
 const mockedGetProjectClient = vi.mocked(getProjectClient);
 
 const mockedClient = {
   createProject: vi.fn(),
-} as Partial<ProjectSvcClient>;
+};
 
 const id = "f23c1618-39c3-4368-a66b-c50ed7187ea6";
 
@@ -29,7 +29,12 @@ describe("Create project", () => {
 
   beforeEach(() => {
     initializeClients();
-    mockedGetProjectClient.mockReturnValue(mockedClient);
+
+    mockedGetProjectClient.mockReturnValue(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mockedClient as any as ProjectSvcClient,
+    );
+
     mockedCreateFileInput.mockReturnValue(<p>Mocked input</p>);
   });
 
@@ -38,8 +43,7 @@ describe("Create project", () => {
   });
 
   it("Should create a project with the provided settings", async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    mockedClient.createProject!.mockResolvedValueOnce(
+    mockedClient.createProject.mockResolvedValueOnce(
       newResult({} as CreateProjectReq, { id } as ProjectHandle),
     );
 
