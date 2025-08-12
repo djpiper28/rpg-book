@@ -40,7 +40,7 @@ go-test: go-core
 	go test ./...
 
 .PHONY: desktop
-desktop: go-core desktop-app desktop-backend
+desktop: desktop-app desktop-backend
 
 .PHONY: desktop-test
 desktop-test: desktop-codegen 
@@ -55,12 +55,13 @@ test: go-test go-lint desktop-test
 
 .PHONY: go-fmt
 go-fmt:
-	gofmt -w -l .
+	gofumpt -w -l .
 
 .PHONY: prettier
 prettier:
 	cd $(DESKTOP_APP) && pnpm lint --fix
 	cd $(DESKTOP_APP) && npx prettier -w .
+	npx prettier -w *.md
 
 .PHONY: format
 format: go-fmt prettier

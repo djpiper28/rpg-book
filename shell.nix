@@ -8,6 +8,7 @@ pkgs.mkShell {
     pnpm
     go
     gopls
+    gofumpt
     golangci-lint
     electron_35
     p7zip

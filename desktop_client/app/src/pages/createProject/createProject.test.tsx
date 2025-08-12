@@ -6,10 +6,10 @@ import {
   type CreateProjectReq,
   type ProjectHandle,
 } from "@/lib/grpcClient/pb/project";
+import { type ProjectSvcClient } from "@/lib/grpcClient/pb/project.client";
 import { newResult } from "@/lib/testUtils/grpcTestUtils";
 import { wrappedRender } from "@/lib/testUtils/wrappedRender";
 import { Component as Page } from "./createProject";
-import { ProjectSvcClient } from "@/lib/grpcClient/pb/project.client";
 
 const mockedGetProjectClient = vi.mocked(getProjectClient);
 

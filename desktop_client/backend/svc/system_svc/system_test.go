@@ -67,7 +67,7 @@ func TestSettings(t *testing.T) {
 			Level:   pb_system.LogLevel_WARNING,
 			Message: "Hello world",
 			Properties: []*pb_system.LogProperty{
-				&pb_system.LogProperty{
+				{
 					Key:   "key",
 					Value: "Value",
 				},

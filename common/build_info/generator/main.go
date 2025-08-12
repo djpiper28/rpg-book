@@ -77,7 +77,7 @@ func main() {
 	log.Info("Generating build info")
 
 	code := generate(packageName)
-	err := os.WriteFile(outputFile, []byte(code), 0777)
+	err := os.WriteFile(outputFile, []byte(code), 0o777)
 	if err != nil {
 		log.Fatal("Cannot write to output folder", loggertags.TagError, err)
 	}
