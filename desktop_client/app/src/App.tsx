@@ -132,7 +132,7 @@ function Layout() {
       >
         <P>{currentError?.body}</P>
       </ErrorModal>
-      <div className="flex flex-col gap-3 p-2">
+      <div className="flex flex-col gap-3 p-2 h-screen ">
         <div
           className="flex flex-row gap-3 justify-between items-center border-b border-b-gray-100 border-r-2"
           id="menu"
@@ -215,7 +215,7 @@ function Layout() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 p-2">
+        <div className="flex flex-col gap-3 p-2 overflow-y-auto">
           <Outlet />
         </div>
       </div>
