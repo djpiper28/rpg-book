@@ -57,5 +57,5 @@ message UpdateCharacterReq {
   string name = 3;
   string description = 4;
   // Read by the backend, leave empty for no change
-  string icon_path = 5;
+  bytes icon = 5;
 }

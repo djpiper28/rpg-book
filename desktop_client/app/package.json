@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "__dev": "vite",
-    "__build_launcher": "cd ../../ && make desktop-client-backend -j",
+    "__build_launcher": "cd ../../ && make desktop-backend -j",
     "dev": "pnpm __build_launcher && cd ../launcher/ && ./launcher --working-dir ../app/ -- pnpm __dev",
     "build": "tsc && vite build && npx electron-builder -c.electronVersion 36.2.1",
     "lint": "eslint ./vite.config.ts ./src ./electron",
