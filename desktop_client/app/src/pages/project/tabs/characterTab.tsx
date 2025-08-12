@@ -1,12 +1,12 @@
 import { Button, Table } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { Pencil } from "lucide-react";
+import { useState } from "react";
 import { Modal } from "@/components/modal/modal";
+import { P } from "@/components/typography/P";
 import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
 import CreateCharacterModal from "./createCharacterModal";
-import { useState } from "react";
-import { P } from "@/components/typography/P";
-import { Pencil } from "lucide-react";
 
 export function CharacterTab() {
   const [selectedCharacter, setSelectedCharacter] = useState("");
