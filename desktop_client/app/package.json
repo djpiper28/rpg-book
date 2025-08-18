@@ -93,6 +93,6 @@
   },
   "main": "dist-electron/main.js",
   "devDependencies": {
-    "@testing-library/jest-dom": "^6.6.4"
+    "@testing-library/jest-dom": "^6.7.0"
   }
 }
