@@ -1,7 +1,9 @@
 import * as remote from "@electron/remote/main";
 // eslint-disable-next-line import-x/no-unresolved
 import { BrowserWindow, app, session } from "electron";
+import { spawn } from "node:child_process";
 import path from "node:path";
+import { exit } from "node:process";
 import { fileURLToPath } from "node:url";
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -19,6 +21,25 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
 
 const isDevServer = !!VITE_DEV_SERVER_URL;
 let win: BrowserWindow | null;
+
+function getLauncherPath(): string {
+  const launcher = process.platform === "win32" ? "launcher.exe" : "launcher";
+  return path.join(process.resourcesPath, "launcher", launcher);
+}
+
+if (!process.env.RPG_BOOK_CERTIFICATE) {
+  if (isDevServer) {
+    spawn(getLauncherPath(), ["pnpm", "__dev"], {
+      stdio: "inherit",
+    }).unref();
+  } else {
+    spawn(getLauncherPath(), [process.execPath], {
+      stdio: "inherit",
+    }).unref();
+  }
+
+  exit(0);
+}
 
 function createWindow() {
   win = new BrowserWindow({

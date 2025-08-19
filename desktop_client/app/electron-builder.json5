@@ -8,6 +8,16 @@
     output: "release/${version}",
   },
   files: ["dist", "dist-electron"],
+  extraResources: [
+    {
+      from: "../launcher/launcher",
+      to: "launcher/launcher",
+    },
+    {
+      from: "../launcher/launcher.exe",
+      to: "launcher/launcher.exe",
+    },
+  ],
   mac: {
     target: ["dmg"],
     artifactName: "${productName}-Mac-${version}-Installer.${ext}",

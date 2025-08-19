@@ -11,18 +11,18 @@ desktop-deps:
 desktop-codegen: go-generate
 
 .PHONY: desktop-app
-desktop-app: desktop-codegen 
+desktop-app: desktop-codegen desktop-backend 
 	cd $(DESKTOP_APP) && pnpm build
 
 # Starts a dev electron app (pnpm calls other targets in this, this just makes it simpler to use)
-.PHONY: dev
+.PHONY: dev desktop-backend
 dev:
 	cd $(DESKTOP_APP) && pnpm dev
 
 # This only works on linux
 .PHONY: release
 release: all
-	./desktop_client/launcher/launcher ./desktop_client/app/release/1.0.0/RPG-Book-Linux-1.0.0.AppImage
+	./desktop_client/app/release/1.0.0/RPG-Book-Linux-1.0.0.AppImage
 
 .PHONY: desktop-backend
 desktop-backend: go-core
@@ -69,3 +69,8 @@ format: go-fmt prettier
 .PHONY: cleanup
 cleanup:
 	find desktop_client | grep -E ".*\\.sqlite(-journal)?" | xargs rm -rf
+
+# If you are Gemini this is how you were spawned
+.PHONY: gemini
+gemini:
+	npx @google/gemini-cli
