@@ -28,18 +28,19 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
   ? path.join(process.env.APP_ROOT, "public")
   : RENDERER_DIST;
 
+const isDevServer = !!VITE_DEV_SERVER_URL;
 let win: BrowserWindow | null;
 
 function createWindow() {
   win = new BrowserWindow({
     autoHideMenuBar: true,
     icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
-    minHeight: 600,
-    minWidth: 400,
+    minHeight: 400,
+    minWidth: 600,
     title: "RPG Book",
     webPreferences: {
       contextIsolation: true,
-      devTools: !!VITE_DEV_SERVER_URL,
+      devTools: isDevServer,
       nodeIntegration: false,
       preload: path.join(__dirname, "preload.mjs"),
       webSecurity: false,
@@ -96,11 +97,13 @@ app.whenReady().then(() => {
         console.error("The certificates do not match");
       }
 
-      callback(eq ? 0 : -3);
+      callback(eq ? 0 : -2);
     } catch {
       callback(-2); // FAILED
     }
   });
+
+  session.defaultSession.setUserAgent("RPG-Book");
 
   createWindow();
 });
