@@ -1,0 +1,19 @@
+
+# Ignore common development and test files
+**/node_modules/**/{test,tests,doc,docs,example,examples}
+**/*.{map,md,txt}
+**/*.d.ts
+
+# Ignore specific development tools and configurations
+.eslintrc.js
+.prettierrc.js
+.storybook/
+vite.config.ts
+vitest.config.ts
+tsconfig.json
+tsconfig.node.json
+
+# Ignore build artifacts that are not part of the final app
+dist-electron/
+dist/
+release/
