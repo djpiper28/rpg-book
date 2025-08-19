@@ -1,12 +1,12 @@
 import { Button, Input, Table } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { Pencil } from "lucide-react";
+import { useState } from "react";
 import { Modal } from "@/components/modal/modal";
+import { P } from "@/components/typography/P";
 import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
 import CreateCharacterModal from "./createCharacterModal";
-import { useState } from "react";
-import { P } from "@/components/typography/P";
-import { Pencil } from "lucide-react";
 
 export function CharacterTab() {
   const [selectedCharacter, setSelectedCharacter] = useState("");
@@ -26,19 +26,18 @@ export function CharacterTab() {
         {opened && <CreateCharacterModal />}
       </Modal>
 
-      <div className="flex flex-col gap-2 justify-between pt-2">
-        <div className="flex flex-row gap-2 justify-between">
-          <Input className="flex-grow" placeholder="TODO Search bar" />
-          <Button
-            onClick={() => {
-              open();
-            }}
-          >
-            Create Character
-          </Button>
-        </div>
-
-        <div className="overflow-scroll-y-auto">
+      <div className="flex flex-row gap-2 pt-2 justify-between">
+        <div className="flex flex-col gap-2 flex-2">
+          <div className="flex flex-row gap-2 justify-between">
+            <Input className="flex-grow" placeholder="TODO Search bar" />
+            <Button
+              onClick={() => {
+                open();
+              }}
+            >
+              Create Character
+            </Button>
+          </div>
           <Table variant="vertical">
             <Table.Thead>
               <Table.Tr>
@@ -78,7 +77,7 @@ export function CharacterTab() {
           </Table>
         </div>
 
-        <div className="flex flex-col gap-2 flex-grow py-2">
+        <div className="flex-1 overflow-x-auto">
           TODO: {selectedCharacter} has been selected.
         </div>
       </div>

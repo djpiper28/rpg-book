@@ -32,10 +32,14 @@ let win: BrowserWindow | null;
 
 function createWindow() {
   win = new BrowserWindow({
+    autoHideMenuBar: true,
     icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
+    minHeight: 600,
+    minWidth: 400,
     title: "RPG Book",
     webPreferences: {
       contextIsolation: true,
+      devTools: !!VITE_DEV_SERVER_URL,
       nodeIntegration: false,
       preload: path.join(__dirname, "preload.mjs"),
       webSecurity: false,
