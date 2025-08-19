@@ -1,6 +1,13 @@
 module github.com/djpiper28/rpg-book
 
-go 1.24
+go 1.25
+
+ignore (
+	./desktop_client/app/dist-electron/
+	./desktop_client/app/dist/
+	./desktop_client/app/node_modules/
+	./desktop_client/app/release/
+)
 
 require (
 	github.com/charmbracelet/log v0.4.2
@@ -11,6 +18,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.30
 	github.com/stretchr/testify v1.10.0
 	google.golang.org/grpc v1.74.2
+	google.golang.org/protobuf v1.36.6
 )
 
 require (
@@ -47,7 +55,6 @@ require (
 	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250528174236-200df99c418a // indirect
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.5.1 // indirect
-	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	nhooyr.io/websocket v1.8.6 // indirect
