@@ -45,18 +45,24 @@ export function initializeClients() {
     fatal: (msg: string, props: Record<string, string>) =>
       logAtLevel(LogLevel.FATAL, msg, props),
   };
+
+  const consoleLogger = (message: any, ...args: any) => {
+    getLogger().info(JSON.stringify(message), {
+      args: JSON.stringify(args),
+      caller1: "console.log",
+    });
+  };
+
+  const consoleErrorLogger = (message: any, ...args: any) => {
+    getLogger().error(JSON.stringify(message), {
+      args: JSON.stringify(args),
+      caller1: "console.error",
+    });
+  };
+
+  console.log = consoleLogger;
+  console.error = consoleErrorLogger;
 }
-
-type logFunc = (msg: string, props: Record<string, string>) => void;
-
-let logger:
-  | {
-      info: logFunc;
-      warn: logFunc;
-      error: logFunc;
-      fatal: logFunc;
-    }
-  | undefined;
 
 export function getProjectClient(): ProjectSvcClient {
   if (!projectClient) {
@@ -73,6 +79,19 @@ export function getSystemClient(): SystemSvcClient {
 
   return systemClient;
 }
+
+type logFunc = (msg: string, props: Record<string, string>) => void;
+
+let logger:
+  | {
+      info: logFunc;
+      warn: logFunc;
+      error: logFunc;
+      fatal: logFunc;
+    }
+  | undefined;
+
+const clog = console.log;
 
 export function getLogger(): {
   info: logFunc;
@@ -109,7 +128,7 @@ function logAtLevel(
     properties: properties,
   });
 
-  console.log(`${level} - ${msg} - ${JSON.stringify(props)}`);
+  clog(`${level} - ${msg} - ${JSON.stringify(props)}`);
   getSystemClient()
     .log(req)
     .then(() => {})
