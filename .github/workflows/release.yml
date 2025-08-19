@@ -57,18 +57,12 @@ jobs:
         run: |
           if [[ "${{ runner.os }}" == "Linux" ]]; then
             echo "app_artifact=desktop_client/app/release/${{ steps.versions.outputs.app-version }}/RPG-Book-Linux-${{ steps.versions.outputs.app-version }}.AppImage" >> $GITHUB_ENV
-            echo "lancher_artifact=desktop_client/launcher/launcher" >> $GITHUB_ENV
-            echo "launcher_artifact=desktop_client/launcher/launcher" >> $GITHUB_ENV
             echo "zip_name=rpg-book-linux.zip" >> $GITHUB_ENV
           elif [[ "${{ runner.os }}" == "Windows" ]]; then
             echo "app_artifact=desktop_client/app/release/${{ steps.versions.outputs.app-version }}/RPG-Book-Windows-${{ steps.versions.outputs.app-version }}-Setup.exe" >> $GITHUB_ENV
-            echo "lancher_artifact=desktop_client/launcher/launcher" >> $GITHUB_ENV
-            echo "launcher_artifact=desktop_client/launcher/launcher.exe" >> $GITHUB_ENV
             echo "zip_name=rpg-book-windows.zip" >> $GITHUB_ENV
           elif [[ "${{ runner.os }}" == "macOS" ]]; then
             echo "app_artifact=desktop_client/app/release/${{ steps.versions.outputs.app-version }}/RPG-Book-Mac-${{ steps.versions.outputs.app-version }}-Installer.dmg" >> $GITHUB_ENV
-            echo "lancher_artifact=desktop_client/launcher/launcher.exe" >> $GITHUB_ENV
-            echo "launcher_artifact=desktop_client/launcher/launcher" >> $GITHUB_ENV
             echo "zip_name=rpg-book-mac.zip" >> $GITHUB_ENV
           fi
 
@@ -77,7 +71,6 @@ jobs:
         run: |
           mkdir release
           mv ${{ env.app_artifact }} release/
-          mv ${{ env.launcher_artifact }} release/
           cp *.md release/
           rm release/GEMINI.md
           cp build_info.txt release/
