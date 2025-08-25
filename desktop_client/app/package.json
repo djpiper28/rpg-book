@@ -25,7 +25,7 @@
     "@mantine/code-highlight": "^7.17.4",
     "@mantine/core": "^7.17.4",
     "@mantine/dropzone": "^7.17.4",
-    "@mantine/form": "^8.0.1",
+    "@mantine/form": "^8.2.7",
     "@mantine/hooks": "^7.17.4",
     "@mantine/modals": "^7.17.4",
     "@mantine/notifications": "^7.17.4",
