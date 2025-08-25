@@ -71,7 +71,7 @@
     "react-markdown": "^10.1.0",
     "react-router": "^7.7.1",
     "recharts": "^2.15.2",
-    "simple-icons": "^15.9.0",
+    "simple-icons": "^15.12.0",
     "sonner": "^2.0.3",
     "storybook": "^8.6.12",
     "tailwind-merge": "^3.1.0",
