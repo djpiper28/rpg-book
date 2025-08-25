@@ -17,8 +17,7 @@ require (
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/mattn/go-sqlite3 v1.14.32
 	github.com/stretchr/testify v1.10.0
-	google.golang.org/grpc v1.66.0-dev
-	google.golang.org/protobuf v1.36.6
+	google.golang.org/grpc v1.76.0-dev
 )
 
 require (
@@ -53,8 +52,9 @@ require (
 	golang.org/x/sys v0.35.0 // indirect
 	golang.org/x/text v0.28.0 // indirect
 	golang.org/x/tools v0.36.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250528174236-200df99c418a // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250707201910-8d1bb00bc6a7 // indirect
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.4.0 // indirect
+	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	nhooyr.io/websocket v1.8.6 // indirect
