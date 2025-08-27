@@ -207,13 +207,13 @@ func (p *ProjectSvc) RecentProjects(ctx context.Context, in *pb_common.Empty) (*
 }
 
 func (p *ProjectSvc) getProject(handle *pb_project.ProjectHandle) (*project.Project, error) {
-	p.lock.Lock()
-	defer p.lock.Unlock()
-
 	id, err := uuid.Parse(handle.Id)
 	if err != nil {
 		return nil, errors.Join(errors.New("Invalid project ID"), err)
 	}
+
+	p.lock.Lock()
+	defer p.lock.Unlock()
 
 	project, found := p.projects[id]
 	if !found {
@@ -223,7 +223,7 @@ func (p *ProjectSvc) getProject(handle *pb_project.ProjectHandle) (*project.Proj
 	return project, nil
 }
 
-func (p *ProjectSvc) CreateCharacter(ctx context.Context, in *pb_project.CreateCharacterReq) (*pb_project.CharacterHandle, error) {
+func (p *ProjectSvc) CreateCharacter(ctx context.Context, in *pb_project.CreateCharacterReq) (*pb_project_character.CharacterHandle, error) {
 	project, err := p.getProject(in.Project)
 
 	character, err := project.CreateCharacter(in.Name)
@@ -231,7 +231,38 @@ func (p *ProjectSvc) CreateCharacter(ctx context.Context, in *pb_project.CreateC
 		return nil, errors.Join(errors.New("Cannot create chracter"), err)
 	}
 
-	return &pb_project.CharacterHandle{
+	return &pb_project_character.CharacterHandle{
 		Id: character.Id.String(),
 	}, nil
+}
+
+func (p *ProjectSvc) UpdateCharacter(ctx context.Context, in *pb_project.UpdateCharacterReq) (*pb_common.Empty, error) {
+	return nil, errors.ErrUnsupported
+}
+
+func (p *ProjectSvc) GetCharacter(ctx context.Context, in *pb_project.GetCharacterReq) (*pb_project_character.BasicCharacterDetails, error) {
+	id, err := uuid.Parse(in.Project.Id)
+	if err != nil {
+		return nil, errors.Join(errors.New("Invalid project ID"), err)
+	}
+
+	characterId, err := uuid.Parse(in.Character.Id)
+	if err != nil {
+		return nil, errors.Join(errors.New("Invalid character ID"), err)
+	}
+
+	p.lock.Lock()
+	defer p.lock.Unlock()
+
+	project, found := p.projects[id]
+	if !found {
+		return nil, errors.New("Cannot find project")
+	}
+
+	character, err := project.GetCharacter(characterId)
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot get chracter"), err)
+	}
+
+	return character.ToPb(), nil
 }

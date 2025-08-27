@@ -8,6 +8,7 @@ import (
 	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/project/model"
+	"github.com/google/uuid"
 )
 
 type Project struct {
@@ -120,6 +121,18 @@ func (p *Project) GetCharacters() ([]*model.Character, error) {
 	}
 
 	return characters, nil
+}
+
+func (p *Project) GetCharacter(id uuid.UUID) (*model.Character, error) {
+	character := model.Character{}
+
+	row := p.db.Db.QueryRowx(`SELECT * FROM characters WHERE id=?;`, id)
+	err := row.StructScan(&character)
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot get character"), err)
+	}
+
+	return &character, nil
 }
 
 func (p *Project) Close() {

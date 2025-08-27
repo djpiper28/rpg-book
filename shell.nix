@@ -8,7 +8,7 @@ pkgs.mkShell {
     pnpm
     go
     golangci-lint
-    electron_37
+    electron
     p7zip
     protobuf_27
     grpc-tools

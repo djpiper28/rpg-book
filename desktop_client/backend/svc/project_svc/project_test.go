@@ -164,4 +164,34 @@ func TestProjectSvc(t *testing.T) {
 		defer closeProject(t, filename, project.Handle)
 		require.Len(t, project.Characters, 1)
 	})
+
+	t.Run("Test get character after create", func(t *testing.T) {
+		filename := uuid.New().String() + database.DbExtension
+		projectName := uuid.New().String()
+		characterName := uuid.New().String()
+
+		projectHandle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
+			FileName:    filename,
+			ProjectName: projectName,
+		})
+		require.NoError(t, err)
+		defer svc.CloseProject(context.Background(), projectHandle)
+
+		character, err := svc.CreateCharacter(context.Background(), &pb_project.CreateCharacterReq{
+			Name:    characterName,
+			Project: projectHandle,
+		})
+
+		require.NoError(t, err)
+		require.NotEmpty(t, character.Id)
+
+		returnedCharacter, err := svc.GetCharacter(context.Background(), &pb_project.GetCharacterReq{
+			Character: character,
+			Project:   projectHandle,
+		})
+		require.NoError(t, err)
+		require.Equal(t, characterName, returnedCharacter.Name)
+		require.Equal(t, "", returnedCharacter.Description)
+		require.Equal(t, []byte(nil), returnedCharacter.Icon)
+	})
 }

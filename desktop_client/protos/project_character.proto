@@ -1,11 +1,14 @@
 syntax = "proto3";
 option go_package = "github.com/djpiper28/rpg-book/desktop_client/backend/pb_project_character";
 
-message ChracterHandle {
+message CharacterHandle {
   string id = 1;
 }
 
 message BasicCharacterDetails {
-  ChracterHandle handle = 1;
+  CharacterHandle handle = 1;
   string name = 2;
+  string description = 4;
+  // Read by the backend, leave empty for no change
+  bytes icon = 5;
 }

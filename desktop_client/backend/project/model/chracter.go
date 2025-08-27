@@ -25,7 +25,7 @@ func NewCharacter(name string) *Character {
 
 func (c *Character) ToPb() *pb_project_character.BasicCharacterDetails {
 	return &pb_project_character.BasicCharacterDetails{
-		Handle: &pb_project_character.ChracterHandle{
+		Handle: &pb_project_character.CharacterHandle{
 			Id: c.Id.String(),
 		},
 		Name: c.Name,

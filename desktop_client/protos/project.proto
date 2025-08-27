@@ -10,6 +10,7 @@ service ProjectSvc {
   rpc CloseProject(ProjectHandle) returns (Empty) {}
   rpc CreateCharacter(CreateCharacterReq) returns (CharacterHandle) {}
   rpc UpdateCharacter(UpdateCharacterReq) returns (Empty) {}
+  rpc GetCharacter(GetCharacterReq) returns (BasicCharacterDetails) {}
 }
 
 message CreateProjectReq {
@@ -47,15 +48,13 @@ message CreateCharacterReq {
   string name = 2;
 }
 
-message CharacterHandle {
-  string id = 1;
+message GetCharacterReq {
+  CharacterHandle character = 1;
+  ProjectHandle project = 2;
 }
 
 message UpdateCharacterReq {
   CharacterHandle handle = 1;
   ProjectHandle project = 2;
-  string name = 3;
-  string description = 4;
-  // Read by the backend, leave empty for no change
-  bytes icon = 5;
+  BasicCharacterDetails details = 3;
 }
