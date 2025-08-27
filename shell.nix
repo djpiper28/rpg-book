@@ -7,13 +7,10 @@ pkgs.mkShell {
     nodejs_22
     pnpm
     go
-    gopls
-    gofumpt
     golangci-lint
-    electron_35
+    electron_37
     p7zip
     protobuf_27
     grpc-tools
-    glibc
   ];
 }

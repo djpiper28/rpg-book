@@ -15,8 +15,8 @@ desktop-app: desktop-codegen desktop-backend
 	cd $(DESKTOP_APP) && pnpm build
 
 # Starts a dev electron app (pnpm calls other targets in this, this just makes it simpler to use)
-.PHONY: dev desktop-backend
-dev:
+.PHONY: dev
+dev: desktop-deps desktop-backend
 	cd $(DESKTOP_APP) && pnpm dev
 
 # This only works on linux
