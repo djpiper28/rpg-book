@@ -46,7 +46,9 @@ export default function CreateCharacterModal() {
               console.log("Created a player", resp.response);
 
               projectStore.addCharacter(projectHandle, {
+                description: "",
                 handle: resp.response,
+                icon: new Uint8Array(),
                 name: characterName,
               });
 
