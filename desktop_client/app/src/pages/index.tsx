@@ -15,6 +15,8 @@ import { useProjectStore } from "@/stores/projectStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useTabStore } from "@/stores/tabStore";
 import { projectPath } from "./project/path";
+import { electronDialog } from "@/lib/electron";
+import { DbExtension } from "@/lib/databaseTypes";
 
 export function Component() {
   const [recentProjects, setRecentProjects] = useState<RecentProjectsResp>({
@@ -26,6 +28,36 @@ export function Component() {
   const navigate = useNavigate();
   const { setError } = useGlobalErrorStore((x) => x);
   const settings = useSettingsStore((x) => x.settings);
+
+  const openProject = (filename: string, projectNameOverride?: string) => {
+    getProjectClient()
+      .openProject({ fileName: filename })
+      .then((resp) => {
+        if (!resp.response.handle) {
+          setError({
+            body: "Invalid project returned by server - no handle",
+          });
+
+          return;
+        }
+
+        tabs.addTab(
+          {
+            id: resp.response.handle.id,
+          },
+          projectNameOverride ?? filename,
+        );
+
+        projects.newProject(resp.response.handle, resp.response);
+        mustVoid(navigate(projectPath));
+      })
+      .catch((error: unknown) => {
+        setError({
+          body: String(error),
+          title: "Cannot open project",
+        });
+      });
+  };
 
   useEffect(() => {
     getProjectClient()
@@ -43,7 +75,36 @@ export function Component() {
   return (
     <>
       <H2>Recent Projects:</H2>
-      <P>Lorem ipsum sit amet dolor</P>
+      <P>
+        Open an recent project or{" "}
+        <Button
+          onClick={() => {
+            electronDialog
+              .showOpenDialog({
+                buttonLabel: "Open project",
+                filters: [
+                  {
+                    extensions: [DbExtension],
+                    name: "Project (*.sqlite)",
+                  },
+                ],
+                title: "Chose a project to open",
+              })
+              .then((result: Electron.OpenDialogReturnValue) => {
+                if (result.canceled) {
+                  return;
+                }
+
+                for (const file of result.filePaths) {
+                  openProject(file);
+                }
+              })
+              .catch(console.error);
+          }}
+        >
+          Browser Your Files
+        </Button>
+      </P>
       <Table variant="vertical">
         <Table.Thead>
           <Table.Tr>
@@ -62,33 +123,7 @@ export function Component() {
               className="cursor-pointer"
               key={x.fileName}
               onClick={() => {
-                getProjectClient()
-                  .openProject({ fileName: x.fileName })
-                  .then((resp) => {
-                    if (!resp.response.handle) {
-                      setError({
-                        body: "Invalid project returned by server - no handle",
-                      });
-
-                      return;
-                    }
-
-                    tabs.addTab(
-                      {
-                        id: resp.response.handle.id,
-                      },
-                      x.projectName,
-                    );
-
-                    projects.newProject(resp.response.handle, resp.response);
-                    mustVoid(navigate(projectPath));
-                  })
-                  .catch((error: unknown) => {
-                    setError({
-                      body: String(error),
-                      title: "Cannot open project",
-                    });
-                  });
+                openProject(x.fileName, x.projectName);
               }}
               role="button"
             >
