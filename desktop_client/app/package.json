@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "__build_launcher": "cd ../../ && make desktop-backend -j",
-    "build": "tsc && vite build && npx electron-builder -c.electronVersion 37",
+    "build": "tsc && vite build && npx electron-builder",
     "dev": "vite",
     "lint": "eslint ./vite.config.ts ./src ./electron",
     "test": "vitest run",
@@ -87,7 +87,7 @@
     "zustand": "^5.0.4"
   },
   "devDependancies": {
-    "electron": "^37.0.0",
+    "electron": "^37.4.0",
     "electron-builder": "^26.0.12"
   },
   "main": "dist-electron/main.js",

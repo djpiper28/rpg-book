@@ -74,3 +74,8 @@ cleanup:
 .PHONY: gemini
 gemini:
 	npx @google/gemini-cli
+
+# Fixes for things that are broken on Nixos
+.PHONY: nixos-fixes
+nixos-fixes: desktop-deps
+	cd ./desktop_client/app/ && bash nix-bins.sh
