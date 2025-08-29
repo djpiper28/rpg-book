@@ -43,8 +43,6 @@ export default function CreateCharacterModal() {
               project: projectHandle,
             })
             .then((resp) => {
-              console.log("Created a player", resp.response);
-
               projectStore.addCharacter(projectHandle, {
                 description: "",
                 handle: resp.response,
