@@ -92,6 +92,7 @@ let logger:
   | undefined;
 
 const clog = console.log;
+const cerror = console.error;
 
 export function getLogger(): {
   info: logFunc;
@@ -133,6 +134,6 @@ function logAtLevel(
     .log(req)
     .then(() => {})
     .catch((e) => {
-      console.error("Cannot log:", e);
+      cerror("Cannot log:", e);
     });
 }
