@@ -1,18 +1,58 @@
 import { Button, Input, Table } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { Pencil } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Modal } from "@/components/modal/modal";
+import MarkdownRenderer from "@/components/renderers/markdown";
+import { H2 } from "@/components/typography/H2";
 import { P } from "@/components/typography/P";
+import { getLogger, getProjectClient } from "@/lib/grpcClient/client";
+import { type BasicCharacterDetails } from "@/lib/grpcClient/pb/project_character";
 import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
 import CreateCharacterModal from "./createCharacterModal";
 
 export function CharacterTab() {
-  const [selectedCharacter, setSelectedCharacter] = useState("");
+  const [selectedCharacterId, setSelectedCharacterId] = useState("");
+
+  const [selectedCharcter, setSelectedCharacter] = useState<
+    BasicCharacterDetails | undefined
+  >();
+
   const [opened, { close, open }] = useDisclosure(false);
   const projectHandle = useTabStore((x) => x.selectedTab);
   const projectStore = useProjectStore((x) => x);
+
+  useEffect(() => {
+    const sync = async () => {
+      if (!selectedCharacterId) {
+        return;
+      }
+
+      if (!projectHandle) {
+        return;
+      }
+
+      try {
+        const resp = await getProjectClient().getCharacter({
+          character: {
+            id: selectedCharacterId,
+          },
+          project: projectHandle,
+        });
+
+        setSelectedCharacter(resp.response);
+      } catch (error: unknown) {
+        getLogger().error("Cannot get character", {
+          character: selectedCharacterId,
+          error: JSON.stringify(error),
+          project: JSON.stringify(projectHandle),
+        });
+      }
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    sync();
+  }, [projectHandle, selectedCharacterId]);
 
   if (!projectHandle) {
     return "No project selected";
@@ -46,26 +86,18 @@ export function CharacterTab() {
               </Table.Tr>
               {thisProject.project.characters.map((character) => {
                 const id = character.handle?.id ?? "";
-                const selected = selectedCharacter == id;
+                const selected = selectedCharacterId == id;
 
                 return (
                   <Table.Tr
                     className={selected ? "bg-gray-500" : ""}
                     key={id}
                     onClick={() => {
-                      setSelectedCharacter(id);
+                      setSelectedCharacterId(id);
                     }}
                   >
                     <Table.Th>
                       <div className="flex flex-row gap-2">
-                        <button
-                          className="cursor-pointer"
-                          onClick={() => {
-                            // TODO: open view / update dialog
-                          }}
-                        >
-                          <Pencil className="p-1" />
-                        </button>
                         <P className="text-wrap">{character.name}</P>
                       </div>
                     </Table.Th>
@@ -78,7 +110,12 @@ export function CharacterTab() {
         </div>
 
         <div className="flex-1 overflow-x-auto">
-          TODO: {selectedCharacter} has been selected.
+          {selectedCharcter && (
+            <>
+              <H2>{selectedCharcter.name}</H2>
+              <MarkdownRenderer markdown={selectedCharcter.description} />
+            </>
+          )}
         </div>
       </div>
     </>

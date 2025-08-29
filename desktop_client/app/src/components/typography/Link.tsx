@@ -38,7 +38,7 @@ export function Link(props: Readonly<Props>) {
 
   try {
     url = new URL(props.href);
-  } catch (error: unknown) {
+  } catch {
     return <p className={style}>Invalid URL</p>;
   }
 
