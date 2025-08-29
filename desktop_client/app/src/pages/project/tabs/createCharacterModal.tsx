@@ -6,7 +6,11 @@ import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
 
-export default function CreateCharacterModal() {
+interface Props {
+  closeDialog: () => void;
+}
+
+export default function CreateCharacterModal(props: Readonly<Props>) {
   const [characterName, setCharacterName] = useState("");
   const [characterDescription, setCharacterDescription] = useState("");
   const { setError } = useGlobalErrorStore((x) => x);
@@ -50,7 +54,7 @@ export default function CreateCharacterModal() {
                 name: characterName,
               });
 
-              close();
+              props.closeDialog();
             })
             .catch((error: unknown) => {
               setError({

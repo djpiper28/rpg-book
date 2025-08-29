@@ -23,7 +23,7 @@ export function CharacterTab() {
   return (
     <>
       <Modal close={close} opened={opened} title="Create Character">
-        {opened && <CreateCharacterModal />}
+        {opened && <CreateCharacterModal closeDialog={close} />}
       </Modal>
 
       <div className="flex flex-row gap-2 pt-2 justify-between">
