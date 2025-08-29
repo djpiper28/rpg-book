@@ -7,6 +7,7 @@ pkgs.mkShell {
     nodejs_22
     pnpm
     go
+    gofumpt
     golangci-lint
     electron
     p7zip

@@ -6,6 +6,8 @@ import { useNavigate } from "react-router";
 import { H2 } from "@/components/typography/H2";
 import { Link } from "@/components/typography/Link";
 import { P } from "@/components/typography/P";
+import { DbExtension } from "@/lib/databaseTypes";
+import { electronDialog } from "@/lib/electron";
 import { bytesToFriendly } from "@/lib/fileSizeHelpers";
 import { getLogger, getProjectClient } from "@/lib/grpcClient/client";
 import { type RecentProjectsResp } from "@/lib/grpcClient/pb/project";
@@ -15,8 +17,6 @@ import { useProjectStore } from "@/stores/projectStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useTabStore } from "@/stores/tabStore";
 import { projectPath } from "./project/path";
-import { electronDialog } from "@/lib/electron";
-import { DbExtension } from "@/lib/databaseTypes";
 
 export function Component() {
   const [recentProjects, setRecentProjects] = useState<RecentProjectsResp>({
@@ -84,10 +84,11 @@ export function Component() {
                 buttonLabel: "Open project",
                 filters: [
                   {
-                    extensions: [DbExtension],
+                    extensions: [DbExtension.replace(".", "")],
                     name: "Project (*.sqlite)",
                   },
                 ],
+                properties: ["openFile", "multiSelections"],
                 title: "Chose a project to open",
               })
               .then((result: Electron.OpenDialogReturnValue) => {
