@@ -36,9 +36,10 @@ const nouns = [
   "Punters",
   "Thieves",
   "Rogues",
+  "Morons",
 ];
 
-const verbs = ["Awakening", "Reckoning", "Masquerade"];
+const ingVerbs = ["Awakening", "Reckoning", "Masquerade", "Happening"];
 
 const places = [
   "Waterdeep",
@@ -47,10 +48,11 @@ const places = [
   "The Gaslands",
   "The City",
   "The Dark Valley",
-  "The Light valley",
+  "The Light Valley",
   "The River Bed",
   "The Evil Island",
   "The Twee Village",
+  "The Model Village",
   "The Dungeons",
   "The Wizard Tower",
   "The Wizard Academy",
@@ -60,6 +62,8 @@ const places = [
   "Heaven",
   "The Desert",
   "The Coast",
+  "Savannah",
+  "Synnibarr",
 ];
 
 const adjectives = [
@@ -78,6 +82,9 @@ const adjectives = [
   "Ruin",
   "Riches",
   "Desperation",
+  "Worm",
+  "Blood",
+  "Courage",
 ];
 
 function random<T>(x: T[]) {
@@ -86,7 +93,7 @@ function random<T>(x: T[]) {
 }
 
 function aTheBGenerator(): string {
-  return `${random(nouns)} The ${random(verbs)}`;
+  return `${random(nouns)} The ${random(ingVerbs)}`;
 }
 
 function aOfBGenerator(): string {
@@ -97,7 +104,11 @@ function aAndBGenerator(): string {
   return `${random(nouns)} And ${random(nouns)}`;
 }
 
-const generators = [aTheBGenerator, aOfBGenerator, aAndBGenerator];
+function aGenerator(): string {
+  return random(nouns);
+}
+
+const generators = [aTheBGenerator, aOfBGenerator, aAndBGenerator, aGenerator];
 
 export function randomPlace(): string {
   return random(generators)();
