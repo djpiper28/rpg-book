@@ -88,11 +88,17 @@ func (p *ProjectSvc) updateProjectOpened(ctx context.Context, filename, projectn
 		filename = absPath
 	}
 
-	_, err = p.primaryDb.Db.ExecContext(ctx,
-		"UPDATE recently_opened SET project_name=?, last_opened=? WHERE file_name=?;",
-		filename,
-		projectname,
-		openedAt)
+	_, err = p.primaryDb.Db.NamedExecContext(ctx,
+		`
+    INSERT INTO recently_opened(project_name, last_opened, file_name) VALUES (:project_name, :last_opened, :file_name)
+    ON CONFLICT(file_name) DO
+      UPDATE SET project_name=:project_name, last_opened=:last_opened WHERE file_name=:file_name;
+    `,
+		&model.RecentlyOpened{
+			FileName:    filename,
+			ProjectName: projectname,
+			LastOpened:  openedAt.String(),
+		})
 	if err != nil {
 		return errors.Join(errors.New("Cannot update recently opened projects"), err)
 	}
@@ -103,16 +109,19 @@ func (p *ProjectSvc) updateProjectOpened(ctx context.Context, filename, projectn
 func (p *ProjectSvc) CreateProject(ctx context.Context, in *pb_project.CreateProjectReq) (*pb_project.ProjectHandle, error) {
 	proj, err := project.Create(in.FileName, in.ProjectName)
 	if err != nil {
+		log.Error("Cannot create project", loggertags.TagError, err)
 		return nil, err
 	}
 
 	err = p.insertProjectOpened(ctx, proj.Filename, proj.Settings.Name)
 	if err != nil {
+		log.Error("Cannot create project", loggertags.TagError, err)
 		return nil, err
 	}
 
 	id, err := p.trackProject(proj)
 	if err != nil {
+		log.Error("Cannot create project", loggertags.TagError, err)
 		return nil, err
 	}
 
@@ -124,22 +133,26 @@ func (p *ProjectSvc) CreateProject(ctx context.Context, in *pb_project.CreatePro
 func (p *ProjectSvc) OpenProject(ctx context.Context, in *pb_project.OpenProjectReq) (*pb_project.OpenProjectResp, error) {
 	proj, err := project.Open(in.FileName)
 	if err != nil {
+		log.Error("Cannot open project", loggertags.TagError, err)
 		return nil, err
 	}
 
 	err = p.updateProjectOpened(ctx, proj.Filename, proj.Settings.Name)
 	if err != nil {
+		log.Error("Cannot open project", loggertags.TagError, err)
 		return nil, err
 	}
 
 	id, err := p.trackProject(proj)
 	if err != nil {
+		log.Error("Cannot open project", loggertags.TagError, err)
 		return nil, err
 	}
 
 	characters := make([]*pb_project_character.BasicCharacterDetails, 0)
 	rawCharacters, err := proj.GetCharacters()
 	if err != nil {
+		log.Error("Cannot open project", loggertags.TagError, err)
 		return nil, err
 	}
 
@@ -166,6 +179,7 @@ func (p *ProjectSvc) CloseProject(ctx context.Context, in *pb_project.ProjectHan
 
 	proj, found := p.projects[id]
 	if !found {
+		log.Error("Cannot close project", loggertags.TagError, err)
 		return nil, errors.New("Cannot find project")
 	}
 
@@ -177,6 +191,7 @@ func (p *ProjectSvc) CloseProject(ctx context.Context, in *pb_project.ProjectHan
 func (p *ProjectSvc) RecentProjects(ctx context.Context, in *pb_common.Empty) (*pb_project.RecentProjectsResp, error) {
 	rows, err := p.primaryDb.Db.QueryxContext(ctx, "SELECT * FROM recently_opened ORDER BY last_opened DESC LIMIT 10;")
 	if err != nil {
+		log.Error("Cannot get recent projects", loggertags.TagError, err)
 		return nil, errors.Join(errors.New("Cannot get recently opened projects"), err)
 	}
 
@@ -185,6 +200,7 @@ func (p *ProjectSvc) RecentProjects(ctx context.Context, in *pb_common.Empty) (*
 		var recent model.RecentlyOpened
 		err = rows.StructScan(&recent)
 		if err != nil {
+			log.Error("Cannot get recent projects", loggertags.TagError, err)
 			return nil, errors.Join(errors.New("Cannot scan recently opened projects"), err)
 		}
 		var size int64 = 0
@@ -231,6 +247,7 @@ func (p *ProjectSvc) CreateCharacter(ctx context.Context, in *pb_project.CreateC
 
 	character, err := project.CreateCharacter(in.Name, in.Description)
 	if err != nil {
+		log.Error("Cannot create character", loggertags.TagError, err)
 		return nil, errors.Join(errors.New("Cannot create chracter"), err)
 	}
 
@@ -245,12 +262,14 @@ func (p *ProjectSvc) UpdateCharacter(ctx context.Context, in *pb_project.UpdateC
 	if len(in.Details.Icon) > 0 {
 		settings, err := p.GetSettings()
 		if err != nil {
+			log.Error("Cannot update character", loggertags.TagError, err)
 			return nil, errors.Join(updateError, err)
 		}
 
 		if settings.CompressImages {
 			img, format, err := image.Decode(bytes.NewBuffer(in.Details.Icon))
 			if err != nil {
+				log.Error("Cannot update character", loggertags.TagError, err)
 				return nil, errors.Join(updateError, err)
 			}
 
@@ -263,17 +282,21 @@ func (p *ProjectSvc) UpdateCharacter(ctx context.Context, in *pb_project.UpdateC
 			in.Details.Icon = compressedBytes
 		}
 	}
+
+	log.Error("This handle does not exist yet")
 	return nil, errors.ErrUnsupported
 }
 
 func (p *ProjectSvc) GetCharacter(ctx context.Context, in *pb_project.GetCharacterReq) (*pb_project_character.BasicCharacterDetails, error) {
 	id, err := uuid.Parse(in.Project.Id)
 	if err != nil {
+		log.Error("Cannot get character")
 		return nil, errors.Join(errors.New("Invalid project ID"), err)
 	}
 
 	characterId, err := uuid.Parse(in.Character.Id)
 	if err != nil {
+		log.Error("Cannot get character")
 		return nil, errors.Join(errors.New("Invalid character ID"), err)
 	}
 
@@ -282,11 +305,13 @@ func (p *ProjectSvc) GetCharacter(ctx context.Context, in *pb_project.GetCharact
 
 	project, found := p.projects[id]
 	if !found {
+		log.Error("Cannot get character")
 		return nil, errors.New("Cannot find project")
 	}
 
 	character, err := project.GetCharacter(characterId)
 	if err != nil {
+		log.Error("Cannot get character")
 		return nil, errors.Join(errors.New("Cannot get chracter"), err)
 	}
 

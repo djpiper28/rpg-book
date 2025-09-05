@@ -70,7 +70,7 @@ export function Component() {
           body: String(error),
         });
       });
-  }, [setError]);
+  }, [setError, projects.projects]);
 
   return (
     <>
