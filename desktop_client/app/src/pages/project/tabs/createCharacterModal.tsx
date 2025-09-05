@@ -43,6 +43,7 @@ export default function CreateCharacterModal(props: Readonly<Props>) {
         onClick={() => {
           getProjectClient()
             .createCharacter({
+              description: characterDescription,
               name: characterName,
               project: projectHandle,
             })
