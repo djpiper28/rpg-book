@@ -1,6 +1,8 @@
 {
   "name": "app",
   "author": "Danny Piper (djpiper28)",
+  "copyright": "No copyright, see LICENSE.md",
+  "description": "An all in one tool for running TTRPGs for GMS",
   "private": true,
   "version": "1.0.0",
   "type": "module",
