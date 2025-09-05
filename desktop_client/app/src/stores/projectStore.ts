@@ -57,12 +57,13 @@ export const useProjectStore = create<ProjectStore>()(
         project: OpenProjectResp,
       ): void => {
         const projects = get();
+        const projectRef = projects.projects[asId(handle)];
 
-        if (!projects.projects[asId(handle)]) {
+        if (!projectRef) {
           return;
         }
 
-        projects.projects[asId(handle)].project = project;
+        projectRef.project = project;
         set(projects);
       },
     }),
