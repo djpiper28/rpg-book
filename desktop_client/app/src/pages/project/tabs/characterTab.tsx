@@ -60,6 +60,10 @@ export function CharacterTab() {
 
   const thisProject = projectStore.getProject(projectHandle);
 
+  if (!thisProject) {
+    return "Project not found";
+  }
+
   return (
     <>
       <Modal close={close} opened={opened} title="Create Character">

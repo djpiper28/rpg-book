@@ -10,6 +10,7 @@ import { getProjectClient } from "@/lib/grpcClient/client";
 import { randomPlace } from "@/lib/random/randomProjectName";
 import { mustVoid } from "@/lib/utils/errorHandlers";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
+import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
 import { projectPath } from "../project/path";
 
@@ -24,6 +25,7 @@ function validateProjectName(rawName: string): string {
 }
 
 export function Component() {
+  const projects = useProjectStore((x) => x);
   const tabs = useTabStore((x) => x);
   const navigate = useNavigate();
   const [projectName, setProjectName] = useState<string>(randomPlace());
@@ -102,6 +104,11 @@ export function Component() {
               projectName,
             })
             .then((resp) => {
+              projects.newProject(resp.response, {
+                characters: [],
+                handle: resp.response,
+              });
+
               tabs.addTab({ id: resp.response.id }, projectName);
               mustVoid(navigate(projectPath));
             })

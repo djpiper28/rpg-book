@@ -16,9 +16,9 @@ interface ProjectStore {
     handle: ProjectHandle,
     character: BasicCharacterDetails,
   ) => void;
-  getProject: (handle: ProjectHandle) => Project;
+  getProject: (handle: ProjectHandle) => Project | undefined;
   newProject: (handle: ProjectHandle, project: OpenProjectResp) => void;
-  projects: Record<string, Project>;
+  projects: Record<string, Project | undefined>;
   updateProject: (handle: ProjectHandle, project: OpenProjectResp) => void;
 }
 
@@ -34,10 +34,10 @@ export const useProjectStore = create<ProjectStore>()(
         character: BasicCharacterDetails,
       ): void => {
         const projects = get();
-        projects.projects[asId(handle)].project.characters.push(character);
+        projects.projects[asId(handle)]?.project.characters.push(character);
         set(projects);
       },
-      getProject: (handle: ProjectHandle): Project => {
+      getProject: (handle: ProjectHandle) => {
         const projects = get();
         return projects.projects[asId(handle)];
       },

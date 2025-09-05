@@ -89,7 +89,7 @@ export function Component() {
                   },
                 ],
                 properties: ["openFile", "multiSelections"],
-                title: "Chose a project to open",
+                title: "Choose a project to open",
               })
               .then((result: Electron.OpenDialogReturnValue) => {
                 if (result.canceled) {

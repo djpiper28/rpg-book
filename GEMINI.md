@@ -27,7 +27,7 @@ make release -j # Starts a release build of the app
 ```js
 // does something
 // above comment is BANNED
-doSomething()
+doSomething();
 ```
 
 2. Installing random npm/go packages that do simple things is banned
