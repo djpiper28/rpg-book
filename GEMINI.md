@@ -25,8 +25,9 @@ make release -j # Starts a release build of the app
 1. Comments that point out the obvious are banned
 
 ```js
-// Example BANNED comment
-console.log("something broke", "error", err);
+// does something
+// above comment is BANNED
+doSomething()
 ```
 
 2. Installing random npm/go packages that do simple things is banned
