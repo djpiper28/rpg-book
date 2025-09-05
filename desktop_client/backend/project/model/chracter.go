@@ -28,6 +28,7 @@ func (c *Character) ToPb() *pb_project_character.BasicCharacterDetails {
 		Handle: &pb_project_character.CharacterHandle{
 			Id: c.Id.String(),
 		},
-		Name: c.Name,
+		Name:        c.Name,
+		Description: c.Description,
 	}
 }

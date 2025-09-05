@@ -49,7 +49,7 @@ export default function CreateCharacterModal(props: Readonly<Props>) {
             })
             .then((resp) => {
               projectStore.addCharacter(projectHandle, {
-                description: "",
+                description: characterDescription,
                 handle: resp.response,
                 icon: new Uint8Array(),
                 name: characterName,

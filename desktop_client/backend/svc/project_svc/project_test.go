@@ -190,9 +190,8 @@ func TestProjectSvc(t *testing.T) {
 		require.NotEmpty(t, character.Id)
 
 		returnedCharacter, err := svc.GetCharacter(context.Background(), &pb_project.GetCharacterReq{
-			Character:   character,
-			Project:     projectHandle,
-			Description: characterDescription,
+			Character: character,
+			Project:   projectHandle,
 		})
 		require.NoError(t, err)
 		require.Equal(t, characterName, returnedCharacter.Name)
