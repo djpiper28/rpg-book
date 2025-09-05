@@ -63,10 +63,12 @@ func TestCreateCharacter(t *testing.T) {
 	defer project.Close()
 
 	name := uuid.New().String()
-	c, err := project.CreateCharacter(name)
+	desc := uuid.New().String()
+	c, err := project.CreateCharacter(name, desc)
 	require.NoError(t, err)
 
 	require.Equal(t, name, c.Name)
+	require.Equal(t, desc, c.Description)
 	require.NotEmpty(t, c.Created)
 	require.NotEmpty(t, c.Id)
 

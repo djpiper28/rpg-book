@@ -88,8 +88,10 @@ func Create(filename string, projectName string) (*Project, error) {
 	}, nil
 }
 
-func (p *Project) CreateCharacter(name string) (*model.Character, error) {
+func (p *Project) CreateCharacter(name, description string) (*model.Character, error) {
 	character := model.NewCharacter(name)
+	character.Description = description
+
 	_, err := p.db.Db.NamedExec(`
     INSERT INTO 
     characters (id, name, created, description)

@@ -226,7 +226,7 @@ func (p *ProjectSvc) getProject(handle *pb_project.ProjectHandle) (*project.Proj
 func (p *ProjectSvc) CreateCharacter(ctx context.Context, in *pb_project.CreateCharacterReq) (*pb_project_character.CharacterHandle, error) {
 	project, err := p.getProject(in.Project)
 
-	character, err := project.CreateCharacter(in.Name)
+	character, err := project.CreateCharacter(in.Name, in.Description)
 	if err != nil {
 		return nil, errors.Join(errors.New("Cannot create chracter"), err)
 	}

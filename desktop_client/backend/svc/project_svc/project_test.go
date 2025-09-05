@@ -140,6 +140,7 @@ func TestProjectSvc(t *testing.T) {
 		filename := uuid.New().String() + database.DbExtension
 		projectName := uuid.New().String()
 		characterName := uuid.New().String()
+		characterDescription := uuid.New().String()
 
 		projectHandle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
 			FileName:    filename,
@@ -148,8 +149,9 @@ func TestProjectSvc(t *testing.T) {
 		require.NoError(t, err)
 
 		character, err := svc.CreateCharacter(context.Background(), &pb_project.CreateCharacterReq{
-			Name:    characterName,
-			Project: projectHandle,
+			Name:        characterName,
+			Project:     projectHandle,
+			Description: characterDescription,
 		})
 
 		require.NoError(t, err)
@@ -169,6 +171,7 @@ func TestProjectSvc(t *testing.T) {
 		filename := uuid.New().String() + database.DbExtension
 		projectName := uuid.New().String()
 		characterName := uuid.New().String()
+		characterDescription := uuid.New().String()
 
 		projectHandle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
 			FileName:    filename,
@@ -178,16 +181,18 @@ func TestProjectSvc(t *testing.T) {
 		defer svc.CloseProject(context.Background(), projectHandle)
 
 		character, err := svc.CreateCharacter(context.Background(), &pb_project.CreateCharacterReq{
-			Name:    characterName,
-			Project: projectHandle,
+			Name:        characterName,
+			Project:     projectHandle,
+			Description: characterDescription,
 		})
 
 		require.NoError(t, err)
 		require.NotEmpty(t, character.Id)
 
 		returnedCharacter, err := svc.GetCharacter(context.Background(), &pb_project.GetCharacterReq{
-			Character: character,
-			Project:   projectHandle,
+			Character:   character,
+			Project:     projectHandle,
+			Description: characterDescription,
 		})
 		require.NoError(t, err)
 		require.Equal(t, characterName, returnedCharacter.Name)
