@@ -174,10 +174,7 @@ function Layout() {
                               .then(() => {
                                 tabs.removeTab(tab.handle);
 
-                                // TODO: figure out why this logic is not working
-                                // if (tabs.selectedTab === tab.handle) {
                                 mustVoid(navigate(indexPath));
-                                // }
                               })
                               .catch(console.error);
                           }}
