@@ -5,6 +5,9 @@ import (
 	"errors"
 	"image"
 	"image/jpeg"
+
+	"github.com/charmbracelet/log"
+	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
 )
 
 const (
@@ -20,5 +23,6 @@ func Compress(in image.Image) ([]byte, error) {
 		return nil, errors.Join(errors.New("Cannot compress image"), err)
 	}
 
+	log.Info("Compressed image", loggertags.TagLength, w.Len())
 	return w.Bytes(), nil
 }

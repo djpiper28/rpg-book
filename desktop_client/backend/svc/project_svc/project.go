@@ -1,14 +1,17 @@
 package projectsvc
 
 import (
+	"bytes"
 	"context"
 	"errors"
+	"image"
 	"os"
 	"path/filepath"
 	"sync"
 	"time"
 
 	"github.com/charmbracelet/log"
+	imagecompression "github.com/djpiper28/rpg-book/common/image/image_compression"
 	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/model"
@@ -237,6 +240,29 @@ func (p *ProjectSvc) CreateCharacter(ctx context.Context, in *pb_project.CreateC
 }
 
 func (p *ProjectSvc) UpdateCharacter(ctx context.Context, in *pb_project.UpdateCharacterReq) (*pb_common.Empty, error) {
+	updateError := errors.New("Cannot update chracter")
+
+	if len(in.Details.Icon) > 0 {
+		settings, err := p.GetSettings()
+		if err != nil {
+			return nil, errors.Join(updateError, err)
+		}
+
+		if settings.CompressImages {
+			img, format, err := image.Decode(bytes.NewBuffer(in.Details.Icon))
+			if err != nil {
+				return nil, errors.Join(updateError, err)
+			}
+
+			compressedBytes, err := imagecompression.Compress(img)
+			if err != nil {
+				log.Error("Cannot compress image", "format", format)
+				return nil, errors.Join(updateError, err)
+			}
+
+			in.Details.Icon = compressedBytes
+		}
+	}
 	return nil, errors.ErrUnsupported
 }
 

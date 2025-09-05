@@ -8,4 +8,5 @@ const (
 	TagCount    = "count"
 	TagDate     = "date"
 	TagVersion  = "version"
+	TagLength   = "length"
 )
