@@ -4,7 +4,14 @@ import (
 	"context"
 	"image"
 	"image/color"
+	"os"
+	"testing"
 	"time"
+
+	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
+	"github.com/djpiper28/rpg-book/desktop_client/backend/project"
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/require"
 )
 
 func NewTestContext() (context.Context, context.CancelFunc) {
@@ -26,4 +33,19 @@ func NewTestImage(w, h int) image.Image {
 	}
 
 	return img
+}
+
+func NewProject(t *testing.T) (*project.Project, func()) {
+	filename := uuid.New().String() + database.DbExtension
+
+	projectName := uuid.New().String()
+
+	project, err := project.Create(filename, projectName)
+	require.NoError(t, err)
+	require.Equal(t, project.Settings.Name, projectName)
+	require.Equal(t, project.Filename, filename)
+
+	return project, func() {
+		os.Remove(filename)
+	}
 }

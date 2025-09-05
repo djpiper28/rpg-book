@@ -4,6 +4,8 @@ import (
 	"os"
 	"testing"
 
+	imagecompression "github.com/djpiper28/rpg-book/common/image/image_compression"
+	testutils "github.com/djpiper28/rpg-book/common/test_utils"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/project"
 	"github.com/google/uuid"
@@ -23,11 +25,11 @@ func TestCreateNewProject(t *testing.T) {
 	defer os.Remove(filename)
 
 	name := uuid.New().String()
-
 	project, err := project.Create(filename, name)
 	require.NoError(t, err)
-	require.Equal(t, project.Settings.Name, name)
 	require.Equal(t, project.Filename, filename)
+
+	require.Equal(t, project.Settings.Name, name)
 	defer project.Close()
 }
 
@@ -52,15 +54,8 @@ func TestReOpenProject(t *testing.T) {
 }
 
 func TestCreateCharacter(t *testing.T) {
-	filename := uuid.New().String() + database.DbExtension
-	defer os.Remove(filename)
-
-	projectName := uuid.New().String()
-
-	project, err := project.Create(filename, projectName)
-	require.NoError(t, err)
-	require.Equal(t, project.Settings.Name, projectName)
-	defer project.Close()
+	project, remove := testutils.NewProject(t)
+	defer remove()
 
 	name := uuid.New().String()
 	desc := uuid.New().String()
@@ -75,4 +70,32 @@ func TestCreateCharacter(t *testing.T) {
 	characters, err := project.GetCharacters()
 	require.NoError(t, err)
 	require.Len(t, characters, 1)
+	require.Equal(t, c, characters[0])
+}
+
+func TestUpdateCharacter(t *testing.T) {
+	project, remove := testutils.NewProject(t)
+	defer remove()
+
+	name := uuid.New().String()
+	desc := uuid.New().String()
+	character, err := project.CreateCharacter(name, desc)
+	require.NoError(t, err)
+
+	img := testutils.NewTestImage(100, 100)
+	icon, err := imagecompression.Compress(img)
+	require.NoError(t, err)
+	name = "new name " + uuid.New().String()
+	description := "new description " + uuid.New().String()
+
+	character.Name = name
+	character.Icon = icon
+	character.Description = description
+
+	err = project.UpdateCharacter(character)
+	require.NoError(t, nil)
+
+	readCharacter, err := project.GetCharacter(character.Id)
+	require.NoError(t, nil)
+	require.Equal(t, *character, *readCharacter)
 }

@@ -137,6 +137,19 @@ func (p *Project) GetCharacter(id uuid.UUID) (*model.Character, error) {
 	return &character, nil
 }
 
+func (p *Project) UpdateCharacter(character *model.Character) error {
+	_, err := p.db.Db.NamedExec(`
+    UPDATE characters
+      SET icon=:icon, name=:name, description=:description
+      WHERE id=:id;
+    `, character)
+	if err != nil {
+		return errors.Join(errors.New("Cannot update character"), err)
+	}
+
+	return nil
+}
+
 func (p *Project) Close() {
 	defer p.db.Close()
 }
