@@ -12,6 +12,7 @@ service SystemSvc {
 message Settings {
   bool devMode = 1;
   bool darkMode = 2;
+  bool compressImages = 3;
 }
 
 message LogRequest {

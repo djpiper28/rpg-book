@@ -39,6 +39,30 @@ func Migrate(db *database.Db) error {
   );
       `,
 		},
+		{
+			Sql: `
+  ALTER TABLE settings ADD COLUMN compress_images BOOLEA NOT NULL DEFAULT('true');
+      `,
+			Test: func(tx *sqlx.Tx) error {
+				var settings model.Settings
+				row := tx.QueryRowx("SELECT * FROM settings;")
+
+				if row == nil {
+					return errors.New("Nil row")
+				}
+
+				err := row.StructScan(&settings)
+				if err != nil {
+					return err
+				}
+
+				if !settings.CompressImages {
+					return errors.New("Not set to required default")
+				}
+
+				return nil
+			},
+		},
 	})
 
 	err := m.Migrate(db)

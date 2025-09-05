@@ -19,8 +19,9 @@ func TestToAndFromProto(t *testing.T) {
 
 func TestToAndFromProto2(t *testing.T) {
 	s := model.Settings{
-		DevMode:  false,
-		DarkMode: true,
+		DevMode:        false,
+		DarkMode:       true,
+		CompressImages: true,
 	}
 
 	s2 := model.SettingsFromProto(s.ToProto())

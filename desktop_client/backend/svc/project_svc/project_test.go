@@ -195,7 +195,7 @@ func TestProjectSvc(t *testing.T) {
 		})
 		require.NoError(t, err)
 		require.Equal(t, characterName, returnedCharacter.Name)
-		require.Equal(t, "", returnedCharacter.Description)
+		require.Equal(t, characterDescription, returnedCharacter.Description)
 		require.Equal(t, []byte(nil), returnedCharacter.Icon)
 	})
 }

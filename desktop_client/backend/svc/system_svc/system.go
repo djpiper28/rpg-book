@@ -36,7 +36,7 @@ func (s *SystemSvc) GetSettings(ctx context.Context, in *pb_common.Empty) (*pb_s
 }
 
 func (s *SystemSvc) SetSettings(ctx context.Context, in *pb_system.Settings) (*pb_common.Empty, error) {
-	_, err := s.db.Db.Exec("UPDATE settings SET dev_mode=?, dark_mode=?;", in.DevMode, in.DarkMode)
+	_, err := s.db.Db.Exec("UPDATE settings SET dev_mode=?, dark_mode=?, compress_images=?;", in.DevMode, in.DarkMode, in.CompressImages)
 	if err != nil {
 		return nil, errors.Join(errors.New("Cannot set settings"), err)
 	}

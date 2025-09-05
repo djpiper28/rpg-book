@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { type Settings } from "@/lib/grpcClient/pb/system";
 
 const defaultSettings: Settings = {
+  compressImages: false,
   darkMode: true,
   devMode: false,
 };

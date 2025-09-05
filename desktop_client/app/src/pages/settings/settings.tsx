@@ -3,6 +3,7 @@ import { Settings, TriangleAlert } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { H2 } from "@/components/typography/H2";
+import { H3 } from "@/components/typography/H3";
 import { getSystemClient } from "@/lib/grpcClient/client";
 import { mustVoid } from "@/lib/utils/errorHandlers";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
@@ -52,6 +53,7 @@ export function Component() {
         <H2>Settings</H2>
       </div>
 
+      <H3>User Interface</H3>
       <Checkbox
         checked={dirtySettings.darkMode}
         description="Whether to use dark mode (checked), or light mode (unchecked) for RPG Book."
@@ -59,6 +61,18 @@ export function Component() {
         onChange={(event) => {
           const s = structuredClone(dirtySettings);
           s.darkMode = event.currentTarget.checked;
+          setDirtySettings(s);
+        }}
+      />
+
+      <H3>Save Settings</H3>
+      <Checkbox
+        checked={dirtySettings.compressImages}
+        description="Whether to compress images to a JPEG when they are added to a project. The compression makes files a lot smaller and images look almost the same as before."
+        label="Compress Images"
+        onChange={(event) => {
+          const s = structuredClone(dirtySettings);
+          s.compressImages = event.currentTarget.checked;
           setDirtySettings(s);
         }}
       />
