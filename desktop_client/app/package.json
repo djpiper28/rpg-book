@@ -38,7 +38,7 @@
     "@protobuf-ts/plugin": "^2.9.6",
     "@protobuf-ts/runtime": "^2.9.6",
     "@protobuf-ts/runtime-rpc": "^2.10.0",
-    "@repodog/eslint-config": "^9.0.16",
+    "@repodog/eslint-config": "^9.0.19",
     "@repodog/eslint-config-react": "^9.0.5",
     "@storybook/addon-onboarding": "^9.1.4",
     "@storybook/react-vite": "^9.1.4",
