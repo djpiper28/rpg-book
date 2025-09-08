@@ -26,11 +26,11 @@ release: all
 
 .PHONY: desktop-backend
 desktop-backend: go-core
-	cd ./desktop_client/launcher && go build
+	cd ./desktop_client/launcher && CC=clang CGO_LDFLAGS="-fuse-ld=lld" go build
 
 .PHONY: go-generate
 go-generate: desktop-deps
-	go generate ./...
+	go generate "./..."
 
 .PHONY: go-core
 go-core: go-generate
