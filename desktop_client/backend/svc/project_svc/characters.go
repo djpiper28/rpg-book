@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"image"
 
 	"github.com/charmbracelet/log"
+	"github.com/disintegration/imaging"
 	imagecompression "github.com/djpiper28/rpg-book/common/image/image_compression"
 	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_common"
@@ -53,7 +53,7 @@ func (p *ProjectSvc) UpdateCharacter(ctx context.Context, in *pb_project.UpdateC
 		}
 
 		if settings.CompressImages {
-			img, format, err := image.Decode(bytes.NewBuffer(in.Details.Icon))
+			img, err := imaging.Decode(bytes.NewBuffer(in.Details.Icon), imaging.AutoOrientation(true))
 			if err != nil {
 				log.Error("Cannot update character", loggertags.TagError, err)
 				return nil, errors.Join(updateError, err)
@@ -61,7 +61,7 @@ func (p *ProjectSvc) UpdateCharacter(ctx context.Context, in *pb_project.UpdateC
 
 			compressedBytes, err := imagecompression.Compress(img)
 			if err != nil {
-				log.Error("Cannot compress image", "format", format)
+				log.Error("Cannot compress image", loggertags.TagError, err)
 				return nil, errors.Join(updateError, err)
 			}
 
