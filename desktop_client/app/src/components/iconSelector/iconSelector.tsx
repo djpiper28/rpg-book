@@ -38,11 +38,13 @@ export function IconSelector(props: Readonly<Props>) {
       >
         <Pencil />
       </button>
-      <img
-        alt="User selected"
-        className="absolute left-0 right-0"
-        src={selectedFile}
-      />
+      {selectedFile && (
+        <img
+          alt="User selected"
+          className="absolute left-0 right-0"
+          src={selectedFile}
+        />
+      )}
     </div>
   );
 }
