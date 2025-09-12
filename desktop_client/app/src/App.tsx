@@ -49,23 +49,23 @@ const router = createHashRouter([
   {
     children: [
       {
-        lazy: (): Promise<{ default: () => ReactNode }> =>
-          import("./pages/index.tsx"),
+        // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+        lazy: () => import("./pages/index.tsx"),
         path: "index",
       },
       {
-        lazy: (): Promise<{ default: () => ReactNode }> =>
-          import("./pages/settings/settings.tsx"),
+        // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+        lazy: () => import("./pages/settings/settings.tsx"),
         path: "settings",
       },
       {
-        lazy: (): Promise<{ default: () => ReactNode }> =>
-          import("./pages/project/project.tsx"),
+        // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+        lazy: () => import("./pages/project/project.tsx"),
         path: "project",
       },
       {
-        lazy: (): Promise<{ default: () => ReactNode }> =>
-          import("./pages/createProject/createProject.tsx"),
+        // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+        lazy: () => import("./pages/createProject/createProject.tsx"),
         path: "create-project",
       },
     ],
