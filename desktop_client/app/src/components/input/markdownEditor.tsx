@@ -1,5 +1,5 @@
 import { Button, Textarea } from "@mantine/core";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import MarkdownRenderer from "../renderers/markdown";
 import { P } from "../typography/P";
 
@@ -9,7 +9,7 @@ interface Props {
   value: string;
 }
 
-export function MarkdownEditor(props: Readonly<Props>) {
+export function MarkdownEditor(props: Readonly<Props>): ReactNode {
   const [showPreview, setShowPreview] = useState(false);
 
   return (

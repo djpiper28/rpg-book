@@ -43,8 +43,6 @@ describe("MarkdownEditor", () => {
     });
   });
 
-
-
   it("Should call setValue when the textarea value changes", async () => {
     const label = "Test Label";
     const value = "Initial Value";
