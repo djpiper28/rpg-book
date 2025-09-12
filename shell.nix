@@ -13,5 +13,7 @@ pkgs.mkShell {
     p7zip
     protobuf_27
     grpc-tools
+    clang
+    lld
   ];
 }

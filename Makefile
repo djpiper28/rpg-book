@@ -26,11 +26,11 @@ release: all
 
 .PHONY: desktop-backend
 desktop-backend: go-core
-	cd ./desktop_client/launcher && go build
+	cd ./desktop_client/launcher && CC=clang CGO_LDFLAGS="-fuse-ld=lld" go build
 
 .PHONY: go-generate
 go-generate: desktop-deps
-	go generate ./...
+	go generate "./..."
 
 .PHONY: go-core
 go-core: go-generate
@@ -69,6 +69,7 @@ format: go-fmt prettier
 .PHONY: cleanup
 cleanup:
 	find desktop_client | grep -E ".*\\.sqlite(-journal)?" | xargs rm -rf
+	rm -rf ./desktop_client/app/node_modules/
 
 # If you are Gemini this is how you were spawned
 .PHONY: gemini
