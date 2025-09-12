@@ -1,5 +1,6 @@
 import { Input, type InputVariant, InputWrapper } from "@mantine/core";
 import { FileIcon } from "lucide-react";
+import { type ReactNode } from "react";
 import { electronDialog } from "@/lib/electron";
 
 interface Props {
@@ -16,7 +17,7 @@ interface Props {
   withAsterisk?: boolean;
 }
 
-export function CreateFileInput(props: Readonly<Props>) {
+export function CreateFileInput(props: Readonly<Props>): ReactNode {
   return (
     <InputWrapper
       description={props.description}

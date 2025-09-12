@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { Button, Input, Table } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { Modal } from "@/components/modal/modal";
 import MarkdownRenderer from "@/components/renderers/markdown";
 import { H2 } from "@/components/typography/H2";
@@ -11,7 +12,7 @@ import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
 import CreateCharacterModal from "./createCharacterModal";
 
-export function CharacterTab() {
+export function CharacterTab(): ReactNode {
   const [selectedCharacterId, setSelectedCharacterId] = useState("");
 
   const [selectedCharcter, setSelectedCharacter] = useState<
@@ -88,7 +89,7 @@ export function CharacterTab() {
                 <Table.Th>Name</Table.Th>
                 <Table.Th>Factions</Table.Th>
               </Table.Tr>
-              {thisProject.project.characters.map((character) => {
+              {thisProject.project.characters.map((character): ReactNode => {
                 const id = character.handle?.id ?? "";
                 const selected = selectedCharacterId == id;
 

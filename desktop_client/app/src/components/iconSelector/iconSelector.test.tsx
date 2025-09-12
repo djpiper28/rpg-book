@@ -1,7 +1,7 @@
 import { fireEvent, waitFor } from "@testing-library/react";
+import { electronDialog } from "@/lib/electron";
 import { wrappedRender } from "@/lib/testUtils/wrappedRender";
 import { IconSelector } from "./iconSelector";
-import { electronDialog } from "@/lib/electron";
 
 vi.mock("@/lib/electron", () => ({
   electronDialog: {
@@ -22,12 +22,15 @@ describe("IconSelector", () => {
 
   it("Should update the image source when a file is selected", async () => {
     const filePath = "/path/to/test/image.jpeg";
+
     mockedElectronDialog.showOpenDialog.mockResolvedValue({
       canceled: false,
       filePaths: [filePath],
     });
 
-    const { findByRole, findByAltText } = wrappedRender(<IconSelector description="test" />);
+    const { findByAltText, findByRole } = wrappedRender(
+      <IconSelector description="test" />,
+    );
 
     const button = await findByRole("button");
     fireEvent.click(button);

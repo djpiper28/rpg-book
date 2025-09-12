@@ -1,7 +1,7 @@
 import { SiGithub } from "@icons-pack/react-simple-icons";
 import { Button, Table } from "@mantine/core";
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { H2 } from "@/components/typography/H2";
 import { Link } from "@/components/typography/Link";
@@ -18,7 +18,7 @@ import { useSettingsStore } from "@/stores/settingsStore";
 import { useTabStore } from "@/stores/tabStore";
 import { projectPath } from "./project/path";
 
-export function Component() {
+export function Component(): ReactNode {
   const [recentProjects, setRecentProjects] = useState<RecentProjectsResp>({
     projects: [],
   });
@@ -29,7 +29,10 @@ export function Component() {
   const { setError } = useGlobalErrorStore((x) => x);
   const settings = useSettingsStore((x) => x.settings);
 
-  const openProject = (filename: string, projectNameOverride?: string) => {
+  const openProject = (
+    filename: string,
+    projectNameOverride?: string,
+  ): void => {
     getProjectClient()
       .openProject({ fileName: filename })
       .then((resp) => {

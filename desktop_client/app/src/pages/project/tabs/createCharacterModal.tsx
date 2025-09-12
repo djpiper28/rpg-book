@@ -1,5 +1,5 @@
 import { Button, TextInput } from "@mantine/core";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import { MarkdownEditor } from "@/components/input/markdownEditor";
 import { getProjectClient } from "@/lib/grpcClient/client";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
@@ -10,7 +10,9 @@ interface Props {
   closeDialog: () => void;
 }
 
-export default function CreateCharacterModal(props: Readonly<Props>) {
+export default function CreateCharacterModal(
+  props: Readonly<Props>,
+): ReactNode {
   const [characterName, setCharacterName] = useState("");
   const [characterDescription, setCharacterDescription] = useState("");
   const { setError } = useGlobalErrorStore((x) => x);

@@ -63,7 +63,6 @@ describe("Create project", () => {
     fireEvent.click(createButton);
 
     await waitFor(() => {
-      //eslint-disable-next-line @typescript-eslint/unbound-method
       expect(mockedClient.createProject).toHaveBeenCalledWith({
         fileName: `${testName}${DbExtension}`,
         projectName: testName,

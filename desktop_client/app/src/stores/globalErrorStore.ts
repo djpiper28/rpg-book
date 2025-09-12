@@ -12,7 +12,7 @@ interface GlobalErrorStore {
 
 export const useGlobalErrorStore = create<GlobalErrorStore>()(
   (set): GlobalErrorStore => ({
-    setError: (error: RpgBookError) => {
+    setError: (error: RpgBookError): void => {
       set({ currentError: error });
     },
   }),

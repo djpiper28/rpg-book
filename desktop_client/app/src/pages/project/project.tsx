@@ -1,4 +1,5 @@
 import { Tabs } from "@mantine/core";
+import { type ReactNode } from "react";
 import { useNavigate } from "react-router";
 import { H2 } from "@/components/typography/H2";
 import { mustVoid } from "@/lib/utils/errorHandlers";
@@ -6,7 +7,7 @@ import { useTabStore } from "@/stores/tabStore";
 import { indexPath } from "../path";
 import { CharacterTab } from "./tabs/characterTab";
 
-export function Component() {
+export function Component(): ReactNode {
   const navigate = useNavigate();
   const tabs = useTabStore();
 

@@ -1,7 +1,7 @@
 import { fireEvent, waitFor } from "@testing-library/react";
+import { electronDialog } from "@/lib/electron";
 import { wrappedRender } from "@/lib/testUtils/wrappedRender";
 import { CreateFileInput } from "./createFileInput";
-import { electronDialog } from "@/lib/electron";
 
 vi.mock("@/lib/electron", () => ({
   electronDialog: {
@@ -13,9 +13,9 @@ const mockedElectronDialog = vi.mocked(electronDialog);
 
 describe("CreateFileInput", () => {
   const defaultProps = {
+    filters: [],
     onChange: vi.fn(),
     value: "",
-    filters: [],
   };
 
   afterEach(() => {
@@ -26,15 +26,17 @@ describe("CreateFileInput", () => {
     const { findByDisplayValue } = wrappedRender(
       <CreateFileInput {...defaultProps} value="initial/path/value" />,
     );
+
     const input = await findByDisplayValue("initial/path/value");
     expect(input).toBeInTheDocument();
   });
 
   it("Should call onChange with the selected file path when a file is chosen", async () => {
     const filePath = "/path/to/save/file.db";
+
     mockedElectronDialog.showSaveDialog.mockResolvedValue({
       canceled: false,
-      filePath: filePath,
+      filePath,
     });
 
     const { findByRole } = wrappedRender(<CreateFileInput {...defaultProps} />);
@@ -49,7 +51,7 @@ describe("CreateFileInput", () => {
   it("Should not call onChange when the save dialog is canceled", async () => {
     mockedElectronDialog.showSaveDialog.mockResolvedValue({
       canceled: true,
-      filePath: undefined,
+      filePath: "",
     });
 
     const { findByRole } = wrappedRender(<CreateFileInput {...defaultProps} />);
@@ -65,6 +67,7 @@ describe("CreateFileInput", () => {
     const { findByPlaceholderText } = wrappedRender(
       <CreateFileInput {...defaultProps} placeholder="test-placeholder" />,
     );
+
     const input = await findByPlaceholderText("test-placeholder");
     fireEvent.change(input, { target: { value: "new-value" } });
 

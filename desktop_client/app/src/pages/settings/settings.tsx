@@ -1,6 +1,6 @@
 import { Button, Checkbox, InputDescription } from "@mantine/core";
 import { Settings, TriangleAlert } from "lucide-react";
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { H2 } from "@/components/typography/H2";
 import { H3 } from "@/components/typography/H3";
@@ -9,7 +9,7 @@ import { mustVoid } from "@/lib/utils/errorHandlers";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 
-export function Component() {
+export function Component(): ReactNode {
   const { setSettings, settings } = useSettingsStore((s) => s);
   const [dirtySettings, setDirtySettings] = useState(settings);
   const [version, setVersion] = useState(<></>);

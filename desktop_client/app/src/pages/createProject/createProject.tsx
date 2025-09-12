@@ -1,6 +1,6 @@
 import { Button, TextInput } from "@mantine/core";
 import { Plus, Text } from "lucide-react";
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { CreateFileInput } from "@/components/input/createFileInput";
 import { H2 } from "@/components/typography/H2";
@@ -24,12 +24,12 @@ function validateProjectName(rawName: string): string {
   return "";
 }
 
-export function Component() {
+export function Component(): ReactNode {
   const projects = useProjectStore((x) => x);
   const tabs = useTabStore((x) => x);
   const navigate = useNavigate();
   const [projectName, setProjectName] = useState<string>(randomPlace());
-  const [saveLocation, setSaveLocation] = useState<string | null>();
+  const [saveLocation, setSaveLocation] = useState<string | undefined>();
   const { setError } = useGlobalErrorStore((x) => x);
 
   useEffect(() => {

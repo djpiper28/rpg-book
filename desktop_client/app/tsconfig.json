@@ -26,6 +26,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "electron", "setupTest.ts", "src/electron.d.ts"],
+  "include": ["src", "electron", "setup-vitest.ts", "src/electron.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

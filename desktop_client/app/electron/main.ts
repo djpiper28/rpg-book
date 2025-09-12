@@ -102,7 +102,7 @@ function getLauncherPath(): string {
   return path.join(process.resourcesPath, "launcher", launcher);
 }
 
-function createWindow() {
+function createWindow(): void {
   win = new BrowserWindow({
     autoHideMenuBar: true,
     icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),

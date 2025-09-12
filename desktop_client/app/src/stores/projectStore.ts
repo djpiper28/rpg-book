@@ -22,7 +22,7 @@ interface ProjectStore {
   updateProject: (handle: ProjectHandle, project: OpenProjectResp) => void;
 }
 
-function asId(handle: ProjectHandle) {
+function asId(handle: ProjectHandle): string {
   return handle.id;
 }
 
@@ -37,7 +37,7 @@ export const useProjectStore = create<ProjectStore>()(
         projects.projects[asId(handle)]?.project.characters.push(character);
         set(projects);
       },
-      getProject: (handle: ProjectHandle) => {
+      getProject: (handle: ProjectHandle): Project | undefined => {
         const projects = get();
         return projects.projects[asId(handle)];
       },

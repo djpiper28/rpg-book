@@ -5,7 +5,7 @@ interface Props {
   className?: string;
 }
 
-export function P(props: Readonly<Props>) {
+export function P(props: Readonly<Props>): ReactNode {
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-template-expression
   return <p className={`${props.className ?? ""}`}>{props.children}</p>;
 }

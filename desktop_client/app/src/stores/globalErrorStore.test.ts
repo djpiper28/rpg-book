@@ -1,10 +1,10 @@
-import { useGlobalErrorStore, type RpgBookError } from "./globalErrorStore";
+import { type RpgBookError, useGlobalErrorStore } from "./globalErrorStore";
 
 describe("globalErrorStore", () => {
   it("should set an error correctly", () => {
     const error: RpgBookError = {
-      title: "Test Error",
       body: "This is a test error.",
+      title: "Test Error",
     };
 
     // Set the error
@@ -17,8 +17,8 @@ describe("globalErrorStore", () => {
   it("should clear the error by setting a new one with an empty body", () => {
     // Set an initial error
     useGlobalErrorStore.getState().setError({
-      title: "Initial Error",
       body: "Some error.",
+      title: "Initial Error",
     });
 
     // Clear the error

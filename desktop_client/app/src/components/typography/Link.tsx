@@ -17,7 +17,7 @@ interface Props {
   safe?: boolean;
 }
 
-export function Link(props: Readonly<Props>) {
+export function Link(props: Readonly<Props>): ReactNode {
   const [opened, { close, open }] = useDisclosure(false);
   const style = "text-blue-500 hover:text-blue-600 underline";
 
@@ -42,7 +42,7 @@ export function Link(props: Readonly<Props>) {
     return <p className={style}>Invalid URL</p>;
   }
 
-  const openUrl = () => {
+  const openUrl = (): void => {
     electronShell
       .openExternal(props.href)
       .then()

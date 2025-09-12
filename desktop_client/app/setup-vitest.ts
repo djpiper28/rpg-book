@@ -4,8 +4,13 @@ import MatchMediaMock from "vitest-matchmedia-mock";
 import { vi } from "vitest";
 
 process.env = {
+  ...process.env,
   [EnvVarPort]: "9000",
   [EnvVarCertificate]: "Testing-cert",
+  APP_ROOT: "",
+  VITE_PUBLIC: "",
+  RPG_BOOK_CERTIFICATE: "",
+  RPG_BOOK_PORT: "",
 };
 
 let matchMediaMock = new MatchMediaMock();
@@ -47,10 +52,10 @@ vi.mock("@/lib/electron", () => mockElectron);
 
 vi.mock("@/lib/grpcClient/client", () => ({
   getLogger: () => ({
-    info: (msg: string, props) => console.log("INFO:", msg, props),
-    warn: (msg: string, props) => console.log("WARN:", msg, props),
-    error: (msg: string, props) => console.log("ERROR:", msg, props),
-    fatal: (msg: string, props) => console.log("FATAL:", msg, props),
+    info: (msg: string, props: any) => console.log("INFO:", msg, props),
+    warn: (msg: string, props: any) => console.log("WARN:", msg, props),
+    error: (msg: string, props: any) => console.log("ERROR:", msg, props),
+    fatal: (msg: string, props: any) => console.log("FATAL:", msg, props),
   }),
   getSystemClient: vi.fn(() => ({
     log: vi.fn(),
@@ -61,4 +66,4 @@ vi.mock("@/lib/grpcClient/client", () => ({
   initializeClients: vi.fn(),
 }));
 
-vi.mock("@electron/remote", () => {});
+vi.mock("@electron/remote", () => ({}));

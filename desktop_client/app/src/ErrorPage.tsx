@@ -1,5 +1,5 @@
 import { Button, Table } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { useNavigate, useRouteError } from "react-router";
 import { H1 } from "./components/typography/H1";
 import { H2 } from "./components/typography/H2";
@@ -11,7 +11,7 @@ import { indexPath } from "./pages/path";
 
 const commonCss = "text-wrap text-red-400";
 
-export function ErrorPage() {
+export function ErrorPage(): ReactNode {
   const navigate = useNavigate();
   const routeError = useRouteError();
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions

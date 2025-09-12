@@ -4,6 +4,6 @@ interface Props {
   children?: string | ReactNode;
 }
 
-export function H2(props: Readonly<Props>) {
+export function H2(props: Readonly<Props>): ReactNode {
   return <h2 className="text-2xl font-semibold">{props.children}</h2>;
 }

@@ -1,12 +1,12 @@
 import { Pencil } from "lucide-react";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import { electronDialog } from "@/lib/electron";
 
 interface Props {
   description: string;
 }
 
-export function IconSelector(props: Readonly<Props>) {
+export function IconSelector(props: Readonly<Props>): ReactNode {
   const [selectedFile, setSelectedFile] = useState("");
 
   return (

@@ -1,7 +1,7 @@
 import { Button, MantineProvider, Tabs, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { LoaderCircle, Plus, Settings, X } from "lucide-react";
-import { useEffect } from "react";
+import { type ReactNode, useEffect } from "react";
 import {
   Outlet,
   RouterProvider,
@@ -26,7 +26,7 @@ import { useGlobalErrorStore } from "./stores/globalErrorStore";
 import { useSettingsStore } from "./stores/settingsStore";
 import { useTabStore } from "./stores/tabStore";
 
-function IndexRedirect() {
+function IndexRedirect(): ReactNode {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,19 +49,23 @@ const router = createHashRouter([
   {
     children: [
       {
-        lazy: () => import("./pages/index.tsx"),
+        lazy: (): Promise<{ default: () => ReactNode }> =>
+          import("./pages/index.tsx"),
         path: "index",
       },
       {
-        lazy: () => import("./pages/settings/settings.tsx"),
+        lazy: (): Promise<{ default: () => ReactNode }> =>
+          import("./pages/settings/settings.tsx"),
         path: "settings",
       },
       {
-        lazy: () => import("./pages/project/project.tsx"),
+        lazy: (): Promise<{ default: () => ReactNode }> =>
+          import("./pages/project/project.tsx"),
         path: "project",
       },
       {
-        lazy: () => import("./pages/createProject/createProject.tsx"),
+        lazy: (): Promise<{ default: () => ReactNode }> =>
+          import("./pages/createProject/createProject.tsx"),
         path: "create-project",
       },
     ],
@@ -86,7 +90,7 @@ const router = createHashRouter([
   },
 ]);
 
-function Loader() {
+function Loader(): ReactNode {
   return (
     <div className="flex flex-row justify-center gap-5 items-center h-screen">
       <span className="animate-spin repeat-infinite">
@@ -97,7 +101,7 @@ function Loader() {
   );
 }
 
-function Layout() {
+function Layout(): ReactNode {
   const { setSettings } = useSettingsStore((s) => s);
   const tabs = useTabStore((x) => x);
   const navigate = useNavigate();
@@ -220,7 +224,7 @@ function Layout() {
   );
 }
 
-export default function App() {
+export default function App(): ReactNode {
   const { settings } = useSettingsStore((s) => s);
 
   useEffect(() => {

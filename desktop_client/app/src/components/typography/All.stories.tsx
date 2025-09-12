@@ -1,4 +1,5 @@
 import { type Meta, type StoryObj } from "@storybook/react-vite";
+import { type ReactNode } from "react";
 import { H1 } from "./H1";
 import { H2 } from "./H2";
 import { H3 } from "./H3";
@@ -8,7 +9,7 @@ interface Props {
   children: string;
 }
 
-function AllHeaders(props: Readonly<Props>) {
+function AllHeaders(props: Readonly<Props>): ReactNode {
   return (
     <div className="flex flex-col gap-5">
       <p>H1:</p>

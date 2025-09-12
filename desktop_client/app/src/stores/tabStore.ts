@@ -18,7 +18,7 @@ interface TabStore {
 export const useTabStore = create<TabStore>()(
   persist(
     (set, get) => ({
-      addTab: (handle: ProjectHandle, name: string) => {
+      addTab: (handle: ProjectHandle, name: string): void => {
         const newTabs = structuredClone(get().tabs);
 
         newTabs[handle.id] = {
@@ -31,7 +31,7 @@ export const useTabStore = create<TabStore>()(
           tabs: newTabs,
         });
       },
-      removeTab: (handle: ProjectHandle) => {
+      removeTab: (handle: ProjectHandle): void => {
         const newTabs = structuredClone(get().tabs);
         // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
         delete newTabs[handle.id];
@@ -41,7 +41,7 @@ export const useTabStore = create<TabStore>()(
         });
       },
       selectedTab: undefined,
-      setSelectedTab: (handle: ProjectHandle) => {
+      setSelectedTab: (handle: ProjectHandle): void => {
         set({
           selectedTab: handle,
         });
