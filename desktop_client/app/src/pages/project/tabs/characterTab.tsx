@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { Button, Input, Table } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { Pencil } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
 import { Modal } from "@/components/modal/modal";
 import MarkdownRenderer from "@/components/renderers/markdown";
@@ -11,6 +11,7 @@ import { type BasicCharacterDetails } from "@/lib/grpcClient/pb/project_characte
 import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
 import CreateCharacterModal from "./createCharacterModal";
+import EditCharacterModal from "./editCharacterModal";
 
 export function CharacterTab(): ReactNode {
   const [selectedCharacterId, setSelectedCharacterId] = useState("");
@@ -19,11 +20,17 @@ export function CharacterTab(): ReactNode {
     BasicCharacterDetails | undefined
   >();
 
-  const [opened, { close, open }] = useDisclosure(false);
+  const [createOpened, { close: createClose, open: createOpen }] =
+    useDisclosure(false);
+
+  const [editOpened, { close: editClose, open: editOpen }] =
+    useDisclosure(false);
+
   const projectHandle = useTabStore((x) => x.selectedTab);
   const projectStore = useProjectStore((x) => x);
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     const sync = async () => {
       if (!selectedCharacterId) {
         return;
@@ -67,8 +74,17 @@ export function CharacterTab(): ReactNode {
 
   return (
     <>
-      <Modal close={close} opened={opened} title="Create Character">
-        {opened && <CreateCharacterModal closeDialog={close} />}
+      <Modal close={createClose} opened={createOpened} title="Create Character">
+        {createOpened && <CreateCharacterModal closeDialog={createClose} />}
+      </Modal>
+
+      <Modal close={editClose} opened={editOpened} title="Edit Character">
+        {editOpened && (
+          <EditCharacterModal
+            characterHandle={{ id: selectedCharacterId }}
+            closeDialog={editClose}
+          />
+        )}
       </Modal>
 
       <div className="flex flex-row gap-2 pt-2 justify-between">
@@ -77,7 +93,7 @@ export function CharacterTab(): ReactNode {
             <Input className="flex-grow" placeholder="TODO Search bar" />
             <Button
               onClick={() => {
-                open();
+                createOpen();
               }}
             >
               Create Character
@@ -117,7 +133,20 @@ export function CharacterTab(): ReactNode {
         <div className="flex-1 overflow-x-auto">
           {selectedCharcter && (
             <>
-              <H2>{selectedCharcter.name}</H2>
+              <div className="flex flex-row gap-3 justify-between">
+                <H2>{selectedCharcter.name}</H2>
+                <button
+                  className="cursor-pointer"
+                  onClick={() => {
+                    editOpen();
+                  }}
+                >
+                  <P className="flex flex-row gap-1">
+                    <Pencil />
+                    Edit
+                  </P>
+                </button>
+              </div>
               <MarkdownRenderer markdown={selectedCharcter.description} />
             </>
           )}
