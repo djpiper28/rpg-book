@@ -1,6 +1,5 @@
 import { dialog, shell } from "@electron/remote";
 import { contextBridge } from "electron";
-import { promises } from "node:fs";
 
 const electronShell = shell;
 const electronDialog = dialog;
@@ -19,15 +18,10 @@ function getBuildType(): string {
   return process.env.VITE_DEV_SERVER_URL ? "Development" : "Production";
 }
 
-async function read(url: string): Promise<Uint8Array> {
-  return await promises.readFile(url);
-}
-
 contextBridge.exposeInMainWorld("electron", {
   dialog: electronDialog,
   getBuildType,
   getSystemVersion,
-  read,
   shell: electronShell,
 });
 

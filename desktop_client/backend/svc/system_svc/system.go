@@ -3,6 +3,8 @@ package systemsvc
 import (
 	"context"
 	"errors"
+	"fmt"
+	"os"
 
 	"github.com/charmbracelet/log"
 	buildinfo "github.com/djpiper28/rpg-book/common/build_info"
@@ -66,4 +68,15 @@ func (s *SystemSvc) Log(ctx context.Context, req *pb_system.LogRequest) (*pb_com
 
 func (s *SystemSvc) GetVersion(ctx context.Context, req *pb_common.Empty) (*pb_system.Version, error) {
 	return &pb_system.Version{Version: buildinfo.Version}, nil
+}
+
+func (s *SystemSvc) ReadFile(ctx context.Context, req *pb_system.ReadFileReq) (*pb_system.ReadFileRes, error) {
+	data, err := os.ReadFile(req.Filepath)
+	if err != nil {
+		return nil, errors.Join(fmt.Errorf("Cannot read file %s", req.Filepath), err)
+	}
+
+	return &pb_system.ReadFileRes{
+		Data: data,
+	}, nil
 }

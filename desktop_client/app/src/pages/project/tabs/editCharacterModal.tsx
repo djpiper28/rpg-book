@@ -2,8 +2,7 @@ import { Button, TextInput } from "@mantine/core";
 import { type ReactNode, useEffect, useState } from "react";
 import { IconSelector } from "@/components/input/iconSelector";
 import { MarkdownEditor } from "@/components/input/markdownEditor";
-import { read } from "@/lib/electron";
-import { getProjectClient } from "@/lib/grpcClient/client";
+import { getProjectClient, getSystemClient } from "@/lib/grpcClient/client";
 import {
   type BasicCharacterDetails,
   type CharacterHandle,
@@ -100,8 +99,11 @@ export default function CreateCharacterModal(
               const FileProtocol = "file://";
 
               if (icon.includes(FileProtocol, 0)) {
-                const iconBytes = await read(icon.replace(FileProtocol, ""));
-                characterDetails.icon = iconBytes;
+                const iconBytes = await getSystemClient().readFile({
+                  filepath: icon.replace(FileProtocol, ""),
+                });
+
+                characterDetails.icon = iconBytes.response.data;
               }
 
               await getProjectClient().updateCharacter({

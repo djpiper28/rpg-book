@@ -2,6 +2,7 @@ package systemsvc_test
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	buildinfo "github.com/djpiper28/rpg-book/common/build_info"
@@ -9,6 +10,7 @@ import (
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_system"
 	systemsvc "github.com/djpiper28/rpg-book/desktop_client/backend/svc/system_svc"
 	testdbutils "github.com/djpiper28/rpg-book/desktop_client/test_db_utils"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
 
@@ -81,5 +83,29 @@ func TestSettings(t *testing.T) {
 		version, err := system.GetVersion(context.Background(), &pb_common.Empty{})
 		require.NoError(t, err)
 		require.Equal(t, version.Version, buildinfo.Version)
+	})
+
+	t.Run("Test read file (failure)", func(t *testing.T) {
+		_, err := system.ReadFile(context.Background(), &pb_system.ReadFileReq{
+			Filepath: "./not_a_real_file",
+		})
+
+		require.Error(t, err)
+	})
+
+	t.Run("Test read file", func(t *testing.T) {
+		const FileName = "./testing_file.txt"
+		data := []byte(uuid.New().String())
+
+		err := os.WriteFile(FileName, data, 0555)
+		defer os.Remove(FileName)
+		require.NoError(t, err)
+
+		readData, err := system.ReadFile(context.Background(), &pb_system.ReadFileReq{
+			Filepath: FileName,
+		})
+
+		require.NoError(t, err)
+		require.Equal(t, data, readData.Data)
 	})
 }

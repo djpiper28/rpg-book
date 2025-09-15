@@ -116,7 +116,7 @@ function showErrorAndQuit(error: Error): void {
 
 function createWindow(): void {
   win = new BrowserWindow({
-    autoHideMenuBar: true,
+    autoHideMenuBar: false,
     icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
     minHeight: 400,
     minWidth: 600,
