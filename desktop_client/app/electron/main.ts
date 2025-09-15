@@ -1,6 +1,5 @@
 import * as remote from "@electron/remote/main";
-// eslint-disable-next-line import-x/no-unresolved
-import { BrowserWindow, app, dialog, globalShortcut, session } from "electron";
+import { BrowserWindow, Menu, app, dialog, session } from "electron";
 import { type ChildProcess, spawn } from "node:child_process";
 import path from "node:path";
 import { exit } from "node:process";
@@ -32,10 +31,6 @@ if (process.env.RPG_BOOK_CERTIFICATE) {
     }
   });
 
-  app.on("will-quit", () => {
-    globalShortcut.unregisterAll();
-  });
-
   app.on("activate", () => {
     // On OS X it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
@@ -46,10 +41,6 @@ if (process.env.RPG_BOOK_CERTIFICATE) {
 
   // eslint-disable-next-line @typescript-eslint/no-floating-promises,unicorn/prefer-top-level-await
   app.whenReady().then(() => {
-    globalShortcut.register("CommandOrControl+Shift+I", () => {
-      win?.webContents.toggleDevTools();
-    });
-
     const certificate = process.env.RPG_BOOK_CERTIFICATE;
 
     session.defaultSession.setCertificateVerifyProc((request, callback) => {
@@ -138,6 +129,23 @@ function createWindow(): void {
       webSecurity: false,
     },
   });
+
+  const menu = Menu.buildFromTemplate([
+    {
+      label: "Developer",
+      submenu: [
+        {
+          accelerator: "CommandOrControl+Shift+I",
+          click: (): void => {
+            win?.webContents.toggleDevTools();
+          },
+          label: "Toggle DevTools",
+        },
+      ],
+    },
+  ]);
+
+  Menu.setApplicationMenu(menu);
 
   if (isDevServer) {
     win.webContents.openDevTools();

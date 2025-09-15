@@ -1,4 +1,3 @@
-// eslint-disable-next-line import-x/no-unresolved
 import { dialog, shell } from "@electron/remote";
 import { contextBridge } from "electron";
 import { promises } from "node:fs";
