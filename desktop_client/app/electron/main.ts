@@ -1,6 +1,6 @@
 import * as remote from "@electron/remote/main";
 // eslint-disable-next-line import-x/no-unresolved
-import { BrowserWindow, app, session } from "electron";
+import { BrowserWindow, app, dialog, globalShortcut, session } from "electron";
 import { type ChildProcess, spawn } from "node:child_process";
 import path from "node:path";
 import { exit } from "node:process";
@@ -32,6 +32,10 @@ if (process.env.RPG_BOOK_CERTIFICATE) {
     }
   });
 
+  app.on("will-quit", () => {
+    globalShortcut.unregisterAll();
+  });
+
   app.on("activate", () => {
     // On OS X it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
@@ -42,6 +46,10 @@ if (process.env.RPG_BOOK_CERTIFICATE) {
 
   // eslint-disable-next-line @typescript-eslint/no-floating-promises,unicorn/prefer-top-level-await
   app.whenReady().then(() => {
+    globalShortcut.register("CommandOrControl+Shift+I", () => {
+      win?.webContents.toggleDevTools();
+    });
+
     const certificate = process.env.RPG_BOOK_CERTIFICATE;
 
     session.defaultSession.setCertificateVerifyProc((request, callback) => {
@@ -55,14 +63,19 @@ if (process.env.RPG_BOOK_CERTIFICATE) {
         }
 
         callback(eq ? 0 : -2);
-      } catch {
+      } catch (error) {
+        showErrorAndQuit(new Error(String(error)));
         callback(-2);
       }
     });
 
     session.defaultSession.setUserAgent("RPG-Book");
 
-    createWindow();
+    try {
+      createWindow();
+    } catch (error) {
+      showErrorAndQuit(new Error(String(error)));
+    }
   });
 } else {
   // Start the application via the launcher
@@ -82,8 +95,7 @@ if (process.env.RPG_BOOK_CERTIFICATE) {
   }
 
   ps.on("error", (error) => {
-    console.log("An error has occurred", error);
-    exit(1);
+    showErrorAndQuit(error);
   });
 
   ps.on("close", () => {
@@ -102,6 +114,15 @@ function getLauncherPath(): string {
   return path.join(process.resourcesPath, "launcher", launcher);
 }
 
+function showErrorAndQuit(error: Error): void {
+  dialog.showErrorBox(
+    "Application Error",
+    `An unexpected error occurred: ${error.message}`,
+  );
+
+  app.quit();
+}
+
 function createWindow(): void {
   win = new BrowserWindow({
     autoHideMenuBar: true,
@@ -111,12 +132,16 @@ function createWindow(): void {
     title: "RPG Book",
     webPreferences: {
       contextIsolation: true,
-      devTools: isDevServer,
+      devTools: true,
       nodeIntegration: false,
       preload: path.join(__dirname, "preload.mjs"),
       webSecurity: false,
     },
   });
+
+  if (isDevServer) {
+    win.webContents.openDevTools();
+  }
 
   // Test active push message to Renderer-process.
   win.webContents.on("did-finish-load", () => {
@@ -126,11 +151,10 @@ function createWindow(): void {
   remote.enable(win.webContents);
 
   if (VITE_DEV_SERVER_URL) {
-    win.loadURL(VITE_DEV_SERVER_URL).then().catch(console.error);
+    win.loadURL(VITE_DEV_SERVER_URL).catch(showErrorAndQuit);
   } else {
     win
       .loadFile(path.join(RENDERER_DIST, "index.html"))
-      .then()
-      .catch(console.error);
+      .catch(showErrorAndQuit);
   }
 }
