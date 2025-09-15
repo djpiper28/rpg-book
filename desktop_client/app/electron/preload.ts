@@ -6,12 +6,14 @@ import {
   getBuildType,
   getEnv,
   getSystemVersion,
+  read,
 } from "../src/lib/electron/main";
 
 contextBridge.exposeInMainWorld("electron", {
   dialog: electronDialog,
   getBuildType,
   getSystemVersion,
+  read,
   shell: electronShell,
 });
 

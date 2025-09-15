@@ -2,9 +2,12 @@ import { Button, TextInput } from "@mantine/core";
 import { type ReactNode, useEffect, useState } from "react";
 import { IconSelector } from "@/components/input/iconSelector";
 import { MarkdownEditor } from "@/components/input/markdownEditor";
-import { P } from "@/components/typography/P";
+import { read } from "@/lib/electron";
 import { getProjectClient } from "@/lib/grpcClient/client";
-import { type CharacterHandle } from "@/lib/grpcClient/pb/project_character";
+import {
+  type BasicCharacterDetails,
+  type CharacterHandle,
+} from "@/lib/grpcClient/pb/project_character";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useTabStore } from "@/stores/tabStore";
 
@@ -16,8 +19,13 @@ interface Props {
 export default function CreateCharacterModal(
   props: Readonly<Props>,
 ): ReactNode {
-  const [characterName, setCharacterName] = useState("");
-  const [characterDescription, setCharacterDescription] = useState("");
+  const [characterDetails, setCharacterDetails] =
+    useState<BasicCharacterDetails>({
+      description: "",
+      icon: new Uint8Array(),
+      name: "",
+    });
+
   const [icon, setIcon] = useState<string>("");
   const { setError } = useGlobalErrorStore((x) => x);
   const projectHandle = useTabStore((x) => x.selectedTab);
@@ -33,9 +41,15 @@ export default function CreateCharacterModal(
         project: projectHandle,
       })
       .then((resp) => {
-        setCharacterName(resp.response.name);
-        setCharacterDescription(resp.response.description);
-        setIcon(resp.response.icon.toBase64());
+        setCharacterDetails(resp.response);
+        const buffer = resp.response.icon;
+
+        const binary = new Uint8Array(buffer).reduce(
+          (acc, byte) => acc + String.fromCodePoint(byte),
+          "",
+        );
+
+        setIcon(btoa(binary));
       })
       .catch((error: unknown) => {
         setError({
@@ -54,30 +68,58 @@ export default function CreateCharacterModal(
         <TextInput
           label="Character Name"
           onChange={(x) => {
-            setCharacterName(x.target.value);
+            const details = structuredClone(characterDetails);
+            details.name = x.target.value;
+            setCharacterDetails(details);
           }}
           placeholder="John Smith"
           required={true}
-          value={characterName}
+          value={characterDetails.name}
         />
         <IconSelector
           description="Select an icon for your character"
-          setSrc={(src) => {
+          filepath={icon}
+          setFilepath={(src) => {
             setIcon(src);
           }}
-          src={icon}
         />
       </div>
       <MarkdownEditor
         label="Description and notes"
         setValue={(value) => {
-          setCharacterDescription(value);
+          const details = structuredClone(characterDetails);
+          details.description = value;
+          setCharacterDetails(details);
         }}
-        value={characterDescription}
+        value={characterDetails.description}
       />
       <Button
         onClick={() => {
-          // TODO: this
+          const f = async (): Promise<void> => {
+            try {
+              const FileProtocol = "file://";
+
+              if (icon.includes(FileProtocol, 0)) {
+                const iconBytes = await read(icon.replace(FileProtocol, ""));
+                characterDetails.icon = iconBytes;
+              }
+
+              await getProjectClient().updateCharacter({
+                details: characterDetails,
+                handle: props.characterHandle,
+                project: projectHandle,
+              });
+
+              props.closeDialog();
+            } catch (error: unknown) {
+              setError({
+                body: String(error),
+              });
+            }
+          };
+
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          f();
         }}
       >
         Save

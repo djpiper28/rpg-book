@@ -5,8 +5,8 @@ import { electronDialog } from "@/lib/electron";
 
 interface Props {
   description: string;
-  setSrc: (src: string) => void;
-  src: string | undefined;
+  filepath: string | undefined;
+  setFilepath: (src: string) => void;
 }
 
 export function IconSelector(props: Readonly<Props>): ReactNode {
@@ -32,14 +32,14 @@ export function IconSelector(props: Readonly<Props>): ReactNode {
                 return;
               }
 
-              props.setSrc("file://" + result.filePaths[0]);
+              props.setFilepath("file://" + result.filePaths[0]);
             })
             .catch(console.error);
         }}
       >
         <Pencil className="absolute" />
-        {props.src ? (
-          <img alt="User selected" className="static" src={props.src} />
+        {props.filepath ? (
+          <img alt="User selected" className="static" src={props.filepath} />
         ) : (
           <P>No icon selected</P>
         )}

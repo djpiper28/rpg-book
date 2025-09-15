@@ -17,46 +17,63 @@ describe("IconSelector", () => {
   });
 
   it("Should render", () => {
-    expect(wrappedRender(<IconSelector description="test" />)).toBeDefined();
+    expect(
+      wrappedRender(
+        <IconSelector
+          description="test"
+          filepath={undefined}
+          setFilepath={vi.fn()}
+        />,
+      ),
+    ).toBeDefined();
   });
 
   it("Should update the image source when a file is selected", async () => {
     const filePath = "/path/to/test/image.jpeg";
+    const setFilepath = vi.fn();
 
     mockedElectronDialog.showOpenDialog.mockResolvedValue({
       canceled: false,
       filePaths: [filePath],
     });
 
-    const { findByAltText, findByRole } = wrappedRender(
-      <IconSelector description="test" />,
-    );
-
-    const button = await findByRole("button");
-    fireEvent.click(button);
-
-    await waitFor(async () => {
-      const img = await findByAltText("User selected");
-      expect(img).toHaveAttribute("src", `file://${filePath}`);
-    });
-  });
-
-  it("Should not update the image source when the dialog is canceled", async () => {
-    mockedElectronDialog.showOpenDialog.mockResolvedValue({
-      canceled: true,
-      filePaths: [],
-    });
-
-    const { findByRole, queryByAltText } = wrappedRender(
-      <IconSelector description="test" />,
+    const { findByRole } = wrappedRender(
+      <IconSelector
+        description="test"
+        filepath={undefined}
+        setFilepath={setFilepath}
+      />,
     );
 
     const button = await findByRole("button");
     fireEvent.click(button);
 
     await waitFor(() => {
-      const img = queryByAltText("User selected");
-      expect(img).not.toBeInTheDocument();
+      expect(setFilepath).toHaveBeenCalledWith(`file://${filePath}`);
+    });
+  });
+
+  it("Should not update the image source when the dialog is canceled", async () => {
+    const setFilepath = vi.fn();
+
+    mockedElectronDialog.showOpenDialog.mockResolvedValue({
+      canceled: true,
+      filePaths: [],
+    });
+
+    const { findByRole } = wrappedRender(
+      <IconSelector
+        description="test"
+        filepath={undefined}
+        setFilepath={setFilepath}
+      />,
+    );
+
+    const button = await findByRole("button");
+    fireEvent.click(button);
+
+    await waitFor(() => {
+      expect(setFilepath).not.toHaveBeenCalled();
     });
   });
 });

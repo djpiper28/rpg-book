@@ -8,4 +8,5 @@ interface Window {
   getEnv: () => {
     [key: string]: string;
   };
+  read(url: string): Promise<Uint8Array>;
 }
