@@ -11,16 +11,16 @@ interface Props {
 
 export function IconSelector(props: Readonly<Props>): ReactNode {
   return (
-    <div className="border-dotted border-2 border-gray-600 min-w-20 min-h-20 p-1">
+    <div className="border-dotted border-2 border-gray-600 min-w-20 max-w-1/2 max-h-1/2 min-h-20 p-1">
       <button
-        className="relative z-10 left-0 top-0"
+        className="cursor-pointer"
         onClick={() => {
           electronDialog
             .showOpenDialog({
               buttonLabel: "Ok",
               filters: [
                 {
-                  extensions: ["image/jpeg", "image/png"],
+                  extensions: ["jpeg", "png", "jpg", "webp", "gif"],
                   name: props.description,
                 },
               ],
@@ -37,17 +37,13 @@ export function IconSelector(props: Readonly<Props>): ReactNode {
             .catch(console.error);
         }}
       >
-        <Pencil />
+        <Pencil className="absolute" />
+        {props.src ? (
+          <img alt="User selected" className="static" src={props.src} />
+        ) : (
+          <P>No icon selected</P>
+        )}
       </button>
-      {props.src ? (
-        <img
-          alt="User selected"
-          className="absolute left-0 right-0 z-0"
-          src={props.src}
-        />
-      ) : (
-        <P>No icon selected</P>
-      )}
     </div>
   );
 }

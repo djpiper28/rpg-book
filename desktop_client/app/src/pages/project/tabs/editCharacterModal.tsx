@@ -1,7 +1,7 @@
 import { Button, TextInput } from "@mantine/core";
 import { type ReactNode, useEffect, useState } from "react";
-import { MarkdownEditor } from "@/components/input/markdownEditor";
 import { IconSelector } from "@/components/input/iconSelector";
+import { MarkdownEditor } from "@/components/input/markdownEditor";
 import { P } from "@/components/typography/P";
 import { getProjectClient } from "@/lib/grpcClient/client";
 import { type CharacterHandle } from "@/lib/grpcClient/pb/project_character";
