@@ -47,6 +47,7 @@ export default function CreateCharacterModal(
             .createCharacter({
               details: {
                 description: characterDescription,
+                icon: [],
                 name: characterName,
               },
               project: projectHandle,
