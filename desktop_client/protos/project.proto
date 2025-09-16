@@ -45,8 +45,7 @@ message RecentProjectsResp {
 
 message CreateCharacterReq {
   ProjectHandle project = 1;
-  string name = 2;
-  string description = 3;
+  BasicCharacterDetails details = 4;
 }
 
 message GetCharacterReq {

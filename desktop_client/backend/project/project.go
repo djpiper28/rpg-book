@@ -88,14 +88,15 @@ func Create(filename string, projectName string) (*Project, error) {
 	}, nil
 }
 
-func (p *Project) CreateCharacter(name, description string) (*model.Character, error) {
+func (p *Project) CreateCharacter(name, description string, icon []byte) (*model.Character, error) {
 	character := model.NewCharacter(name)
 	character.Description = description
+	character.Icon = icon
 
 	_, err := p.db.Db.NamedExec(`
     INSERT INTO 
-    characters (id, name, created, description)
-    VALUES(:id, :name, :created, :description);`,
+    characters (id, name, created, description, icon)
+    VALUES(:id, :name, :created, :description, :icon);`,
 		character)
 	if err != nil {
 		return nil, errors.Join(errors.New("Cannot create character"), err)

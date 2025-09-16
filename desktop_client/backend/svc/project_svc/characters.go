@@ -19,7 +19,7 @@ import (
 func (p *ProjectSvc) CreateCharacter(ctx context.Context, in *pb_project.CreateCharacterReq) (*pb_project_character.CharacterHandle, error) {
 	project, err := p.getProject(in.Project)
 
-	character, err := project.CreateCharacter(in.Name, in.Description)
+	character, err := project.CreateCharacter(in.Details.Name, in.Details.Description, in.Details.Icon)
 	if err != nil {
 		log.Error("Cannot create character", loggertags.TagError, err)
 		return nil, errors.Join(errors.New("Cannot create chracter"), err)

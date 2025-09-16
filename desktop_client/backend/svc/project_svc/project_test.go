@@ -1,13 +1,17 @@
 package projectsvc_test
 
 import (
+	"bytes"
 	"context"
+	"image/jpeg"
 	"os"
 	"testing"
 
+	testutils "github.com/djpiper28/rpg-book/common/test_utils"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_common"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_project"
+	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_project_character"
 	projectsvc "github.com/djpiper28/rpg-book/desktop_client/backend/svc/project_svc"
 	testdbutils "github.com/djpiper28/rpg-book/desktop_client/test_db_utils"
 	"github.com/google/uuid"
@@ -180,6 +184,10 @@ func TestProjectSvc(t *testing.T) {
 		projectName := uuid.New().String()
 		characterName := uuid.New().String()
 		characterDescription := uuid.New().String()
+		icon := bytes.NewBuffer([]byte{})
+
+		err := jpeg.Encode(icon, testutils.NewTestImage(100, 100), nil)
+		require.NoError(t, err)
 
 		projectHandle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
 			FileName:    filename,
@@ -188,9 +196,12 @@ func TestProjectSvc(t *testing.T) {
 		require.NoError(t, err)
 
 		character, err := svc.CreateCharacter(context.Background(), &pb_project.CreateCharacterReq{
-			Name:        characterName,
-			Project:     projectHandle,
-			Description: characterDescription,
+			Project: projectHandle,
+			Details: &pb_project_character.BasicCharacterDetails{
+				Name:        characterName,
+				Description: characterDescription,
+				Icon:        icon.Bytes(),
+			},
 		})
 
 		require.NoError(t, err)
@@ -211,6 +222,10 @@ func TestProjectSvc(t *testing.T) {
 		projectName := uuid.New().String()
 		characterName := uuid.New().String()
 		characterDescription := uuid.New().String()
+		icon := bytes.NewBuffer([]byte{})
+
+		err := jpeg.Encode(icon, testutils.NewTestImage(100, 100), nil)
+		require.NoError(t, err)
 
 		projectHandle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
 			FileName:    filename,
@@ -220,9 +235,12 @@ func TestProjectSvc(t *testing.T) {
 		defer svc.CloseProject(context.Background(), projectHandle)
 
 		character, err := svc.CreateCharacter(context.Background(), &pb_project.CreateCharacterReq{
-			Name:        characterName,
-			Project:     projectHandle,
-			Description: characterDescription,
+			Project: projectHandle,
+			Details: &pb_project_character.BasicCharacterDetails{
+				Name:        characterName,
+				Description: characterDescription,
+				Icon:        icon.Bytes(),
+			},
 		})
 
 		require.NoError(t, err)
@@ -235,6 +253,7 @@ func TestProjectSvc(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, characterName, returnedCharacter.Name)
 		require.Equal(t, characterDescription, returnedCharacter.Description)
-		require.Equal(t, []byte(nil), returnedCharacter.Icon)
+		require.NotNil(t, returnedCharacter.Icon)
+		require.True(t, len(returnedCharacter.Icon) > 0)
 	})
 }

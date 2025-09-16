@@ -97,7 +97,7 @@ func TestSettings(t *testing.T) {
 		const FileName = "./testing_file.txt"
 		data := []byte(uuid.New().String())
 
-		err := os.WriteFile(FileName, data, 0555)
+		err := os.WriteFile(FileName, data, 0o555)
 		defer os.Remove(FileName)
 		require.NoError(t, err)
 

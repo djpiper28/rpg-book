@@ -59,11 +59,35 @@ func TestCreateCharacter(t *testing.T) {
 
 	name := uuid.New().String()
 	desc := uuid.New().String()
-	c, err := project.CreateCharacter(name, desc)
+	icon := []byte{0x01, 0x02, 0x03, 0x04}
+	c, err := project.CreateCharacter(name, desc, icon)
 	require.NoError(t, err)
 
 	require.Equal(t, name, c.Name)
 	require.Equal(t, desc, c.Description)
+	require.Equal(t, icon, c.Icon)
+	require.NotEmpty(t, c.Created)
+	require.NotEmpty(t, c.Id)
+
+	characters, err := project.GetCharacters()
+	require.NoError(t, err)
+	require.Len(t, characters, 1)
+	require.Equal(t, c, characters[0])
+}
+
+func TestCreateCharacterNilIcon(t *testing.T) {
+	project, remove := testutils.NewProject(t)
+	defer remove()
+
+	name := uuid.New().String()
+	desc := uuid.New().String()
+	var icon []byte = nil
+	c, err := project.CreateCharacter(name, desc, icon)
+	require.NoError(t, err)
+
+	require.Equal(t, name, c.Name)
+	require.Equal(t, desc, c.Description)
+	require.Equal(t, icon, c.Icon)
 	require.NotEmpty(t, c.Created)
 	require.NotEmpty(t, c.Id)
 
@@ -79,7 +103,7 @@ func TestUpdateCharacter(t *testing.T) {
 
 	name := uuid.New().String()
 	desc := uuid.New().String()
-	character, err := project.CreateCharacter(name, desc)
+	character, err := project.CreateCharacter(name, desc, nil)
 	require.NoError(t, err)
 
 	img := testutils.NewTestImage(100, 100)

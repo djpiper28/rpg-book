@@ -45,8 +45,10 @@ export default function CreateCharacterModal(
         onClick={() => {
           getProjectClient()
             .createCharacter({
-              description: characterDescription,
-              name: characterName,
+              details: {
+                description: characterDescription,
+                name: characterName,
+              },
               project: projectHandle,
             })
             .then((resp) => {
