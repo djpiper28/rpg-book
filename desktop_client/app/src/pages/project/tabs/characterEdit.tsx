@@ -6,6 +6,7 @@ import { type BasicCharacterDetails } from "@/lib/grpcClient/pb/project_characte
 
 interface Props {
   character: BasicCharacterDetails;
+  // TODO: make this a base64 object ALWAYS
   // base 64 or a file:// URL
   icon: string;
   setCharacter: (details: BasicCharacterDetails) => void;
