@@ -1,4 +1,6 @@
+import { uint8ArrayToBase64 } from "@/lib/utils/base64";
 import { fireEvent, waitFor } from "@testing-library/react";
+import { getSystemClient } from "@/lib/grpcClient/client";
 import { electronDialog } from "@/lib/electron";
 import { wrappedRender } from "@/lib/testUtils/wrappedRender";
 import { IconSelector } from "./iconSelector";
@@ -9,7 +11,12 @@ vi.mock("@/lib/electron", () => ({
   },
 }));
 
+vi.mock("@/lib/grpcClient/client", () => ({
+  getSystemClient: vi.fn(),
+}));
+
 const mockedElectronDialog = vi.mocked(electronDialog);
+const mockedGetSystemClient = vi.mocked(getSystemClient);
 
 describe("IconSelector", () => {
   afterEach(() => {
@@ -21,8 +28,8 @@ describe("IconSelector", () => {
       wrappedRender(
         <IconSelector
           description="test"
-          filepath={undefined}
-          setFilepath={vi.fn()}
+          imageB64={undefined}
+          setImageB64={vi.fn()}
         />,
       ),
     ).toBeDefined();
@@ -30,18 +37,30 @@ describe("IconSelector", () => {
 
   it("Should update the image source when a file is selected", async () => {
     const filePath = "/path/to/test/image.jpeg";
-    const setFilepath = vi.fn();
+    const setImageB64 = vi.fn();
+    const fakeFileBytes = new Uint8Array([1, 2, 3]);
+    const fakeBase64 = uint8ArrayToBase64(fakeFileBytes);
 
     mockedElectronDialog.showOpenDialog.mockResolvedValue({
       canceled: false,
       filePaths: [filePath],
     });
 
+    const mockSystemClient = {
+      readFile: vi.fn().mockResolvedValue({
+        response: {
+          data: fakeFileBytes,
+        },
+      }),
+    } as unknown as SystemSvcClient;
+
+    mockedGetSystemClient.mockReturnValue(mockSystemClient);
+
     const { findByRole } = wrappedRender(
       <IconSelector
         description="test"
-        filepath={undefined}
-        setFilepath={setFilepath}
+        imageB64={undefined}
+        setImageB64={setImageB64}
       />,
     );
 
@@ -49,7 +68,9 @@ describe("IconSelector", () => {
     fireEvent.click(button);
 
     await waitFor(() => {
-      expect(setFilepath).toHaveBeenCalledWith(`file://${filePath}`);
+      expect(setImageB64).toHaveBeenCalledWith(
+        `data:image/jpeg;base64,${fakeBase64}`,
+      );
     });
   });
 
@@ -64,8 +85,8 @@ describe("IconSelector", () => {
     const { findByRole } = wrappedRender(
       <IconSelector
         description="test"
-        filepath={undefined}
-        setFilepath={setFilepath}
+        imageB64={undefined}
+        setImageB64={setFilepath}
       />,
     );
 

@@ -1,11 +1,12 @@
+import { base64ToUint8Array } from "@/lib/utils/base64";
 import { Button } from "@mantine/core";
 import { type ReactNode, useState } from "react";
 import { getProjectClient } from "@/lib/grpcClient/client";
+import { type BasicCharacterDetails } from "@/lib/grpcClient/pb/project_character";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
 import { CharacterEdit } from "./characterEdit";
-import { BasicCharacterDetails } from "@/lib/grpcClient/pb/project_character";
 
 interface Props {
   closeDialog: () => void;
@@ -17,8 +18,16 @@ export default function CreateCharacterModal(
   const { setError } = useGlobalErrorStore((x) => x);
   const projectHandle = useTabStore((x) => x.selectedTab);
   const projectStore = useProjectStore((x) => x);
-  const [character, setCharacter] = useState<BasicCharacterDetails>({});
-  const [icon, setIcon] = useState("");
+  const [iconB64, setIconB64] = useState("");
+
+  const [character, setCharacter] = useState<BasicCharacterDetails>({
+    description: "",
+    handle: {
+      id: "",
+    },
+    icon: new Uint8Array(),
+    name: "",
+  });
 
   if (!projectHandle) {
     return "No project selected";
@@ -28,15 +37,18 @@ export default function CreateCharacterModal(
     <div className="flex flex-col gap-3">
       <CharacterEdit
         character={character}
-        icon={icon}
+        iconB64={iconB64}
         setCharacter={setCharacter}
-        setIcon={setIcon}
+        setIconB64={setIconB64}
       />
       <Button
         onClick={() => {
           getProjectClient()
             .createCharacter({
-              details: character,
+              details: {
+                ...character,
+                icon: base64ToUint8Array(iconB64.split(",")[1]),
+              },
               project: projectHandle,
             })
             .then((resp) => {

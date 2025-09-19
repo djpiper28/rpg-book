@@ -6,11 +6,9 @@ import { type BasicCharacterDetails } from "@/lib/grpcClient/pb/project_characte
 
 interface Props {
   character: BasicCharacterDetails;
-  // TODO: make this a base64 object ALWAYS
-  // base 64 or a file:// URL
-  icon: string;
+  iconB64: string;
   setCharacter: (details: BasicCharacterDetails) => void;
-  setIcon: (icon: string) => void;
+  setIconB64: (icon: string) => void;
 }
 
 export function CharacterEdit(props: Readonly<Props>): ReactNode {
@@ -30,9 +28,9 @@ export function CharacterEdit(props: Readonly<Props>): ReactNode {
         />
         <IconSelector
           description="Select an icon for your character"
-          filepath={props.icon}
-          setFilepath={(src) => {
-            props.setIcon(src);
+          imageB64={props.iconB64}
+          setImageB64={(src) => {
+            props.setIconB64(src);
           }}
         />
       </div>

@@ -1,23 +1,21 @@
-import { Button, TextInput } from "@mantine/core";
+import { base64ToUint8Array, uint8ArrayToBase64 } from "@/lib/utils/base64";
+import { Button } from "@mantine/core";
 import { type ReactNode, useEffect, useState } from "react";
-import { IconSelector } from "@/components/input/iconSelector";
-import { MarkdownEditor } from "@/components/input/markdownEditor";
-import { getProjectClient, getSystemClient } from "@/lib/grpcClient/client";
+import { getProjectClient } from "@/lib/grpcClient/client";
 import {
   type BasicCharacterDetails,
   type CharacterHandle,
 } from "@/lib/grpcClient/pb/project_character";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useTabStore } from "@/stores/tabStore";
+import { CharacterEdit } from "./characterEdit";
 
 interface Props {
   characterHandle: CharacterHandle;
   closeDialog: () => void;
 }
 
-export default function CreateCharacterModal(
-  props: Readonly<Props>,
-): ReactNode {
+export default function EditCharacterModal(props: Readonly<Props>): ReactNode {
   const [characterDetails, setCharacterDetails] =
     useState<BasicCharacterDetails>({
       description: "",
@@ -25,7 +23,8 @@ export default function CreateCharacterModal(
       name: "",
     });
 
-  const [icon, setIcon] = useState<string>("");
+  const [iconB64, setIconB64] = useState<string>("");
+  const [dirtyIcon, setDirtyIcon] = useState(false);
   const { setError } = useGlobalErrorStore((x) => x);
   const projectHandle = useTabStore((x) => x.selectedTab);
 
@@ -43,12 +42,11 @@ export default function CreateCharacterModal(
         setCharacterDetails(resp.response);
         const buffer = resp.response.icon;
 
-        const binary = new Uint8Array(buffer).reduce(
-          (acc, byte) => acc + String.fromCodePoint(byte),
-          "",
-        );
-
-        setIcon(btoa(binary));
+        if (buffer.length > 0) {
+          const b64 = uint8ArrayToBase64(buffer);
+          setIconB64(`data:image/png;base64,${b64}`);
+          setDirtyIcon(true);
+        }
       })
       .catch((error: unknown) => {
         setError({
@@ -63,53 +61,26 @@ export default function CreateCharacterModal(
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex flex-row gap-3 justify-between items-start">
-        <TextInput
-          label="Character Name"
-          onChange={(x) => {
-            const details = structuredClone(characterDetails);
-            details.name = x.target.value;
-            setCharacterDetails(details);
-          }}
-          placeholder="John Smith"
-          required={true}
-          value={characterDetails.name}
-        />
-        <IconSelector
-          description="Select an icon for your character"
-          filepath={icon}
-          setFilepath={(src) => {
-            setIcon(src);
-          }}
-        />
-      </div>
-      <MarkdownEditor
-        label="Description and notes"
-        setValue={(value) => {
-          const details = structuredClone(characterDetails);
-          details.description = value;
-          setCharacterDetails(details);
-        }}
-        value={characterDetails.description}
+      <CharacterEdit
+        character={characterDetails}
+        iconB64={iconB64}
+        setCharacter={setCharacterDetails}
+        setIconB64={setIconB64}
       />
       <Button
         onClick={() => {
           const f = async (): Promise<void> => {
             try {
-              const FileProtocol = "file://";
-
-              if (icon.includes(FileProtocol, 0)) {
-                const iconBytes = await getSystemClient().readFile({
-                  filepath: icon.replace(FileProtocol, ""),
-                });
-
-                characterDetails.icon = iconBytes.response.data;
+              if (dirtyIcon) {
+                const b64 = iconB64.split(",")[1];
+                characterDetails.icon = base64ToUint8Array(b64);
               }
 
               await getProjectClient().updateCharacter({
                 details: characterDetails,
                 handle: props.characterHandle,
                 project: projectHandle,
+                setImage: dirtyIcon,
               });
 
               props.closeDialog();
