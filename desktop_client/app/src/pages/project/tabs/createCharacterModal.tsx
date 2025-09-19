@@ -73,7 +73,7 @@ export default function CreateCharacterModal(
             });
         }}
       >
-        Create
+        Create Character
       </Button>
     </div>
   );

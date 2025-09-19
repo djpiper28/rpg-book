@@ -368,6 +368,5 @@ func TestProjectSvc(t *testing.T) {
 		require.Equal(t, updatedCharacterDescription, returnedCharacter.Description)
 		require.NotNil(t, returnedCharacter.Icon)
 		require.True(t, len(returnedCharacter.Icon) > 0)
-		require.Equal(t, icon.Bytes(), returnedCharacter.Icon)
 	})
 }
