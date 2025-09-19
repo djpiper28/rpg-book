@@ -107,7 +107,7 @@ func TestUpdateCharacter(t *testing.T) {
 	require.NoError(t, err)
 
 	img := testutils.NewTestImage(100, 100)
-	icon, err := imagecompression.Compress(img)
+	icon, err := imagecompression.CompressIcon(img)
 	require.NoError(t, err)
 	name = "new name " + uuid.New().String()
 	description := "new description " + uuid.New().String()
@@ -132,7 +132,7 @@ func TestUpdateCharacterNoIconChange(t *testing.T) {
 	desc := uuid.New().String()
 
 	img := testutils.NewTestImage(100, 100)
-	icon, err := imagecompression.Compress(img)
+	icon, err := imagecompression.CompressIcon(img)
 	require.NoError(t, err)
   
 	character, err := project.CreateCharacter(name, desc, icon)

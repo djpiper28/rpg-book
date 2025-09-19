@@ -6,7 +6,7 @@ import (
 	"errors"
 
 	"github.com/charmbracelet/log"
-	"github.com/disintegration/imaging"
+	"github.com/djpiper28/rpg-book/common/image"
 	imagecompression "github.com/djpiper28/rpg-book/common/image/image_compression"
 	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_common"
@@ -25,12 +25,12 @@ func (p *ProjectSvc) compressImageIfNeeded(img []byte) ([]byte, error) {
 	}
 
 	if settings.CompressImages {
-		img, err := imaging.Decode(bytes.NewBuffer(img), imaging.AutoOrientation(true))
+		img, err := image.CustomDecode(bytes.NewBuffer(img))
 		if err != nil {
 			return nil, errors.Join(compressError, err)
 		}
 
-		compressedBytes, err := imagecompression.Compress(img)
+		compressedBytes, err := imagecompression.CompressIcon(img)
 		if err != nil {
 			return nil, errors.Join(compressError, err)
 		}

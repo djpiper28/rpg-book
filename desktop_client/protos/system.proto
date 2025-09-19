@@ -7,7 +7,7 @@ service SystemSvc {
   rpc SetSettings(Settings) returns (Empty) {}
   rpc Log(LogRequest) returns (Empty) {}
   rpc GetVersion(Empty) returns (Version) {}
-  rpc ReadFile(ReadFileReq) returns (ReadFileRes) {}
+  rpc ReadImageFile(ReadImageFileReq) returns (ReadImageFileRes) {}
 }
 
 message Settings {
@@ -39,10 +39,11 @@ message Version {
   string version = 1;
 }
 
-message ReadFileReq {
+message ReadImageFileReq {
   string filepath = 1;
+  bool is_icon = 2;
 }
 
-message ReadFileRes {
+message ReadImageFileRes {
   bytes data = 1;
 }

@@ -1,6 +1,7 @@
 package systemsvc
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -8,6 +9,8 @@ import (
 
 	"github.com/charmbracelet/log"
 	buildinfo "github.com/djpiper28/rpg-book/common/build_info"
+	"github.com/djpiper28/rpg-book/common/image"
+	imagecompression "github.com/djpiper28/rpg-book/common/image/image_compression"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/model"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_common"
@@ -70,13 +73,51 @@ func (s *SystemSvc) GetVersion(ctx context.Context, req *pb_common.Empty) (*pb_s
 	return &pb_system.Version{Version: buildinfo.Version}, nil
 }
 
-func (s *SystemSvc) ReadFile(ctx context.Context, req *pb_system.ReadFileReq) (*pb_system.ReadFileRes, error) {
-	data, err := os.ReadFile(req.Filepath)
+func (s *SystemSvc) compressImageIfNeeded(img []byte, isIcon bool) ([]byte, error) {
+	compressError := errors.New("Cannot compress iamge")
+	rows := s.db.Db.QueryRowx("SELECT compress_images FROM settings;")
+
+	var settings model.Settings
+	err := rows.StructScan(&settings)
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot get settings"), err)
+	}
+
+	if settings.CompressImages {
+		img, err := image.CustomDecode(bytes.NewBuffer(img))
+		if err != nil {
+			return nil, errors.Join(compressError, err)
+		}
+
+		var compressedBytes []byte
+		if isIcon {
+			compressedBytes, err = imagecompression.CompressIcon(img)
+		} else {
+			compressedBytes, err = imagecompression.Compress(img)
+		}
+
+		if err != nil {
+			return nil, errors.Join(compressError, err)
+		}
+
+		return compressedBytes, nil
+	} else {
+		return img, nil
+	}
+}
+
+func (s *SystemSvc) ReadImageFile(ctx context.Context, req *pb_system.ReadImageFileReq) (*pb_system.ReadImageFileRes, error) {
+	rawImageData, err := os.ReadFile(req.Filepath)
 	if err != nil {
 		return nil, errors.Join(fmt.Errorf("Cannot read file %s", req.Filepath), err)
 	}
 
-	return &pb_system.ReadFileRes{
-		Data: data,
+	compressedData, err := s.compressImageIfNeeded(rawImageData, req.IsIcon)
+	if err != nil {
+		return nil, errors.Join(fmt.Errorf("Cannot read file %s", req.Filepath), err)
+	}
+
+	return &pb_system.ReadImageFileRes{
+		Data: compressedData,
 	}, nil
 }

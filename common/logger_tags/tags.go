@@ -9,4 +9,7 @@ const (
 	TagDate     = "date"
 	TagVersion  = "version"
 	TagLength   = "length"
+	TagScale    = "scale"
+	TagWidth    = "width"
+	TagHeight   = "height"
 )

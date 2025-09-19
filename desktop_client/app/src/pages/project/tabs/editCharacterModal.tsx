@@ -44,7 +44,7 @@ export default function EditCharacterModal(props: Readonly<Props>): ReactNode {
 
         if (buffer.length > 0) {
           const b64 = uint8ArrayToBase64(buffer);
-          setIconB64(`data:image/png;base64,${b64}`);
+          setIconB64(`data:image/jpg;base64,${b64}`);
           setDirtyIcon(true);
         }
       })

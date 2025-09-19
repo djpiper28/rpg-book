@@ -47,8 +47,9 @@ export function IconSelector(props: Readonly<Props>): ReactNode {
                   return;
                 }
 
-                const resp = await getSystemClient().readFile({
+                const resp = await getSystemClient().readImageFile({
                   filepath: result.filePaths[0],
+                  isIcon: true,
                 });
 
                 const b64 = uint8ArrayToBase64(resp.response.data);

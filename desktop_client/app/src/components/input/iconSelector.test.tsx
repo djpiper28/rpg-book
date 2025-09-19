@@ -48,7 +48,7 @@ describe("IconSelector", () => {
     });
 
     const mockSystemClient = {
-      readFile: vi.fn().mockResolvedValue({
+      readImageFile: vi.fn().mockResolvedValue({
         response: {
           data: fakeFileBytes,
         },

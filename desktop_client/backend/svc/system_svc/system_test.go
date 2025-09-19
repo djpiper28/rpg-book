@@ -1,11 +1,16 @@
 package systemsvc_test
 
 import (
+	"bytes"
 	"context"
+	"image"
+	"image/png"
 	"os"
 	"testing"
 
 	buildinfo "github.com/djpiper28/rpg-book/common/build_info"
+	imagecompression "github.com/djpiper28/rpg-book/common/image/image_compression"
+	testutils "github.com/djpiper28/rpg-book/common/test_utils"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_common"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_system"
 	systemsvc "github.com/djpiper28/rpg-book/desktop_client/backend/svc/system_svc"
@@ -86,14 +91,14 @@ func TestSettings(t *testing.T) {
 	})
 
 	t.Run("Test read file (failure)", func(t *testing.T) {
-		_, err := system.ReadFile(context.Background(), &pb_system.ReadFileReq{
+		_, err := system.ReadImageFile(context.Background(), &pb_system.ReadImageFileReq{
 			Filepath: "./not_a_real_file",
 		})
 
 		require.Error(t, err)
 	})
 
-	t.Run("Test read file", func(t *testing.T) {
+	t.Run("Test read non image file", func(t *testing.T) {
 		const FileName = "./testing_file.txt"
 		data := []byte(uuid.New().String())
 
@@ -101,11 +106,73 @@ func TestSettings(t *testing.T) {
 		defer os.Remove(FileName)
 		require.NoError(t, err)
 
-		readData, err := system.ReadFile(context.Background(), &pb_system.ReadFileReq{
+		_, err = system.ReadImageFile(context.Background(), &pb_system.ReadImageFileReq{
 			Filepath: FileName,
 		})
 
+		require.Error(t, err)
+	})
+
+	t.Run("Test read image file (not icon)", func(t *testing.T) {
+		const FileName = "./testing_file.jpeg"
+		const imgSize = 2500
+
+		img := testutils.NewTestImage(imgSize, imgSize)
+		buffer := bytes.NewBuffer([]byte{})
+
+		err := png.Encode(buffer, img)
 		require.NoError(t, err)
-		require.Equal(t, data, readData.Data)
+
+		data := buffer.Bytes()
+
+		err = os.WriteFile(FileName, data, 0o555)
+		defer os.Remove(FileName)
+		require.NoError(t, err)
+
+		resp, err := system.ReadImageFile(context.Background(), &pb_system.ReadImageFileReq{
+			Filepath: FileName,
+			IsIcon:   false,
+		})
+
+		require.NoError(t, err)
+		require.NotNil(t, data)
+		require.True(t, len(data) > 0)
+
+		img, format, err := image.Decode(bytes.NewBuffer(resp.Data))
+		require.Equal(t, "jpeg", format)
+		require.Equal(t, imgSize, img.Bounds().Dx())
+		require.Equal(t, imgSize, img.Bounds().Dy())
+		require.Greater(t, imgSize, int(imagecompression.MaxDimension), "this checks that the icon compression code was never actually called")
+	})
+
+	t.Run("Test read image file (icon)", func(t *testing.T) {
+		const FileName = "./testing_file.jpeg"
+		const imgSize = 2000
+
+		img := testutils.NewTestImage(imgSize, imgSize)
+		buffer := bytes.NewBuffer([]byte{})
+
+		err := png.Encode(buffer, img)
+		require.NoError(t, err)
+
+		data := buffer.Bytes()
+
+		err = os.WriteFile(FileName, data, 0o555)
+		defer os.Remove(FileName)
+		require.NoError(t, err)
+
+		resp, err := system.ReadImageFile(context.Background(), &pb_system.ReadImageFileReq{
+			Filepath: FileName,
+			IsIcon:   true,
+		})
+
+		require.NoError(t, err)
+		require.NotNil(t, data)
+		require.True(t, len(data) > 0)
+
+		img, format, err := image.Decode(bytes.NewBuffer(resp.Data))
+		require.Equal(t, "jpeg", format)
+		require.Equal(t, int(imagecompression.MaxDimension), img.Bounds().Dx())
+		require.Equal(t, int(imagecompression.MaxDimension), img.Bounds().Dy())
 	})
 }
