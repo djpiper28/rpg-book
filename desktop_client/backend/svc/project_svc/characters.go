@@ -45,7 +45,7 @@ func (p *ProjectSvc) UpdateCharacter(ctx context.Context, in *pb_project.UpdateC
 		return nil, errors.Join(updateError, err)
 	}
 
-	if len(in.Details.Icon) > 0 {
+	if in.SetImage {
 		settings, err := p.GetSettings()
 		if err != nil {
 			log.Error("Cannot update character", loggertags.TagError, err)
@@ -74,7 +74,7 @@ func (p *ProjectSvc) UpdateCharacter(ctx context.Context, in *pb_project.UpdateC
 		Description: in.Details.Description,
 		Name:        in.Details.Name,
 		Icon:        in.Details.Icon,
-	})
+	}, in.SetImage)
 	if err != nil {
 		log.Error("Cannot update character", loggertags.TagError, err)
 		return nil, errors.Join(updateError, err)

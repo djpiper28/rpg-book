@@ -256,4 +256,118 @@ func TestProjectSvc(t *testing.T) {
 		require.NotNil(t, returnedCharacter.Icon)
 		require.True(t, len(returnedCharacter.Icon) > 0)
 	})
+
+	t.Run("Test update character with icon set", func(t *testing.T) {
+		filename := uuid.New().String() + database.DbExtension
+		projectName := uuid.New().String()
+		characterName := uuid.New().String()
+		characterDescription := uuid.New().String()
+		icon := bytes.NewBuffer([]byte{})
+
+		err := jpeg.Encode(icon, testutils.NewTestImage(100, 100), nil)
+		require.NoError(t, err)
+
+		projectHandle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
+			FileName:    filename,
+			ProjectName: projectName,
+		})
+		require.NoError(t, err)
+		defer closeProject(t, filename, projectHandle)
+
+		characterHandle, err := svc.CreateCharacter(context.Background(), &pb_project.CreateCharacterReq{
+			Project: projectHandle,
+			Details: &pb_project_character.BasicCharacterDetails{
+				Name:        characterName,
+				Description: characterDescription,
+				Icon:        icon.Bytes(),
+			},
+		})
+		require.NoError(t, err)
+		require.NotEmpty(t, characterHandle.Id)
+
+		updatedCharacterName := uuid.New().String()
+		updatedCharacterDescription := uuid.New().String()
+		updatedIcon := bytes.NewBuffer([]byte{})
+		err = jpeg.Encode(updatedIcon, testutils.NewTestImage(50, 50), nil)
+		require.NoError(t, err)
+
+		_, err = svc.UpdateCharacter(context.Background(), &pb_project.UpdateCharacterReq{
+			Handle:  characterHandle,
+			Project: projectHandle,
+			Details: &pb_project_character.BasicCharacterDetails{
+				Name:        updatedCharacterName,
+				Description: updatedCharacterDescription,
+				Icon:        updatedIcon.Bytes(),
+			},
+			SetImage: true,
+		})
+		require.NoError(t, err)
+
+		returnedCharacter, err := svc.GetCharacter(context.Background(), &pb_project.GetCharacterReq{
+			Character: characterHandle,
+			Project:   projectHandle,
+		})
+		require.NoError(t, err)
+		require.Equal(t, updatedCharacterName, returnedCharacter.Name)
+		require.Equal(t, updatedCharacterDescription, returnedCharacter.Description)
+		require.NotNil(t, returnedCharacter.Icon)
+		require.True(t, len(returnedCharacter.Icon) > 0)
+    // Image is compressed by default
+		require.NotEqual(t, updatedIcon.Bytes(), returnedCharacter.Icon)
+	})
+
+	t.Run("Test update character without icon set", func(t *testing.T) {
+		filename := uuid.New().String() + database.DbExtension
+		projectName := uuid.New().String()
+		characterName := uuid.New().String()
+		characterDescription := uuid.New().String()
+		icon := bytes.NewBuffer([]byte{})
+
+		err := jpeg.Encode(icon, testutils.NewTestImage(100, 100), nil)
+		require.NoError(t, err)
+
+		projectHandle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
+			FileName:    filename,
+			ProjectName: projectName,
+		})
+		require.NoError(t, err)
+		defer closeProject(t, filename, projectHandle)
+
+		characterHandle, err := svc.CreateCharacter(context.Background(), &pb_project.CreateCharacterReq{
+			Project: projectHandle,
+			Details: &pb_project_character.BasicCharacterDetails{
+				Name:        characterName,
+				Description: characterDescription,
+				Icon:        icon.Bytes(),
+			},
+		})
+		require.NoError(t, err)
+		require.NotEmpty(t, characterHandle.Id)
+
+		updatedCharacterName := uuid.New().String()
+		updatedCharacterDescription := uuid.New().String()
+
+		_, err = svc.UpdateCharacter(context.Background(), &pb_project.UpdateCharacterReq{
+			Handle:  characterHandle,
+			Project: projectHandle,
+			Details: &pb_project_character.BasicCharacterDetails{
+				Name:        updatedCharacterName,
+				Description: updatedCharacterDescription,
+				Icon:        []byte{},
+			},
+			SetImage: false,
+		})
+		require.NoError(t, err)
+
+		returnedCharacter, err := svc.GetCharacter(context.Background(), &pb_project.GetCharacterReq{
+			Character: characterHandle,
+			Project:   projectHandle,
+		})
+		require.NoError(t, err)
+		require.Equal(t, updatedCharacterName, returnedCharacter.Name)
+		require.Equal(t, updatedCharacterDescription, returnedCharacter.Description)
+		require.NotNil(t, returnedCharacter.Icon)
+		require.True(t, len(returnedCharacter.Icon) > 0)
+		require.Equal(t, icon.Bytes(), returnedCharacter.Icon)
+	})
 }

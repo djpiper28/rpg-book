@@ -116,10 +116,40 @@ func TestUpdateCharacter(t *testing.T) {
 	character.Icon = icon
 	character.Description = description
 
-	err = project.UpdateCharacter(character)
+	err = project.UpdateCharacter(character, true)
 	require.NoError(t, nil)
 
 	readCharacter, err := project.GetCharacter(character.Id)
 	require.NoError(t, nil)
+	require.Equal(t, *character, *readCharacter)
+}
+
+func TestUpdateCharacterNoIconChange(t *testing.T) {
+	project, remove := testutils.NewProject(t)
+	defer remove()
+
+	name := uuid.New().String()
+	desc := uuid.New().String()
+
+	img := testutils.NewTestImage(100, 100)
+	icon, err := imagecompression.Compress(img)
+	require.NoError(t, err)
+  
+	character, err := project.CreateCharacter(name, desc, icon)
+	require.NoError(t, err)
+
+	name = "new name " + uuid.New().String()
+	description := "new description " + uuid.New().String()
+
+	character.Name = name
+	character.Icon = nil 
+	character.Description = description
+
+	err = project.UpdateCharacter(character, false)
+	require.NoError(t, nil)
+
+	readCharacter, err := project.GetCharacter(character.Id)
+	require.NoError(t, nil)
+	character.Icon = icon 
 	require.Equal(t, *character, *readCharacter)
 }
