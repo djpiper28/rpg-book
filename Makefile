@@ -2,6 +2,7 @@
 all: desktop
 
 DESKTOP_APP="$(shell pwd)/desktop_client/app/"
+GOEXPERIMENT=nodwarf5,jsonv2
 
 .PHONY: desktop-deps
 desktop-deps:

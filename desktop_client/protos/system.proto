@@ -7,6 +7,7 @@ service SystemSvc {
   rpc SetSettings(Settings) returns (Empty) {}
   rpc Log(LogRequest) returns (Empty) {}
   rpc GetVersion(Empty) returns (Version) {}
+  rpc ReadImageFile(ReadImageFileReq) returns (ReadImageFileRes) {}
 }
 
 message Settings {
@@ -36,4 +37,13 @@ enum LogLevel {
 
 message Version {
   string version = 1;
+}
+
+message ReadImageFileReq {
+  string filepath = 1;
+  bool is_icon = 2;
+}
+
+message ReadImageFileRes {
+  bytes data = 1;
 }

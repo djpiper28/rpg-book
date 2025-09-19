@@ -88,14 +88,15 @@ func Create(filename string, projectName string) (*Project, error) {
 	}, nil
 }
 
-func (p *Project) CreateCharacter(name, description string) (*model.Character, error) {
+func (p *Project) CreateCharacter(name, description string, icon []byte) (*model.Character, error) {
 	character := model.NewCharacter(name)
 	character.Description = description
+	character.Icon = icon
 
 	_, err := p.db.Db.NamedExec(`
     INSERT INTO 
-    characters (id, name, created, description)
-    VALUES(:id, :name, :created, :description);`,
+    characters (id, name, created, description, icon)
+    VALUES(:id, :name, :created, :description, :icon);`,
 		character)
 	if err != nil {
 		return nil, errors.Join(errors.New("Cannot create character"), err)
@@ -137,12 +138,21 @@ func (p *Project) GetCharacter(id uuid.UUID) (*model.Character, error) {
 	return &character, nil
 }
 
-func (p *Project) UpdateCharacter(character *model.Character) error {
-	_, err := p.db.Db.NamedExec(`
+func (p *Project) UpdateCharacter(character *model.Character, setIcon bool) error {
+	sql := `
     UPDATE characters
       SET icon=:icon, name=:name, description=:description
       WHERE id=:id;
-    `, character)
+    `
+	if !setIcon {
+		sql = `
+    UPDATE characters
+      SET name=:name, description=:description
+      WHERE id=:id;
+    `
+	}
+
+	_, err := p.db.Db.NamedExec(sql, character)
 	if err != nil {
 		return errors.Join(errors.New("Cannot update character"), err)
 	}

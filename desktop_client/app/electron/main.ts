@@ -1,6 +1,5 @@
 import * as remote from "@electron/remote/main";
-// eslint-disable-next-line import-x/no-unresolved
-import { BrowserWindow, app, session } from "electron";
+import { BrowserWindow, Menu, app, dialog, session } from "electron";
 import { type ChildProcess, spawn } from "node:child_process";
 import path from "node:path";
 import { exit } from "node:process";
@@ -55,14 +54,19 @@ if (process.env.RPG_BOOK_CERTIFICATE) {
         }
 
         callback(eq ? 0 : -2);
-      } catch {
+      } catch (error) {
+        showErrorAndQuit(new Error(String(error)));
         callback(-2);
       }
     });
 
     session.defaultSession.setUserAgent("RPG-Book");
 
-    createWindow();
+    try {
+      createWindow();
+    } catch (error) {
+      showErrorAndQuit(new Error(String(error)));
+    }
   });
 } else {
   // Start the application via the launcher
@@ -82,8 +86,7 @@ if (process.env.RPG_BOOK_CERTIFICATE) {
   }
 
   ps.on("error", (error) => {
-    console.log("An error has occurred", error);
-    exit(1);
+    showErrorAndQuit(error);
   });
 
   ps.on("close", () => {
@@ -102,21 +105,51 @@ function getLauncherPath(): string {
   return path.join(process.resourcesPath, "launcher", launcher);
 }
 
+function showErrorAndQuit(error: Error): void {
+  dialog.showErrorBox(
+    "Application Error",
+    `An unexpected error occurred: ${error.message}`,
+  );
+
+  app.quit();
+}
+
 function createWindow(): void {
   win = new BrowserWindow({
-    autoHideMenuBar: true,
+    autoHideMenuBar: false,
     icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
     minHeight: 400,
     minWidth: 600,
     title: "RPG Book",
     webPreferences: {
       contextIsolation: true,
-      devTools: isDevServer,
+      devTools: true,
       nodeIntegration: false,
       preload: path.join(__dirname, "preload.mjs"),
       webSecurity: false,
     },
   });
+
+  const menu = Menu.buildFromTemplate([
+    {
+      label: "Developer",
+      submenu: [
+        {
+          accelerator: "CommandOrControl+Shift+I",
+          click: (): void => {
+            win?.webContents.toggleDevTools();
+          },
+          label: "Toggle DevTools",
+        },
+      ],
+    },
+  ]);
+
+  Menu.setApplicationMenu(menu);
+
+  if (isDevServer) {
+    win.webContents.openDevTools();
+  }
 
   // Test active push message to Renderer-process.
   win.webContents.on("did-finish-load", () => {
@@ -126,11 +159,10 @@ function createWindow(): void {
   remote.enable(win.webContents);
 
   if (VITE_DEV_SERVER_URL) {
-    win.loadURL(VITE_DEV_SERVER_URL).then().catch(console.error);
+    win.loadURL(VITE_DEV_SERVER_URL).catch(showErrorAndQuit);
   } else {
     win
       .loadFile(path.join(RENDERER_DIST, "index.html"))
-      .then()
-      .catch(console.error);
+      .catch(showErrorAndQuit);
   }
 }

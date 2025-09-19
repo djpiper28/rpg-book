@@ -6,7 +6,7 @@ import (
 	"errors"
 
 	"github.com/charmbracelet/log"
-	"github.com/disintegration/imaging"
+	"github.com/djpiper28/rpg-book/common/image"
 	imagecompression "github.com/djpiper28/rpg-book/common/image/image_compression"
 	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_common"
@@ -16,13 +16,45 @@ import (
 	"github.com/google/uuid"
 )
 
+func (p *ProjectSvc) compressImageIfNeeded(img []byte) ([]byte, error) {
+	compressError := errors.New("Cannot compress iamge")
+
+	settings, err := p.GetSettings()
+	if err != nil {
+		return nil, errors.Join(compressError, err)
+	}
+
+	if settings.CompressImages {
+		img, err := image.CustomDecode(bytes.NewBuffer(img))
+		if err != nil {
+			return nil, errors.Join(compressError, err)
+		}
+
+		compressedBytes, err := imagecompression.CompressIcon(img)
+		if err != nil {
+			return nil, errors.Join(compressError, err)
+		}
+
+		return compressedBytes, nil
+	} else {
+		return img, nil
+	}
+}
+
 func (p *ProjectSvc) CreateCharacter(ctx context.Context, in *pb_project.CreateCharacterReq) (*pb_project_character.CharacterHandle, error) {
 	project, err := p.getProject(in.Project)
 
-	character, err := project.CreateCharacter(in.Name, in.Description)
+	img, err := p.compressImageIfNeeded(in.Details.Icon)
+	if err != nil {
+		log.Error("Cannot compress image", loggertags.TagError, err)
+		return nil, errors.Join(errors.New("Cannot create character"), err)
+	}
+	in.Details.Icon = img
+
+	character, err := project.CreateCharacter(in.Details.Name, in.Details.Description, in.Details.Icon)
 	if err != nil {
 		log.Error("Cannot create character", loggertags.TagError, err)
-		return nil, errors.Join(errors.New("Cannot create chracter"), err)
+		return nil, errors.Join(errors.New("Cannot create character"), err)
 	}
 
 	return &pb_project_character.CharacterHandle{
@@ -31,42 +63,27 @@ func (p *ProjectSvc) CreateCharacter(ctx context.Context, in *pb_project.CreateC
 }
 
 func (p *ProjectSvc) UpdateCharacter(ctx context.Context, in *pb_project.UpdateCharacterReq) (*pb_common.Empty, error) {
-	updateError := errors.New("Cannot update chracter")
+	updateError := errors.New("Cannot update character")
 
 	project, err := p.getProject(in.Project)
 	if err != nil {
-		log.Error("Cannot get character")
+		log.Error("Cannot get projecct id")
 		return nil, updateError
 	}
 
 	characterId, err := uuid.Parse(in.Handle.Id)
 	if err != nil {
-		log.Error("Cannot get character")
+		log.Error("Cannot get character id")
 		return nil, errors.Join(updateError, err)
 	}
 
-	if len(in.Details.Icon) > 0 {
-		settings, err := p.GetSettings()
+	if in.SetImage {
+		img, err := p.compressImageIfNeeded(in.Details.Icon)
 		if err != nil {
-			log.Error("Cannot update character", loggertags.TagError, err)
-			return nil, errors.Join(updateError, err)
+			log.Error("Cannot compress image", loggertags.TagError, err)
+			return nil, errors.Join(errors.New("Cannot create character"), err)
 		}
-
-		if settings.CompressImages {
-			img, err := imaging.Decode(bytes.NewBuffer(in.Details.Icon), imaging.AutoOrientation(true))
-			if err != nil {
-				log.Error("Cannot update character", loggertags.TagError, err)
-				return nil, errors.Join(updateError, err)
-			}
-
-			compressedBytes, err := imagecompression.Compress(img)
-			if err != nil {
-				log.Error("Cannot compress image", loggertags.TagError, err)
-				return nil, errors.Join(updateError, err)
-			}
-
-			in.Details.Icon = compressedBytes
-		}
+		in.Details.Icon = img
 	}
 
 	err = project.UpdateCharacter(&model.Character{
@@ -74,7 +91,7 @@ func (p *ProjectSvc) UpdateCharacter(ctx context.Context, in *pb_project.UpdateC
 		Description: in.Details.Description,
 		Name:        in.Details.Name,
 		Icon:        in.Details.Icon,
-	})
+	}, in.SetImage)
 	if err != nil {
 		log.Error("Cannot update character", loggertags.TagError, err)
 		return nil, errors.Join(updateError, err)
@@ -99,7 +116,7 @@ func (p *ProjectSvc) GetCharacter(ctx context.Context, in *pb_project.GetCharact
 	character, err := project.GetCharacter(characterId)
 	if err != nil {
 		log.Error("Cannot get character")
-		return nil, errors.Join(errors.New("Cannot get chracter"), err)
+		return nil, errors.Join(errors.New("Cannot get character"), err)
 	}
 
 	return character.ToPb(), nil

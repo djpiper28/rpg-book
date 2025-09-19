@@ -68,7 +68,7 @@ export function Component(): ReactNode {
       <H3>Save Settings</H3>
       <Checkbox
         checked={dirtySettings.compressImages}
-        description="Whether to compress images to a JPEG when they are added to a project. The compression makes files a lot smaller and images look almost the same as before."
+        description="Whether to compress images to a JPEG when they are added to a project. The compression will also resize images to a maximum dimension of x . 1000."
         label="Compress Images"
         onChange={(event) => {
           const s = structuredClone(dirtySettings);

@@ -10,6 +10,9 @@ export default [
         project: "./tsconfig.json",
       },
     },
+    settings: {
+      "import-x/core-modules": ["electron"],
+    },
     rules: {
       "@typescript-eslint/no-non-null-assertion": "off",
       "eslint-comments/no-unlimited-disable": "warn",

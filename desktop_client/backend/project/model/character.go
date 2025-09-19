@@ -30,5 +30,6 @@ func (c *Character) ToPb() *pb_project_character.BasicCharacterDetails {
 		},
 		Name:        c.Name,
 		Description: c.Description,
+		Icon:        c.Icon,
 	}
 }

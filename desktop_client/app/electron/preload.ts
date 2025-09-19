@@ -1,12 +1,22 @@
-// eslint-disable-next-line import-x/no-unresolved
+import { dialog, shell } from "@electron/remote";
 import { contextBridge } from "electron";
-import {
-  electronDialog,
-  electronShell,
-  getBuildType,
-  getEnv,
-  getSystemVersion,
-} from "../src/lib/electron/main";
+
+const electronShell = shell;
+const electronDialog = dialog;
+
+function getSystemVersion(): string {
+  return process.getSystemVersion();
+}
+
+function getEnv(): Record<string, string> {
+  return {
+    RPG_BOOK_PORT: process.env.RPG_BOOK_PORT,
+  };
+}
+
+function getBuildType(): string {
+  return process.env.VITE_DEV_SERVER_URL ? "Development" : "Production";
+}
 
 contextBridge.exposeInMainWorld("electron", {
   dialog: electronDialog,
