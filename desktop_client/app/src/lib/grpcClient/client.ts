@@ -28,6 +28,7 @@ export function initializeClients() {
       keepalive: true,
       redirect: "error",
       cache: "no-cache",
+      priority: "high",
     },
     format: "binary",
     timeout: 5_000,

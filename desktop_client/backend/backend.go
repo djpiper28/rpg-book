@@ -27,6 +27,33 @@ import (
 	"google.golang.org/grpc"
 )
 
+type responseWriter struct {
+	http.ResponseWriter
+	statusCode int
+}
+
+func (rw *responseWriter) WriteHeader(code int) {
+	rw.statusCode = code
+	rw.ResponseWriter.WriteHeader(code)
+}
+
+func recoveryMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			if err := recover(); err != nil {
+				log.Error("http: panic", "err", err)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			}
+		}()
+
+		rw := &responseWriter{ResponseWriter: w, statusCode: http.StatusOK}
+		next.ServeHTTP(rw, r)
+		if rw.statusCode != http.StatusOK {
+			log.Warn("http: non-200 status", "status", rw.statusCode, "method", r.Method, "path", r.URL.Path)
+		}
+	})
+}
+
 type Server struct {
 	ctx        context.Context
 	Port       int
@@ -140,7 +167,7 @@ const (
 	m              = k * k
 	g              = m * k
 	maxMessageSize = g
-	maxHeaderSize  = 3 * m
+	maxHeaderSize  = 30 * m
 )
 
 func (s *Server) start() error {
@@ -162,9 +189,10 @@ func (s *Server) start() error {
 	wrappedGrpc := grpcweb.WrapServer(s.server)
 
 	httpServer := &http.Server{
-		Addr:      fmt.Sprintf("127.0.0.1:%d", s.Port),
-		TLSConfig: creds,
-		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		MaxHeaderBytes: maxHeaderSize,
+		Addr:           fmt.Sprintf("127.0.0.1:%d", s.Port),
+		TLSConfig:      creds,
+		Handler: recoveryMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if wrappedGrpc.IsGrpcWebRequest(r) {
 				wrappedGrpc.ServeHTTP(w, r)
 				return
@@ -172,7 +200,7 @@ func (s *Server) start() error {
 
 			// Fall back to other servers.
 			http.DefaultServeMux.ServeHTTP(w, r)
-		}),
+		})),
 	}
 	go func() {
 		defer httpServer.Close()
