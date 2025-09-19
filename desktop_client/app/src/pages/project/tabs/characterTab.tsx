@@ -12,6 +12,7 @@ import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
 import CreateCharacterModal from "./createCharacterModal";
 import EditCharacterModal from "./editCharacterModal";
+import { uint8ArrayToBase64 } from "@/lib/utils/base64";
 
 export function CharacterTab(): ReactNode {
   const [selectedCharacterId, setSelectedCharacterId] = useState("");
@@ -28,6 +29,7 @@ export function CharacterTab(): ReactNode {
 
   const projectHandle = useTabStore((x) => x.selectedTab);
   const projectStore = useProjectStore((x) => x);
+  const [iconB64, setIconB64] = useState("");
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -49,6 +51,7 @@ export function CharacterTab(): ReactNode {
         });
 
         setSelectedCharacter(resp.response);
+        setIconB64(uint8ArrayToBase64(resp.response.icon));
       } catch (error: unknown) {
         getLogger().error("Cannot get character", {
           character: selectedCharacterId,
@@ -60,7 +63,7 @@ export function CharacterTab(): ReactNode {
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     sync();
-  }, [projectHandle, selectedCharacterId]);
+  }, [projectHandle, selectedCharacterId, editOpened]);
 
   if (!projectHandle) {
     return "No project selected";
@@ -134,6 +137,13 @@ export function CharacterTab(): ReactNode {
           {selectedCharcter && (
             <>
               <div className="flex flex-row gap-3 justify-between">
+                {iconB64 && (
+                  <img
+                    alt="User selected"
+                    className="max-w-1/2 max-h-1/2"
+                    src={`data:image/jpg;base64,${iconB64}`}
+                  />
+                )}
                 <H2>{selectedCharcter.name}</H2>
                 <button
                   className="cursor-pointer"

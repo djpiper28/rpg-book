@@ -1,6 +1,6 @@
 import { Button } from "@mantine/core";
 import { type ReactNode, useState } from "react";
-import { getProjectClient } from "@/lib/grpcClient/client";
+import { getLogger, getProjectClient } from "@/lib/grpcClient/client";
 import { type BasicCharacterDetails } from "@/lib/grpcClient/pb/project_character";
 import { base64ToUint8Array } from "@/lib/utils/base64";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
@@ -47,7 +47,7 @@ export default function CreateCharacterModal(
             .createCharacter({
               details: {
                 ...character,
-                icon: base64ToUint8Array(iconB64.split(",")[1]),
+                icon: base64ToUint8Array(iconB64),
               },
               project: projectHandle,
             })
@@ -62,6 +62,10 @@ export default function CreateCharacterModal(
               props.closeDialog();
             })
             .catch((error: unknown) => {
+              getLogger().error("Cannot create character", {
+                error: String(error),
+              });
+
               setError({
                 body: String(error),
                 title: "Cannot create character",

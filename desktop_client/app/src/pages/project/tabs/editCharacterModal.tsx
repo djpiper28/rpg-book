@@ -1,6 +1,6 @@
 import { Button } from "@mantine/core";
 import { type ReactNode, useEffect, useState } from "react";
-import { getProjectClient } from "@/lib/grpcClient/client";
+import { getLogger, getProjectClient } from "@/lib/grpcClient/client";
 import {
   type BasicCharacterDetails,
   type CharacterHandle,
@@ -72,8 +72,7 @@ export default function EditCharacterModal(props: Readonly<Props>): ReactNode {
           const f = async (): Promise<void> => {
             try {
               if (dirtyIcon) {
-                const b64 = iconB64.split(",")[1];
-                characterDetails.icon = base64ToUint8Array(b64);
+                characterDetails.icon = base64ToUint8Array(iconB64);
               }
 
               await getProjectClient().updateCharacter({
@@ -85,6 +84,10 @@ export default function EditCharacterModal(props: Readonly<Props>): ReactNode {
 
               props.closeDialog();
             } catch (error: unknown) {
+              getLogger().error("Cannot edit character", {
+                error: String(error),
+              });
+
               setError({
                 body: String(error),
               });

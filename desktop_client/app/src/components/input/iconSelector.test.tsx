@@ -41,7 +41,6 @@ describe("IconSelector", () => {
     const setImageB64 = vi.fn();
     const fakeFileBytes = new Uint8Array([1, 2, 3]);
     const fakeBase64 = uint8ArrayToBase64(fakeFileBytes);
-    const expectedDataURL = `data:image/jpeg;base66;base64,${fakeBase64}`;
 
     mockedElectronDialog.showOpenDialog.mockResolvedValue({
       canceled: false,
@@ -70,7 +69,7 @@ describe("IconSelector", () => {
     fireEvent.click(button);
 
     await waitFor(() => {
-      expect(setImageB64).toHaveBeenCalledWith(expectedDataURL);
+      expect(setImageB64).toHaveBeenCalledWith(fakeBase64);
     });
   });
 
