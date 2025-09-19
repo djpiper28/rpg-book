@@ -1,8 +1,9 @@
-import { uint8ArrayToBase64 } from "@/lib/utils/base64";
 import { fireEvent, waitFor } from "@testing-library/react";
-import { getSystemClient } from "@/lib/grpcClient/client";
 import { electronDialog } from "@/lib/electron";
+import { getSystemClient } from "@/lib/grpcClient/client";
+import { type SystemSvcClient } from "@/lib/grpcClient/pb/system.client";
 import { wrappedRender } from "@/lib/testUtils/wrappedRender";
+import { uint8ArrayToBase64 } from "@/lib/utils/base64";
 import { IconSelector } from "./iconSelector";
 
 vi.mock("@/lib/electron", () => ({

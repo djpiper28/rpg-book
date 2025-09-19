@@ -1,9 +1,9 @@
-import { uint8ArrayToBase64 } from "@/lib/utils/base64";
 import { Pencil } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import { P } from "@/components/typography/P";
 import { electronDialog } from "@/lib/electron";
 import { getLogger, getSystemClient } from "@/lib/grpcClient/client";
+import { uint8ArrayToBase64 } from "@/lib/utils/base64";
 
 interface Props {
   description: string;
@@ -31,23 +31,25 @@ export function IconSelector(props: Readonly<Props>): ReactNode {
               properties: ["openFile"],
               title: "Chose a project to open",
             })
-            .then(async (result: Electron.OpenDialogReturnValue) => {
-              if (result.canceled) {
-                return;
-              }
+            .then(
+              async (result: Electron.OpenDialogReturnValue): Promise<void> => {
+                if (result.canceled) {
+                  return;
+                }
 
-              const resp = await getSystemClient().readFile({
-                filepath: result.filePaths[0],
-              });
+                const resp = await getSystemClient().readFile({
+                  filepath: result.filePaths[0],
+                });
 
-              const b64 = uint8ArrayToBase64(resp.response.data);
+                const b64 = uint8ArrayToBase64(resp.response.data);
 
-              const extension =
-                result.filePaths[0].split(".").pop()?.toLowerCase() ?? "png";
+                const extension =
+                  result.filePaths[0].split(".").pop()?.toLowerCase() ?? "png";
 
-              setExt(extension);
-              props.setImageB64(b64);
-            })
+                setExt(extension);
+                props.setImageB64(b64);
+              },
+            )
             .catch((error: unknown) => {
               getLogger().error("Cannot get base64 for file", {
                 error: String(error),

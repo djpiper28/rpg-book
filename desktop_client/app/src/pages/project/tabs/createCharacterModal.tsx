@@ -1,8 +1,8 @@
-import { base64ToUint8Array } from "@/lib/utils/base64";
 import { Button } from "@mantine/core";
 import { type ReactNode, useState } from "react";
 import { getProjectClient } from "@/lib/grpcClient/client";
 import { type BasicCharacterDetails } from "@/lib/grpcClient/pb/project_character";
+import { base64ToUint8Array } from "@/lib/utils/base64";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
