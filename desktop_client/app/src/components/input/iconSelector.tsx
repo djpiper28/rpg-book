@@ -24,7 +24,17 @@ export function IconSelector(props: Readonly<Props>): ReactNode {
               buttonLabel: "Ok",
               filters: [
                 {
-                  extensions: ["jpeg", "png", "jpg", "webp", "gif"],
+                  extensions: [
+                    "jpeg",
+                    "png",
+                    "jpg",
+                    "webp",
+                    "gif",
+                    "bmp",
+                    "svg",
+                    "tiff",
+                    "ccitt",
+                  ],
                   name: props.description,
                 },
               ],
