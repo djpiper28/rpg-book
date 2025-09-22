@@ -91,7 +91,7 @@ func (p *ProjectSvc) UpdateCharacter(ctx context.Context, in *pb_project.UpdateC
 		img, err = p.readAndCompressImageIfNeeded(in.Details.IconPath)
 		if err != nil {
 			log.Error("Cannot compress image", loggertags.TagError, err)
-			return nil, errors.Join(errors.New("Cannot create character"), err)
+			return nil, errors.Join(errors.New("Cannot update character"), err)
 		}
 	}
 
