@@ -5,7 +5,7 @@ import {
   type BasicCharacterDetails,
   type CharacterHandle,
 } from "@/lib/grpcClient/pb/project_character";
-import { base64ToUint8Array, uint8ArrayToBase64 } from "@/lib/utils/base64";
+import { uint8ArrayToBase64 } from "@/lib/utils/base64";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useTabStore } from "@/stores/tabStore";
 import { CharacterEdit } from "./characterEdit";
@@ -19,11 +19,15 @@ export default function EditCharacterModal(props: Readonly<Props>): ReactNode {
   const [characterDetails, setCharacterDetails] =
     useState<BasicCharacterDetails>({
       description: "",
+      handle: {
+        id: "",
+      },
       icon: new Uint8Array(),
+      iconPath: "",
       name: "",
     });
 
-  const [iconB64, setIconB64] = useState<string>("");
+  const [iconPath, setIconPath] = useState<string>("");
   const [dirtyIcon, setDirtyIcon] = useState(false);
   const { setError } = useGlobalErrorStore((x) => x);
   const projectHandle = useTabStore((x) => x.selectedTab);
@@ -40,13 +44,6 @@ export default function EditCharacterModal(props: Readonly<Props>): ReactNode {
       })
       .then((resp) => {
         setCharacterDetails(resp.response);
-        const buffer = resp.response.icon;
-
-        if (buffer.length > 0) {
-          const b64 = uint8ArrayToBase64(buffer);
-          setIconB64(`data:image/jpg;base64,${b64}`);
-          setDirtyIcon(true);
-        }
       })
       .catch((error: unknown) => {
         setError({
@@ -59,24 +56,29 @@ export default function EditCharacterModal(props: Readonly<Props>): ReactNode {
     return "No project selected";
   }
 
+  const iconB64 = uint8ArrayToBase64(characterDetails.icon);
+
   return (
     <div className="flex flex-col gap-3">
       <CharacterEdit
         character={characterDetails}
-        iconB64={iconB64}
+        iconPath={iconPath}
+        imageDataB64={iconB64}
         setCharacter={setCharacterDetails}
-        setIconB64={setIconB64}
+        setIconPath={(path) => {
+          setIconPath(path);
+          setDirtyIcon(true);
+        }}
       />
       <Button
         onClick={() => {
           const f = async (): Promise<void> => {
             try {
-              if (dirtyIcon) {
-                characterDetails.icon = base64ToUint8Array(iconB64);
-              }
-
               await getProjectClient().updateCharacter({
-                details: characterDetails,
+                details: {
+                  ...characterDetails,
+                  iconPath,
+                },
                 handle: props.characterHandle,
                 project: projectHandle,
                 setImage: dirtyIcon,

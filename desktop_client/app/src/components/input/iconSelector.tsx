@@ -1,19 +1,17 @@
 import { Pencil } from "lucide-react";
-import { type ReactNode, useState } from "react";
+import { type ReactNode } from "react";
 import { P } from "@/components/typography/P";
 import { electronDialog } from "@/lib/electron";
-import { getLogger, getSystemClient } from "@/lib/grpcClient/client";
-import { uint8ArrayToBase64 } from "@/lib/utils/base64";
+import { getLogger } from "@/lib/grpcClient/client";
 
 interface Props {
   description: string;
-  imageB64: string | undefined;
-  setImageB64: (src: string) => void;
+  imageDataB64?: string;
+  imagePath?: string;
+  setImagePath: (src: string) => void;
 }
 
 export function IconSelector(props: Readonly<Props>): ReactNode {
-  const [ext, setExt] = useState("jpg");
-
   return (
     <div className="border-dotted border-2 border-gray-600 min-w-20 max-w-1/2 max-h-1/2 min-h-20 p-1">
       <button
@@ -41,26 +39,13 @@ export function IconSelector(props: Readonly<Props>): ReactNode {
               properties: ["openFile"],
               title: "Chose a project to open",
             })
-            .then(
-              async (result: Electron.OpenDialogReturnValue): Promise<void> => {
-                if (result.canceled) {
-                  return;
-                }
+            .then((result: Electron.OpenDialogReturnValue): void => {
+              if (result.canceled) {
+                return;
+              }
 
-                const resp = await getSystemClient().readImageFile({
-                  filepath: result.filePaths[0],
-                  isIcon: true,
-                });
-
-                const b64 = uint8ArrayToBase64(resp.response.data);
-
-                const extension =
-                  result.filePaths[0].split(".").pop()?.toLowerCase() ?? "png";
-
-                setExt(extension);
-                props.setImageB64(b64);
-              },
-            )
+              props.setImagePath(result.filePaths[0]);
+            })
             .catch((error: unknown) => {
               getLogger().error("Cannot get base64 for file", {
                 error: String(error),
@@ -69,11 +54,17 @@ export function IconSelector(props: Readonly<Props>): ReactNode {
         }}
       >
         <Pencil className="absolute" />
-        {props.imageB64 ? (
+        {props.imagePath ? (
           <img
             alt="User selected"
             className="static max-w-1/2 max-h-1/2"
-            src={`data:image/${ext};base64,${props.imageB64}`}
+            src={`file://${props.imagePath}`}
+          />
+        ) : props.imageDataB64 ? (
+          <img
+            alt="User selected"
+            className="static max-w-1/2 max-h-1/2"
+            src={`data:image/jpg;base64,${props.imageDataB64}`}
           />
         ) : (
           <P>No icon selected</P>

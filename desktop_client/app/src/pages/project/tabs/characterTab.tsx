@@ -8,11 +8,11 @@ import { H2 } from "@/components/typography/H2";
 import { P } from "@/components/typography/P";
 import { getLogger, getProjectClient } from "@/lib/grpcClient/client";
 import { type BasicCharacterDetails } from "@/lib/grpcClient/pb/project_character";
+import { uint8ArrayToBase64 } from "@/lib/utils/base64";
 import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
 import CreateCharacterModal from "./createCharacterModal";
 import EditCharacterModal from "./editCharacterModal";
-import { uint8ArrayToBase64 } from "@/lib/utils/base64";
 
 export function CharacterTab(): ReactNode {
   const [selectedCharacterId, setSelectedCharacterId] = useState("");

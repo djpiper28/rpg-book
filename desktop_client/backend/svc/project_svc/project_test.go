@@ -18,6 +18,24 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func newTestImageFile(t *testing.T) string {
+	t.Helper()
+
+	img := testutils.NewTestImage(100, 100)
+	buff := bytes.NewBuffer([]byte{})
+	err := jpeg.Encode(buff, img, nil)
+	require.NoError(t, err)
+
+	file, err := os.CreateTemp("", "test-image-*.jpg")
+	require.NoError(t, err)
+	defer file.Close()
+
+	_, err = file.Write(buff.Bytes())
+	require.NoError(t, err)
+
+	return file.Name()
+}
+
 func TestProjectSvc(t *testing.T) {
 	db, closeDb := testdbutils.GetPrimaryDb()
 	defer closeDb()
@@ -184,10 +202,8 @@ func TestProjectSvc(t *testing.T) {
 		projectName := uuid.New().String()
 		characterName := uuid.New().String()
 		characterDescription := uuid.New().String()
-		icon := bytes.NewBuffer([]byte{})
-
-		err := jpeg.Encode(icon, testutils.NewTestImage(100, 100), nil)
-		require.NoError(t, err)
+		iconPath := newTestImageFile(t)
+		defer os.Remove(iconPath)
 
 		projectHandle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
 			FileName:    filename,
@@ -200,7 +216,7 @@ func TestProjectSvc(t *testing.T) {
 			Details: &pb_project_character.BasicCharacterDetails{
 				Name:        characterName,
 				Description: characterDescription,
-				Icon:        icon.Bytes(),
+				IconPath:    iconPath,
 			},
 		})
 
@@ -222,10 +238,8 @@ func TestProjectSvc(t *testing.T) {
 		projectName := uuid.New().String()
 		characterName := uuid.New().String()
 		characterDescription := uuid.New().String()
-		icon := bytes.NewBuffer([]byte{})
-
-		err := jpeg.Encode(icon, testutils.NewTestImage(100, 100), nil)
-		require.NoError(t, err)
+		iconPath := newTestImageFile(t)
+		defer os.Remove(iconPath)
 
 		projectHandle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
 			FileName:    filename,
@@ -239,7 +253,7 @@ func TestProjectSvc(t *testing.T) {
 			Details: &pb_project_character.BasicCharacterDetails{
 				Name:        characterName,
 				Description: characterDescription,
-				Icon:        icon.Bytes(),
+				IconPath:    iconPath,
 			},
 		})
 
@@ -262,10 +276,8 @@ func TestProjectSvc(t *testing.T) {
 		projectName := uuid.New().String()
 		characterName := uuid.New().String()
 		characterDescription := uuid.New().String()
-		icon := bytes.NewBuffer([]byte{})
-
-		err := jpeg.Encode(icon, testutils.NewTestImage(100, 100), nil)
-		require.NoError(t, err)
+		iconPath := newTestImageFile(t)
+		defer os.Remove(iconPath)
 
 		projectHandle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
 			FileName:    filename,
@@ -279,7 +291,7 @@ func TestProjectSvc(t *testing.T) {
 			Details: &pb_project_character.BasicCharacterDetails{
 				Name:        characterName,
 				Description: characterDescription,
-				Icon:        icon.Bytes(),
+				IconPath:    iconPath,
 			},
 		})
 		require.NoError(t, err)
@@ -287,9 +299,8 @@ func TestProjectSvc(t *testing.T) {
 
 		updatedCharacterName := uuid.New().String()
 		updatedCharacterDescription := uuid.New().String()
-		updatedIcon := bytes.NewBuffer([]byte{})
-		err = jpeg.Encode(updatedIcon, testutils.NewTestImage(50, 50), nil)
-		require.NoError(t, err)
+		updatedIconPath := newTestImageFile(t)
+		defer os.Remove(updatedIconPath)
 
 		_, err = svc.UpdateCharacter(context.Background(), &pb_project.UpdateCharacterReq{
 			Handle:  characterHandle,
@@ -297,7 +308,7 @@ func TestProjectSvc(t *testing.T) {
 			Details: &pb_project_character.BasicCharacterDetails{
 				Name:        updatedCharacterName,
 				Description: updatedCharacterDescription,
-				Icon:        updatedIcon.Bytes(),
+				IconPath:    updatedIconPath,
 			},
 			SetImage: true,
 		})
@@ -312,8 +323,6 @@ func TestProjectSvc(t *testing.T) {
 		require.Equal(t, updatedCharacterDescription, returnedCharacter.Description)
 		require.NotNil(t, returnedCharacter.Icon)
 		require.True(t, len(returnedCharacter.Icon) > 0)
-    // Image is compressed by default
-		require.NotEqual(t, updatedIcon.Bytes(), returnedCharacter.Icon)
 	})
 
 	t.Run("Test update character without icon set", func(t *testing.T) {
@@ -321,10 +330,8 @@ func TestProjectSvc(t *testing.T) {
 		projectName := uuid.New().String()
 		characterName := uuid.New().String()
 		characterDescription := uuid.New().String()
-		icon := bytes.NewBuffer([]byte{})
-
-		err := jpeg.Encode(icon, testutils.NewTestImage(100, 100), nil)
-		require.NoError(t, err)
+		iconPath := newTestImageFile(t)
+		defer os.Remove(iconPath)
 
 		projectHandle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
 			FileName:    filename,
@@ -338,7 +345,7 @@ func TestProjectSvc(t *testing.T) {
 			Details: &pb_project_character.BasicCharacterDetails{
 				Name:        characterName,
 				Description: characterDescription,
-				Icon:        icon.Bytes(),
+				IconPath:    iconPath,
 			},
 		})
 		require.NoError(t, err)
@@ -353,7 +360,7 @@ func TestProjectSvc(t *testing.T) {
 			Details: &pb_project_character.BasicCharacterDetails{
 				Name:        updatedCharacterName,
 				Description: updatedCharacterDescription,
-				Icon:        []byte{},
+				IconPath:    "",
 			},
 			SetImage: false,
 		})
