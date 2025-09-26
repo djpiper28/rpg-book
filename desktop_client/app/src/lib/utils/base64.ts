@@ -1,4 +1,8 @@
-export function uint8ArrayToBase64(uint8Array: Uint8Array): string {
+export function uint8ArrayToBase64(uint8Array: Uint8Array | undefined): string {
+  if (!uint8Array) {
+    return "";
+  }
+
   let binaryString = "";
   for (let i = 0; i < uint8Array.length; i++) {
     binaryString += String.fromCodePoint(uint8Array[i]);

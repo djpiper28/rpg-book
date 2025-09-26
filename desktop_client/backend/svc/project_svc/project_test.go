@@ -43,7 +43,7 @@ func TestProjectSvc(t *testing.T) {
 	svc := projectsvc.New(db)
 	defer svc.Close()
 
-	closeProjectWithoutDelete := func(t *testing.T, filename string, handle *pb_project.ProjectHandle) {
+	closeProjectWithoutDelete := func(t *testing.T, handle *pb_project.ProjectHandle) {
 		_, err := svc.CloseProject(context.Background(), handle)
 		require.NoError(t, err)
 	}
@@ -51,7 +51,7 @@ func TestProjectSvc(t *testing.T) {
 	closeProject := func(t *testing.T, filename string, handle *pb_project.ProjectHandle) {
 		defer os.Remove(filename)
 
-		closeProjectWithoutDelete(t, filename, handle)
+		closeProjectWithoutDelete(t, handle)
 	}
 
 	t.Run("Test no recent projects", func(t *testing.T) {
@@ -107,7 +107,7 @@ func TestProjectSvc(t *testing.T) {
 			ProjectName: name,
 		})
 		require.NoError(t, err)
-		closeProjectWithoutDelete(t, filename, handle)
+		closeProjectWithoutDelete(t, handle)
 
 		resp, err := svc.OpenProject(context.Background(), &pb_project.OpenProjectReq{
 			FileName: filename,
@@ -134,7 +134,7 @@ func TestProjectSvc(t *testing.T) {
 			ProjectName: name,
 		})
 		require.NoError(t, err)
-		closeProjectWithoutDelete(t, filename, handle)
+		closeProjectWithoutDelete(t, handle)
 
 		require.NotEmpty(t, handle)
 
@@ -216,8 +216,8 @@ func TestProjectSvc(t *testing.T) {
 			Details: &pb_project_character.BasicCharacterDetails{
 				Name:        characterName,
 				Description: characterDescription,
-				IconPath:    iconPath,
 			},
+			IconPath: iconPath,
 		})
 
 		require.NoError(t, err)
@@ -253,8 +253,8 @@ func TestProjectSvc(t *testing.T) {
 			Details: &pb_project_character.BasicCharacterDetails{
 				Name:        characterName,
 				Description: characterDescription,
-				IconPath:    iconPath,
 			},
+			IconPath: iconPath,
 		})
 
 		require.NoError(t, err)
@@ -265,8 +265,8 @@ func TestProjectSvc(t *testing.T) {
 			Project:   projectHandle,
 		})
 		require.NoError(t, err)
-		require.Equal(t, characterName, returnedCharacter.Name)
-		require.Equal(t, characterDescription, returnedCharacter.Description)
+		require.Equal(t, characterName, returnedCharacter.Details.Name)
+		require.Equal(t, characterDescription, returnedCharacter.Details.Description)
 		require.NotNil(t, returnedCharacter.Icon)
 		require.True(t, len(returnedCharacter.Icon) > 0)
 	})
@@ -291,8 +291,8 @@ func TestProjectSvc(t *testing.T) {
 			Details: &pb_project_character.BasicCharacterDetails{
 				Name:        characterName,
 				Description: characterDescription,
-				IconPath:    iconPath,
 			},
+			IconPath: iconPath,
 		})
 		require.NoError(t, err)
 		require.NotEmpty(t, characterHandle.Id)
@@ -308,9 +308,9 @@ func TestProjectSvc(t *testing.T) {
 			Details: &pb_project_character.BasicCharacterDetails{
 				Name:        updatedCharacterName,
 				Description: updatedCharacterDescription,
-				IconPath:    updatedIconPath,
 			},
-			SetImage: true,
+			IconPath: updatedIconPath,
+			SetIcon:  true,
 		})
 		require.NoError(t, err)
 
@@ -319,8 +319,8 @@ func TestProjectSvc(t *testing.T) {
 			Project:   projectHandle,
 		})
 		require.NoError(t, err)
-		require.Equal(t, updatedCharacterName, returnedCharacter.Name)
-		require.Equal(t, updatedCharacterDescription, returnedCharacter.Description)
+		require.Equal(t, updatedCharacterName, returnedCharacter.Details.Name)
+		require.Equal(t, updatedCharacterDescription, returnedCharacter.Details.Description)
 		require.NotNil(t, returnedCharacter.Icon)
 		require.True(t, len(returnedCharacter.Icon) > 0)
 	})
@@ -345,7 +345,6 @@ func TestProjectSvc(t *testing.T) {
 			Details: &pb_project_character.BasicCharacterDetails{
 				Name:        characterName,
 				Description: characterDescription,
-				IconPath:    iconPath,
 			},
 		})
 		require.NoError(t, err)
@@ -353,6 +352,8 @@ func TestProjectSvc(t *testing.T) {
 
 		updatedCharacterName := uuid.New().String()
 		updatedCharacterDescription := uuid.New().String()
+		updatedIconPath := newTestImageFile(t)
+		defer os.Remove(updatedIconPath)
 
 		_, err = svc.UpdateCharacter(context.Background(), &pb_project.UpdateCharacterReq{
 			Handle:  characterHandle,
@@ -360,9 +361,9 @@ func TestProjectSvc(t *testing.T) {
 			Details: &pb_project_character.BasicCharacterDetails{
 				Name:        updatedCharacterName,
 				Description: updatedCharacterDescription,
-				IconPath:    "",
 			},
-			SetImage: false,
+			IconPath: updatedIconPath,
+			SetIcon:  false,
 		})
 		require.NoError(t, err)
 
@@ -371,9 +372,8 @@ func TestProjectSvc(t *testing.T) {
 			Project:   projectHandle,
 		})
 		require.NoError(t, err)
-		require.Equal(t, updatedCharacterName, returnedCharacter.Name)
-		require.Equal(t, updatedCharacterDescription, returnedCharacter.Description)
-		require.NotNil(t, returnedCharacter.Icon)
-		require.True(t, len(returnedCharacter.Icon) > 0)
+		require.Equal(t, updatedCharacterName, returnedCharacter.Details.Name)
+		require.Equal(t, updatedCharacterDescription, returnedCharacter.Details.Description)
+		require.Empty(t, returnedCharacter.Icon)
 	})
 }

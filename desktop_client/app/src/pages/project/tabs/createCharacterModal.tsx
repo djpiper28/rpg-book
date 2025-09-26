@@ -45,10 +45,8 @@ export default function CreateCharacterModal(
         onClick={() => {
           getProjectClient()
             .createCharacter({
-              details: {
-                ...character,
-                iconPath,
-              },
+              details: character,
+              iconPath,
               project: projectHandle,
             })
             .then((resp) => {
@@ -60,7 +58,7 @@ export default function CreateCharacterModal(
                 .then((charDetails) => {
                   projectStore.addCharacter(
                     projectHandle,
-                    charDetails.response,
+                    charDetails.response.details,
                   );
 
                   props.closeDialog();

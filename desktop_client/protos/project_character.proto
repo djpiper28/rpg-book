@@ -9,8 +9,4 @@ message BasicCharacterDetails {
   CharacterHandle handle = 1;
   string name = 2;
   string description = 4;
-  // Returned by the backend, do not use for creating/updating
-  bytes icon = 5;
-  // Read by the backend, leave empty for no change
-  string icon_path = 6;
 }

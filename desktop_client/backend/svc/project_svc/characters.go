@@ -18,6 +18,10 @@ import (
 )
 
 func (p *ProjectSvc) readAndCompressImageIfNeeded(path string) ([]byte, error) {
+	if path == "" {
+		return []byte{}, nil
+	}
+
 	compressError := errors.New("Cannot compress iamge")
 
 	imgBytes, err := os.ReadFile(path)
@@ -51,8 +55,8 @@ func (p *ProjectSvc) CreateCharacter(ctx context.Context, in *pb_project.CreateC
 	project, err := p.getProject(in.Project)
 
 	var img []byte
-	if in.Details.IconPath != "" {
-		img, err = p.readAndCompressImageIfNeeded(in.Details.IconPath)
+	if in.IconPath != "" {
+		img, err = p.readAndCompressImageIfNeeded(in.IconPath)
 		if err != nil {
 			log.Error("Cannot compress image", loggertags.TagError, err)
 			return nil, errors.Join(errors.New("Cannot create character"), err)
@@ -85,14 +89,10 @@ func (p *ProjectSvc) UpdateCharacter(ctx context.Context, in *pb_project.UpdateC
 		return nil, errors.Join(updateError, err)
 	}
 
-	var img []byte
-	if in.SetImage {
-		var err error
-		img, err = p.readAndCompressImageIfNeeded(in.Details.IconPath)
-		if err != nil {
-			log.Error("Cannot compress image", loggertags.TagError, err)
-			return nil, errors.Join(errors.New("Cannot update character"), err)
-		}
+	img, err := p.readAndCompressImageIfNeeded(in.IconPath)
+	if err != nil {
+		log.Error("Cannot compress image", loggertags.TagError, err)
+		return nil, errors.Join(errors.New("Cannot update character"), err)
 	}
 
 	err = project.UpdateCharacter(&model.Character{
@@ -100,7 +100,7 @@ func (p *ProjectSvc) UpdateCharacter(ctx context.Context, in *pb_project.UpdateC
 		Description: in.Details.Description,
 		Name:        in.Details.Name,
 		Icon:        img,
-	}, in.SetImage)
+	}, in.SetIcon)
 	if err != nil {
 		log.Error("Cannot update character", loggertags.TagError, err)
 		return nil, errors.Join(updateError, err)
@@ -109,7 +109,7 @@ func (p *ProjectSvc) UpdateCharacter(ctx context.Context, in *pb_project.UpdateC
 	return &pb_common.Empty{}, nil
 }
 
-func (p *ProjectSvc) GetCharacter(ctx context.Context, in *pb_project.GetCharacterReq) (*pb_project_character.BasicCharacterDetails, error) {
+func (p *ProjectSvc) GetCharacter(ctx context.Context, in *pb_project.GetCharacterReq) (*pb_project.GetCharacterResp, error) {
 	project, err := p.getProject(in.Project)
 	if err != nil {
 		log.Error("Cannot get character")
@@ -128,5 +128,8 @@ func (p *ProjectSvc) GetCharacter(ctx context.Context, in *pb_project.GetCharact
 		return nil, errors.Join(errors.New("Cannot get character"), err)
 	}
 
-	return character.ToPb(), nil
+	return &pb_project.GetCharacterResp{
+		Details: character.ToPb(),
+		Icon:    character.Icon,
+	}, nil
 }

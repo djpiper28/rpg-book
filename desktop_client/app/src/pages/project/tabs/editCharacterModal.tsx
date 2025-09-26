@@ -7,6 +7,7 @@ import {
 } from "@/lib/grpcClient/pb/project_character";
 import { uint8ArrayToBase64 } from "@/lib/utils/base64";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
+import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
 import { CharacterEdit } from "./characterEdit";
 
@@ -22,11 +23,11 @@ export default function EditCharacterModal(props: Readonly<Props>): ReactNode {
       handle: {
         id: "",
       },
-      icon: new Uint8Array(),
-      iconPath: "",
       name: "",
     });
 
+  const projectStore = useProjectStore((x) => x);
+  const [icon, setIcon] = useState("");
   const [iconPath, setIconPath] = useState<string>("");
   const [dirtyIcon, setDirtyIcon] = useState(false);
   const { setError } = useGlobalErrorStore((x) => x);
@@ -43,7 +44,9 @@ export default function EditCharacterModal(props: Readonly<Props>): ReactNode {
         project: projectHandle,
       })
       .then((resp) => {
-        setCharacterDetails(resp.response);
+        setCharacterDetails(resp.response.details);
+        setIcon(uint8ArrayToBase64(resp.response.icon));
+        setDirtyIcon(false);
       })
       .catch((error: unknown) => {
         setError({
@@ -56,14 +59,12 @@ export default function EditCharacterModal(props: Readonly<Props>): ReactNode {
     return "No project selected";
   }
 
-  const iconB64 = uint8ArrayToBase64(characterDetails.icon);
-
   return (
     <div className="flex flex-col gap-3">
       <CharacterEdit
         character={characterDetails}
         iconPath={iconPath}
-        imageDataB64={iconB64}
+        imageDataB64={icon}
         setCharacter={setCharacterDetails}
         setIconPath={(path) => {
           setIconPath(path);
@@ -75,16 +76,16 @@ export default function EditCharacterModal(props: Readonly<Props>): ReactNode {
           const f = async (): Promise<void> => {
             try {
               await getProjectClient().updateCharacter({
-                details: {
-                  ...characterDetails,
-                  iconPath,
-                },
+                details: characterDetails,
                 handle: props.characterHandle,
+                iconPath,
                 project: projectHandle,
-                setImage: dirtyIcon,
+                setIcon: dirtyIcon,
               });
 
               props.closeDialog();
+
+              projectStore.addCharacter(characterDetails);
             } catch (error: unknown) {
               getLogger().error("Cannot edit character", {
                 error: String(error),

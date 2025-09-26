@@ -10,7 +10,7 @@ service ProjectSvc {
   rpc CloseProject(ProjectHandle) returns (Empty) {}
   rpc CreateCharacter(CreateCharacterReq) returns (CharacterHandle) {}
   rpc UpdateCharacter(UpdateCharacterReq) returns (Empty) {}
-  rpc GetCharacter(GetCharacterReq) returns (BasicCharacterDetails) {}
+  rpc GetCharacter(GetCharacterReq) returns (GetCharacterResp) {}
 }
 
 message CreateProjectReq {
@@ -46,6 +46,7 @@ message RecentProjectsResp {
 message CreateCharacterReq {
   ProjectHandle project = 1;
   BasicCharacterDetails details = 4;
+  string icon_path = 5;
 }
 
 message GetCharacterReq {
@@ -53,10 +54,15 @@ message GetCharacterReq {
   ProjectHandle project = 2;
 }
 
+message GetCharacterResp {
+  BasicCharacterDetails details = 1;
+  bytes icon = 2;
+}
+
 message UpdateCharacterReq {
   CharacterHandle handle = 1;
   ProjectHandle project = 2;
   BasicCharacterDetails details = 3;
-  // This means that not changing the image is cheap
-  bool SetImage = 4;
+  bool set_icon = 4;
+  string icon_path = 5;
 }

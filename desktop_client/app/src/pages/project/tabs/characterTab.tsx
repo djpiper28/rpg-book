@@ -50,7 +50,7 @@ export function CharacterTab(): ReactNode {
           project: projectHandle,
         });
 
-        setSelectedCharacter(resp.response);
+        setSelectedCharacter(resp.response.details);
         setIconB64(uint8ArrayToBase64(resp.response.icon));
       } catch (error: unknown) {
         getLogger().error("Cannot get character", {

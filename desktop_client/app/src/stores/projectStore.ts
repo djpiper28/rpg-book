@@ -34,6 +34,11 @@ export const useProjectStore = create<ProjectStore>()(
         character: BasicCharacterDetails,
       ): void => {
         const projects = get();
+
+        projects.projects[asId(handle)]?.project.characters.filter(
+          (x) => x.handle != character.handle,
+        );
+
         projects.projects[asId(handle)]?.project.characters.push(character);
         set(projects);
       },
