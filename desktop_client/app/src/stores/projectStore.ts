@@ -36,7 +36,7 @@ export const useProjectStore = create<ProjectStore>()(
         const projects = get();
 
         projects.projects[asId(handle)]?.project.characters.filter(
-          (x) => x.handle != character.handle,
+          (x) => x.handle.id != character.handle.id,
         );
 
         projects.projects[asId(handle)]?.project.characters.push(character);
