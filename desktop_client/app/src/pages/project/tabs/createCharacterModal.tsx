@@ -24,8 +24,6 @@ export default function CreateCharacterModal(
     handle: {
       id: "",
     },
-    icon: new Uint8Array(),
-    iconPath: "",
     name: "",
   });
 
@@ -56,6 +54,10 @@ export default function CreateCharacterModal(
                   project: projectHandle,
                 })
                 .then((charDetails) => {
+                  if (!charDetails.response.details) {
+                    return;
+                  }
+
                   projectStore.addCharacter(
                     projectHandle,
                     charDetails.response.details,
