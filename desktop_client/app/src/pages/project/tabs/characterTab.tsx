@@ -133,29 +133,31 @@ export function CharacterTab(): ReactNode {
           </Table>
         </div>
 
-        <div className="flex-1 overflow-x-auto">
+        <div className="flex-1 gap-3 overflow-y-auto">
           {selectedCharcter && (
             <>
-              <div className="flex flex-row gap-3 justify-between">
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-row gap-3 items-center justify-between">
+                  <H2>{selectedCharcter.name}</H2>
+                  <button
+                    className="cursor-pointer h-fit"
+                    onClick={() => {
+                      editOpen();
+                    }}
+                  >
+                    <P className="flex flex-row gap-1">
+                      <Pencil />
+                      Edit
+                    </P>
+                  </button>
+                </div>
                 {iconB64 && (
                   <img
                     alt="User selected"
-                    className="max-w-1/2 max-h-1/2"
+                    className="max-h-screen"
                     src={`data:image/jpg;base64,${iconB64}`}
                   />
                 )}
-                <H2>{selectedCharcter.name}</H2>
-                <button
-                  className="cursor-pointer"
-                  onClick={() => {
-                    editOpen();
-                  }}
-                >
-                  <P className="flex flex-row gap-1">
-                    <Pencil />
-                    Edit
-                  </P>
-                </button>
               </div>
               <MarkdownRenderer markdown={selectedCharcter.description} />
             </>
