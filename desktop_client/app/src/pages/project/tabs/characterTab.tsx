@@ -8,11 +8,11 @@ import { H2 } from "@/components/typography/H2";
 import { P } from "@/components/typography/P";
 import { getLogger, getProjectClient } from "@/lib/grpcClient/client";
 import { type BasicCharacterDetails } from "@/lib/grpcClient/pb/project_character";
+import { uint8ArrayToBase64 } from "@/lib/utils/base64";
 import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
 import CreateCharacterModal from "./createCharacterModal";
 import EditCharacterModal from "./editCharacterModal";
-import { uint8ArrayToBase64 } from "@/lib/utils/base64";
 
 export function CharacterTab(): ReactNode {
   const [selectedCharacterId, setSelectedCharacterId] = useState("");
@@ -50,7 +50,7 @@ export function CharacterTab(): ReactNode {
           project: projectHandle,
         });
 
-        setSelectedCharacter(resp.response);
+        setSelectedCharacter(resp.response.details);
         setIconB64(uint8ArrayToBase64(resp.response.icon));
       } catch (error: unknown) {
         getLogger().error("Cannot get character", {
@@ -133,29 +133,31 @@ export function CharacterTab(): ReactNode {
           </Table>
         </div>
 
-        <div className="flex-1 overflow-x-auto">
+        <div className="flex-1 gap-3 overflow-y-auto">
           {selectedCharcter && (
             <>
-              <div className="flex flex-row gap-3 justify-between">
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-row gap-3 items-center justify-between">
+                  <H2>{selectedCharcter.name}</H2>
+                  <button
+                    className="cursor-pointer h-fit"
+                    onClick={() => {
+                      editOpen();
+                    }}
+                  >
+                    <P className="flex flex-row gap-1">
+                      <Pencil />
+                      Edit
+                    </P>
+                  </button>
+                </div>
                 {iconB64 && (
                   <img
                     alt="User selected"
-                    className="max-w-1/2 max-h-1/2"
+                    className="max-h-screen"
                     src={`data:image/jpg;base64,${iconB64}`}
                   />
                 )}
-                <H2>{selectedCharcter.name}</H2>
-                <button
-                  className="cursor-pointer"
-                  onClick={() => {
-                    editOpen();
-                  }}
-                >
-                  <P className="flex flex-row gap-1">
-                    <Pencil />
-                    Edit
-                  </P>
-                </button>
               </div>
               <MarkdownRenderer markdown={selectedCharcter.description} />
             </>

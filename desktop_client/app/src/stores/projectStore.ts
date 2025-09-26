@@ -34,7 +34,22 @@ export const useProjectStore = create<ProjectStore>()(
         character: BasicCharacterDetails,
       ): void => {
         const projects = get();
-        projects.projects[asId(handle)]?.project.characters.push(character);
+        const project = projects.projects[asId(handle)]?.project;
+
+        if (!project) {
+          return;
+        }
+
+        const oldCharacter = project.characters.findIndex(
+          (x) => x.handle?.id === character.handle?.id,
+        );
+
+        if (oldCharacter) {
+          project.characters[oldCharacter] = structuredClone(character);
+        } else {
+          project.characters.push(character);
+        }
+
         set(projects);
       },
       getProject: (handle: ProjectHandle): Project | undefined => {

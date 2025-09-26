@@ -23,6 +23,8 @@ func NewCharacter(name string) *Character {
 	}
 }
 
+// The icon is not set here, if you want an icon then you need to set it to another proto
+// this is to avoid sending the icon as much
 func (c *Character) ToPb() *pb_project_character.BasicCharacterDetails {
 	return &pb_project_character.BasicCharacterDetails{
 		Handle: &pb_project_character.CharacterHandle{
@@ -30,6 +32,5 @@ func (c *Character) ToPb() *pb_project_character.BasicCharacterDetails {
 		},
 		Name:        c.Name,
 		Description: c.Description,
-		Icon:        c.Icon,
 	}
 }

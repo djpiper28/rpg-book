@@ -5,8 +5,9 @@ import {
   type BasicCharacterDetails,
   type CharacterHandle,
 } from "@/lib/grpcClient/pb/project_character";
-import { base64ToUint8Array, uint8ArrayToBase64 } from "@/lib/utils/base64";
+import { uint8ArrayToBase64 } from "@/lib/utils/base64";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
+import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
 import { CharacterEdit } from "./characterEdit";
 
@@ -19,11 +20,15 @@ export default function EditCharacterModal(props: Readonly<Props>): ReactNode {
   const [characterDetails, setCharacterDetails] =
     useState<BasicCharacterDetails>({
       description: "",
-      icon: new Uint8Array(),
+      handle: {
+        id: "",
+      },
       name: "",
     });
 
-  const [iconB64, setIconB64] = useState<string>("");
+  const projectStore = useProjectStore((x) => x);
+  const [icon, setIcon] = useState("");
+  const [iconPath, setIconPath] = useState<string>("");
   const [dirtyIcon, setDirtyIcon] = useState(false);
   const { setError } = useGlobalErrorStore((x) => x);
   const projectHandle = useTabStore((x) => x.selectedTab);
@@ -39,14 +44,13 @@ export default function EditCharacterModal(props: Readonly<Props>): ReactNode {
         project: projectHandle,
       })
       .then((resp) => {
-        setCharacterDetails(resp.response);
-        const buffer = resp.response.icon;
-
-        if (buffer.length > 0) {
-          const b64 = uint8ArrayToBase64(buffer);
-          setIconB64(`data:image/jpg;base64,${b64}`);
-          setDirtyIcon(true);
+        if (!resp.response.details) {
+          return;
         }
+
+        setCharacterDetails(resp.response.details);
+        setIcon(uint8ArrayToBase64(resp.response.icon));
+        setDirtyIcon(false);
       })
       .catch((error: unknown) => {
         setError({
@@ -63,26 +67,29 @@ export default function EditCharacterModal(props: Readonly<Props>): ReactNode {
     <div className="flex flex-col gap-3">
       <CharacterEdit
         character={characterDetails}
-        iconB64={iconB64}
+        iconPath={iconPath}
+        imageDataB64={icon}
         setCharacter={setCharacterDetails}
-        setIconB64={setIconB64}
+        setIconPath={(path) => {
+          setIconPath(path);
+          setDirtyIcon(true);
+        }}
       />
       <Button
         onClick={() => {
           const f = async (): Promise<void> => {
             try {
-              if (dirtyIcon) {
-                characterDetails.icon = base64ToUint8Array(iconB64);
-              }
-
               await getProjectClient().updateCharacter({
                 details: characterDetails,
                 handle: props.characterHandle,
+                iconPath,
                 project: projectHandle,
-                setImage: dirtyIcon,
+                setIcon: dirtyIcon,
               });
 
               props.closeDialog();
+
+              projectStore.addCharacter(projectHandle, characterDetails);
             } catch (error: unknown) {
               getLogger().error("Cannot edit character", {
                 error: String(error),

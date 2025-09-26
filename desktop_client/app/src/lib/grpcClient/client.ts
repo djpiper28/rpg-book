@@ -31,7 +31,7 @@ export function initializeClients() {
       priority: "high",
     },
     format: "binary",
-    timeout: 5_000,
+    timeout: 30_000,
   });
 
   systemClient = new SystemSvcClient(transport);
