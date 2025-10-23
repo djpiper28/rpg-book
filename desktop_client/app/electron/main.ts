@@ -71,16 +71,25 @@ if (process.env.RPG_BOOK_CERTIFICATE) {
 } else {
   // Start the application via the launcher
   let ps: ChildProcess;
+  const args = process.argv.slice(1);
+
+  const env = {
+    ...process.env,
+    FILES_TO_OPEN: JSON.stringify(args),
+  };
+
   console.log("Starting application with launcher");
 
   if (isDevServer) {
     console.log("Dev server detected");
 
     ps = spawn(getLauncherPath(), ["pnpm", "dev"], {
+      env,
       stdio: "inherit",
     });
   } else {
     ps = spawn(getLauncherPath(), [process.execPath], {
+      env,
       stdio: "inherit",
     });
   }

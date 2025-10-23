@@ -12,7 +12,9 @@ import { ErrorPage } from "./ErrorPage.tsx";
 import { ErrorModal } from "./components/modal/errorModal";
 import { H2 } from "./components/typography/H2.tsx";
 import { P } from "./components/typography/P";
+import { filesToOpen } from "./lib/electron/index.ts";
 import {
+  getLogger,
   getProjectClient,
   getSystemClient,
   initializeClients,
@@ -23,6 +25,7 @@ import { indexPath, withLayoutPath } from "./pages/path.ts";
 import { projectPath } from "./pages/project/path.ts";
 import { settingsPath } from "./pages/settings/path.ts";
 import { useGlobalErrorStore } from "./stores/globalErrorStore";
+import { useProjectStore } from "./stores/projectStore.ts";
 import { useSettingsStore } from "./stores/settingsStore";
 import { useTabStore } from "./stores/tabStore";
 
@@ -226,9 +229,55 @@ function Layout(): ReactNode {
 
 export default function App(): ReactNode {
   const { settings } = useSettingsStore((s) => s);
+  const projects = useProjectStore((p) => p);
+  const tabs = useTabStore((t) => t);
 
   useEffect(() => {
     initializeClients();
+
+    // Load files on startup
+    const files = filesToOpen();
+
+    if (files.length === 0) {
+      return;
+    }
+
+    getLogger().info("Loading projects on startup", {
+      projects: JSON.stringify(files),
+    });
+
+    Promise.all(
+      files.map(async (file) => {
+        return getProjectClient()
+          .openProject({
+            fileName: file,
+          })
+          .then((resp) => {
+            if (!resp.response.handle) {
+              throw new Error("Invalid project returned");
+            }
+
+            projects.newProject(resp.response.handle, resp.response);
+            tabs.addTab(resp.response.handle, file);
+          })
+          .catch((error: unknown) => {
+            getLogger().error("Cannot load project", {
+              error: JSON.stringify(error),
+              project: file,
+            });
+
+            throw new Error(`Cannot load project ${file}`);
+          });
+      }),
+    )
+      .then(() => {
+        getLogger().info("Loaded all projects successfully", {});
+      })
+      .catch((error: unknown) => {
+        getLogger().error("Could not load all projects successfully", {
+          error: JSON.stringify(error),
+        });
+      });
   }, []);
 
   return (
