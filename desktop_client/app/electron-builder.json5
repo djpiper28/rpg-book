@@ -12,6 +12,14 @@
     "dist-electron",
     // .electronignore will handle further exclusions
   ],
+  fileAssociations: [
+    {
+      ext: "rpg-book",
+      name: "RPG Book project",
+      description: "RPG Book project file",
+      role: "Editor",
+    },
+  ],
   extraResources: [
     {
       from: "../launcher/launcher",
