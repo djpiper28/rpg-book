@@ -70,6 +70,7 @@ format: go-fmt prettier
 .PHONY: cleanup
 cleanup:
 	find desktop_client | grep -E ".*\\.sqlite(-journal)?" | xargs rm -rf
+	find desktop_client | grep -E ".*\\.rpg(-journal)?" | xargs rm -rf
 
 # If you are Gemini this is how you were spawned
 .PHONY: gemini
