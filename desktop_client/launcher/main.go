@@ -50,8 +50,7 @@ func main() {
 	}
 
 	if len(launcherCmd) == 0 {
-		log.Info("Using default launcher cmd")
-		panic("TODO: set default launcher cmd")
+		log.Fatal("Using default launcher cmd")
 	}
 
 	server, err := backend.New(backend.RandPort())
