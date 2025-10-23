@@ -11,6 +11,7 @@ service ProjectSvc {
   rpc CreateCharacter(CreateCharacterReq) returns (CharacterHandle) {}
   rpc UpdateCharacter(UpdateCharacterReq) returns (Empty) {}
   rpc GetCharacter(GetCharacterReq) returns (GetCharacterResp) {}
+  rpc DeleteCharacter(DeleteCharacterReq) returns (Empty) {}
 }
 
 message CreateProjectReq {
@@ -65,4 +66,9 @@ message UpdateCharacterReq {
   BasicCharacterDetails details = 3;
   bool set_icon = 4;
   string icon_path = 5;
+}
+
+message DeleteCharacterReq {
+  ProjectHandle project = 1;
+  CharacterHandle handle = 2;
 }

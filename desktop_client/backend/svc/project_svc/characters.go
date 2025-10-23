@@ -118,13 +118,13 @@ func (p *ProjectSvc) GetCharacter(ctx context.Context, in *pb_project.GetCharact
 
 	characterId, err := uuid.Parse(in.Character.Id)
 	if err != nil {
-		log.Error("Cannot get character")
+		log.Error("Cannot get character", loggertags.TagError, err)
 		return nil, errors.Join(errors.New("Invalid character ID"), err)
 	}
 
 	character, err := project.GetCharacter(characterId)
 	if err != nil {
-		log.Error("Cannot get character")
+		log.Error("Cannot get character", loggertags.TagError, err)
 		return nil, errors.Join(errors.New("Cannot get character"), err)
 	}
 
@@ -132,4 +132,26 @@ func (p *ProjectSvc) GetCharacter(ctx context.Context, in *pb_project.GetCharact
 		Details: character.ToPb(),
 		Icon:    character.Icon,
 	}, nil
+}
+
+func (p *ProjectSvc) DeleteCharacter(ctx context.Context, in *pb_project.DeleteCharacterReq) (*pb_common.Empty, error) {
+	project, err := p.getProject(in.Project)
+	if err != nil {
+		log.Error("Cannot get character")
+		return nil, errors.New("Cannot find project")
+	}
+
+	characterId, err := uuid.Parse(in.Handle.Id)
+	if err != nil {
+		log.Error("Cannot get character", loggertags.TagError, err)
+		return nil, errors.Join(errors.New("Invalid character ID"), err)
+	}
+
+	err = project.DeleteCharacter(characterId)
+	if err != nil {
+		log.Error("Cannot delete character", loggertags.TagError, err)
+		return nil, errors.Join(errors.New("Cannotdelete character"), err)
+	}
+
+	return &pb_common.Empty{}, nil
 }

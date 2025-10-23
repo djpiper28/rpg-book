@@ -376,4 +376,66 @@ func TestProjectSvc(t *testing.T) {
 		require.Equal(t, updatedCharacterDescription, returnedCharacter.Details.Description)
 		require.Empty(t, returnedCharacter.Icon)
 	})
+
+	t.Run("Test delete character", func(t *testing.T) {
+		filename := uuid.New().String() + database.DbExtension
+		projectName := uuid.New().String()
+		characterName := uuid.New().String()
+		characterDescription := uuid.New().String()
+		iconPath := newTestImageFile(t)
+		defer os.Remove(iconPath)
+
+		projectHandle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
+			FileName:    filename,
+			ProjectName: projectName,
+		})
+		require.NoError(t, err)
+		defer closeProject(t, filename, projectHandle)
+
+		characterHandle, err := svc.CreateCharacter(context.Background(), &pb_project.CreateCharacterReq{
+			Project: projectHandle,
+			Details: &pb_project_character.BasicCharacterDetails{
+				Name:        characterName,
+				Description: characterDescription,
+			},
+		})
+		require.NoError(t, err)
+		require.NotEmpty(t, characterHandle.Id)
+
+		resp, err := svc.DeleteCharacter(context.Background(), &pb_project.DeleteCharacterReq{
+			Project: projectHandle,
+			Handle:  characterHandle,
+		})
+
+		require.NotNil(t, resp)
+		require.NoError(t, err)
+
+		_, err = svc.GetCharacter(context.Background(), &pb_project.GetCharacterReq{
+			Character: characterHandle,
+			Project:   projectHandle,
+		})
+		require.Error(t, err)
+	})
+
+	t.Run("Test parse nil projectId", func(t *testing.T) {
+		_, err := svc.GetCharacter(context.Background(), &pb_project.GetCharacterReq{
+			Character: &pb_project_character.CharacterHandle{
+				Id: uuid.New().String(),
+			},
+			Project: nil,
+		})
+		require.Error(t, err)
+	})
+
+	t.Run("Test parse nil characterId", func(t *testing.T) {
+		_, err := svc.GetCharacter(context.Background(), &pb_project.GetCharacterReq{
+			Character: &pb_project_character.CharacterHandle{
+				Id: uuid.New().String(),
+			},
+			Project: &pb_project.ProjectHandle{
+				Id: uuid.New().String(),
+			},
+		})
+		require.Error(t, err)
+	})
 }

@@ -223,6 +223,10 @@ func (p *ProjectSvc) RecentProjects(ctx context.Context, in *pb_common.Empty) (*
 }
 
 func (p *ProjectSvc) getProject(handle *pb_project.ProjectHandle) (*project.Project, error) {
+	if handle == nil {
+		return nil, errors.New("Nil handle ID")
+	}
+
 	id, err := uuid.Parse(handle.Id)
 	if err != nil {
 		return nil, errors.Join(errors.New("Invalid project ID"), err)

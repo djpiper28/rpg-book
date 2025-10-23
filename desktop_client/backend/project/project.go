@@ -160,6 +160,15 @@ func (p *Project) UpdateCharacter(character *model.Character, setIcon bool) erro
 	return nil
 }
 
+func (p *Project) DeleteCharacter(id uuid.UUID) error {
+	_, err := p.db.Db.Exec("DELETE FROM characters WHERE id=?;", id)
+	if err != nil {
+		return errors.Join(errors.New("Cannot delete character"), err)
+	}
+
+	return nil
+}
+
 func (p *Project) Close() {
 	defer p.db.Close()
 }

@@ -153,3 +153,19 @@ func TestUpdateCharacterNoIconChange(t *testing.T) {
 	character.Icon = icon
 	require.Equal(t, *character, *readCharacter)
 }
+
+func TestDeleteCharacter(t *testing.T) {
+	project, remove := testutils.NewProject(t)
+	defer remove()
+
+	name := uuid.New().String()
+	desc := uuid.New().String()
+	character, err := project.CreateCharacter(name, desc, nil)
+	require.NoError(t, err)
+
+	err = project.DeleteCharacter(character.Id)
+	require.NoError(t, err)
+
+	_, err = project.GetCharacter(character.Id)
+	require.Error(t, err)
+}
