@@ -71,7 +71,7 @@ func RandPort() int {
 	return 9000 + mathrand.IntN(1000)
 }
 
-const primaryDb = "rpg-book-primary" + database.DbExtension
+const primaryDb = "rpg-book-primary.sqlite"
 
 func New(port int) (*Server, error) {
 	key, err := rsa.GenerateKey(rand.Reader, 4096)
