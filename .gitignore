@@ -1,4 +1,6 @@
 *.pb.go
 *.sqlite
 *.sqlite-journal
+*.rpg
+*.rpg-journal
 *.log
