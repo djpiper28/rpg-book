@@ -88,7 +88,7 @@ export function Component(): ReactNode {
                 filters: [
                   {
                     extensions: [DbExtension.replace(".", "")],
-                    name: "Project (*.sqlite)",
+                    name: "Project (*.rpg)",
                   },
                 ],
                 properties: ["openFile", "multiSelections"],

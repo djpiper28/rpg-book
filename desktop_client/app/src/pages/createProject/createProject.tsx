@@ -71,7 +71,7 @@ export function Component(): ReactNode {
         filters={[
           {
             extensions: [DbExtension],
-            name: "Project (*.sqlite)",
+            name: "Project (*.rpg)",
           },
         ]}
         label="Save Location"
