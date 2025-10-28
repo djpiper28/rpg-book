@@ -4,7 +4,10 @@ import {
   type OpenProjectResp,
   type ProjectHandle,
 } from "@/lib/grpcClient/pb/project";
-import { type BasicCharacterDetails } from "@/lib/grpcClient/pb/project_character";
+import {
+  type BasicCharacterDetails,
+  type CharacterHandle,
+} from "@/lib/grpcClient/pb/project_character";
 
 export interface Project {
   handle: ProjectHandle;
@@ -16,6 +19,7 @@ interface ProjectStore {
     handle: ProjectHandle,
     character: BasicCharacterDetails,
   ) => void;
+  deleteCharacter: (handle: ProjectHandle, character: CharacterHandle) => void;
   getProject: (handle: ProjectHandle) => Project | undefined;
   newProject: (handle: ProjectHandle, project: OpenProjectResp) => void;
   projects: Record<string, Project | undefined>;
@@ -49,6 +53,23 @@ export const useProjectStore = create<ProjectStore>()(
         } else {
           project.characters.push(character);
         }
+
+        set(projects);
+      },
+      deleteCharacter: (
+        handle: ProjectHandle,
+        character: CharacterHandle,
+      ): void => {
+        const projects = get();
+        const project = projects.projects[asId(handle)]?.project;
+
+        if (!project) {
+          return;
+        }
+
+        project.characters = project.characters.filter(
+          (x) => x.handle?.id !== character.id,
+        );
 
         set(projects);
       },

@@ -1,18 +1,23 @@
 import { Button, Input, Table } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
 import { Modal } from "@/components/modal/modal";
 import MarkdownRenderer from "@/components/renderers/markdown";
 import { H2 } from "@/components/typography/H2";
 import { P } from "@/components/typography/P";
 import { getLogger, getProjectClient } from "@/lib/grpcClient/client";
-import { type BasicCharacterDetails } from "@/lib/grpcClient/pb/project_character";
+import {
+  CharacterHandle,
+  type BasicCharacterDetails,
+} from "@/lib/grpcClient/pb/project_character";
 import { uint8ArrayToBase64 } from "@/lib/utils/base64";
 import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
 import CreateCharacterModal from "./createCharacterModal";
 import EditCharacterModal from "./editCharacterModal";
+import { ConfirmModal } from "@/components/modal/confirmModal";
+import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 
 export function CharacterTab(): ReactNode {
   const [selectedCharacterId, setSelectedCharacterId] = useState("");
@@ -27,8 +32,12 @@ export function CharacterTab(): ReactNode {
   const [editOpened, { close: editClose, open: editOpen }] =
     useDisclosure(false);
 
+  const [deleteOpened, { close: deleteClose, open: deleteOpen }] =
+    useDisclosure(false);
+
   const projectHandle = useTabStore((x) => x.selectedTab);
   const projectStore = useProjectStore((x) => x);
+  const errorStore = useGlobalErrorStore((x) => x);
   const [iconB64, setIconB64] = useState("");
 
   useEffect(() => {
@@ -90,6 +99,37 @@ export function CharacterTab(): ReactNode {
         )}
       </Modal>
 
+      <ConfirmModal
+        close={deleteClose}
+        onConfirm={() => {
+          if (!selectedCharcter?.handle) {
+            deleteClose();
+            return;
+          }
+
+          const characterHandle = selectedCharcter.handle;
+
+          getProjectClient()
+            .deleteCharacter({
+              handle: characterHandle,
+              project: thisProject.handle,
+            })
+            .then(() => {
+              projectStore.deleteCharacter(projectHandle, characterHandle);
+
+              setSelectedCharacter(undefined);
+            })
+            .catch((error: unknown) => {
+              errorStore.setError({
+                body: JSON.stringify(error),
+                title: "Cannot delete character",
+              });
+            });
+        }}
+        opened={deleteOpened}
+        title={`Delete Character "${selectedCharcter?.name ?? "no name"}"`}
+      />
+
       <div className="flex flex-row gap-2 pt-2 justify-between">
         <div className="flex flex-col gap-2 flex-1">
           <div className="flex flex-row gap-2 justify-between">
@@ -133,23 +173,36 @@ export function CharacterTab(): ReactNode {
           </Table>
         </div>
 
-        <div className="flex-1 gap-3 overflow-y-auto">
+        <div className="flex-1 gap-3 overflow-y-auto flex flex-col">
           {selectedCharcter && (
             <>
               <div className="flex flex-col gap-3">
                 <div className="flex flex-row gap-3 items-center justify-between">
                   <H2>{selectedCharcter.name}</H2>
-                  <button
-                    className="cursor-pointer h-fit"
-                    onClick={() => {
-                      editOpen();
-                    }}
-                  >
-                    <P className="flex flex-row gap-1">
-                      <Pencil />
-                      Edit
-                    </P>
-                  </button>
+                  <div className="flex flex-row gap-3 self-start">
+                    <button
+                      className="cursor-pointer h-fit"
+                      onClick={() => {
+                        editOpen();
+                      }}
+                    >
+                      <P className="flex flex-row gap-1">
+                        <Pencil />
+                        Edit
+                      </P>
+                    </button>
+                    <button
+                      className="cursor-pointer h-fit"
+                      onClick={() => {
+                        deleteOpen();
+                      }}
+                    >
+                      <P className="flex flex-row gap-1 text-red-500 font-bold">
+                        <Trash />
+                        Delete
+                      </P>
+                    </button>
+                  </div>
                 </div>
                 {iconB64 && (
                   <img
