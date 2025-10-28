@@ -1,7 +1,7 @@
 import { Button, Input, Table } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { Pencil, Trash } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
+import { EditDelete } from "@/components/buttons/editDelete";
 import { ConfirmModal } from "@/components/modal/confirmModal";
 import { Modal } from "@/components/modal/modal";
 import MarkdownRenderer from "@/components/renderers/markdown";
@@ -176,30 +176,14 @@ export function CharacterTab(): ReactNode {
               <div className="flex flex-col gap-3">
                 <div className="flex flex-row gap-3 items-center justify-between">
                   <H2>{selectedCharcter.name}</H2>
-                  <div className="flex flex-row gap-3 self-start">
-                    <button
-                      className="cursor-pointer h-fit"
-                      onClick={() => {
-                        editOpen();
-                      }}
-                    >
-                      <P className="flex flex-row gap-1">
-                        <Pencil />
-                        Edit
-                      </P>
-                    </button>
-                    <button
-                      className="cursor-pointer h-fit"
-                      onClick={() => {
-                        deleteOpen();
-                      }}
-                    >
-                      <P className="flex flex-row gap-1 text-red-500 font-bold">
-                        <Trash />
-                        Delete
-                      </P>
-                    </button>
-                  </div>
+                  <EditDelete
+                    delete={() => {
+                      deleteOpen();
+                    }}
+                    edit={() => {
+                      editOpen();
+                    }}
+                  />
                 </div>
                 {iconB64 && (
                   <img
