@@ -2,22 +2,19 @@ import { Button, Input, Table } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Pencil, Trash } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
+import { ConfirmModal } from "@/components/modal/confirmModal";
 import { Modal } from "@/components/modal/modal";
 import MarkdownRenderer from "@/components/renderers/markdown";
 import { H2 } from "@/components/typography/H2";
 import { P } from "@/components/typography/P";
 import { getLogger, getProjectClient } from "@/lib/grpcClient/client";
-import {
-  CharacterHandle,
-  type BasicCharacterDetails,
-} from "@/lib/grpcClient/pb/project_character";
+import { type BasicCharacterDetails } from "@/lib/grpcClient/pb/project_character";
 import { uint8ArrayToBase64 } from "@/lib/utils/base64";
+import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
 import CreateCharacterModal from "./createCharacterModal";
 import EditCharacterModal from "./editCharacterModal";
-import { ConfirmModal } from "@/components/modal/confirmModal";
-import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 
 export function CharacterTab(): ReactNode {
   const [selectedCharacterId, setSelectedCharacterId] = useState("");
