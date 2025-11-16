@@ -3,15 +3,15 @@ package parser
 type parser Peg {
 }
 
-Grammer <- Spacing? Query Spacing? EndOfFile
-Query <- (InnerQuery Spacing BinaryOperator Spacing Query) /
-         ( '(' InnerQuery Spacing Query ')' ) /
-         (InnerQuery Spacing Query) /
-         InnerQuery
+Grammar <- Spacing? Query Spacing? EndOfFile
+Query <- (Term Spacing BinaryOperator Spacing Query) /
+         ( '(' Term Spacing Query ')' ) /
+         (Term Spacing Query) /
+         Term 
 
-InnerQuery <- TextQuery /
-              SetGenerator /
-              '-' SetGenerator
+Term <- TextQuery /
+        SetGenerator /
+        '-' SetGenerator
 
 # Set generators
 TextQuery <- Text /
