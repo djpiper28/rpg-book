@@ -35,6 +35,6 @@ GeneratorBinaryOperator <- ':' /
 # Tokens
 Spacing <- (' ' / '\t' / '\r\n' / '\n')+
 QuotedText <- '"' ([^"] / '\\"')+ '"'
-Text <- ([[a-z0-9._]] / '-')+
+Text <- ([a-zA-Z0-9._] / '-')+
 
 EndOfFile <- !.
