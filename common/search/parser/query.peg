@@ -4,19 +4,33 @@ type parser Peg {
 }
 
 Grammer <- Spacing? Query Spacing? EndOfFile
-Query <- (InnerQuery Spacing BinaryOperator Spacing Query) / 
-         (InnerQuery Spacing Query) / 
+Query <- (InnerQuery Spacing BinaryOperator Spacing Query) /
+         ( '(' InnerQuery Spacing Query ')' ) /
+         (InnerQuery Spacing Query) /
          InnerQuery
-InnerQuery <- TextQuery 
+
+InnerQuery <- TextQuery /
+              SetGenerator /
+              '-' SetGenerator
 
 # Set generators
 TextQuery <- Text /
              QuotedText
 
+SetGenerator <- TextQuery GeneratorBinaryOperator TextQuery
+
 # Binary Operators
 BinaryOperator <- 'or' /
                   'and' /
                   'xor'
+
+GeneratorBinaryOperator <- ':' /
+                           '<' /
+                           '<=' /
+                           '>' /
+                           '>=' /
+                           '=' /
+                           '~'
 
 # Tokens
 Spacing <- (' ' / '\t' / '\r\n' / '\n')+

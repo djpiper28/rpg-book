@@ -38,3 +38,28 @@ func TestXorOperator(t *testing.T) {
 	_, err := parser.ParseExpr("John xor Smith")
 	require.NoError(t, err)
 }
+
+func TestBrackets(t *testing.T) {
+	_, err := parser.ParseExpr("(red and green)")
+	require.NoError(t, err)
+}
+
+func TestNestedBrackets(t *testing.T) {
+	_, err := parser.ParseExpr("((red and green) or blue)")
+	require.NoError(t, err)
+}
+
+func TestSetGenerator(t *testing.T) {
+  _, err := parser.ParseExpr("a:b")
+	require.NoError(t, err)
+}
+
+func TestNegatedSetGenerator(t *testing.T) {
+  _, err := parser.ParseExpr("-a:b")
+	require.NoError(t, err)
+}
+
+func TestBigQuery(t *testing.T) {
+  _, err := parser.ParseExpr("red and (green and blue) or test:yes xor (uwu or uwu:owo)")
+	require.NoError(t, err)
+}
