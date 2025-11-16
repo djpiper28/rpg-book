@@ -3,21 +3,24 @@ package parser
 type parser Peg {
 }
 
-Grammer <- Spacing* Query Spacing* EndOfFile
-Query <- (Query Spacing+ BinaryOperator Spacing+ Query) / 
-         (Query Spacing+ Query) / 
-         BasicQuery
+Grammer <- Spacing? Query Spacing? EndOfFile
+Query <- (InnerQuery Spacing BinaryOperator Spacing Query) / 
+         (InnerQuery Spacing Query) / 
+         InnerQuery
+InnerQuery <- TextQuery 
 
-BasicQuery <- Text 
+# Set generators
+TextQuery <- Text /
+             QuotedText
 
 # Binary Operators
-BinaryOperator <- Or / And / Xor
-Or <- 'or'
-And <- 'and'
-Xor <- 'xor'
+BinaryOperator <- 'or' /
+                  'and' /
+                  'xor'
 
 # Tokens
-Spacing <- [ \r\n\t]+
-Text <- ([[a-z0-9_]] / '-')+
+Spacing <- (' ' / '\t' / '\r\n' / '\n')+
+QuotedText <- '"' ([^"] / '\\"')+ '"'
+Text <- ([[a-z0-9._]] / '-')+
 
 EndOfFile <- !.
