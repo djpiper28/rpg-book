@@ -5,13 +5,13 @@ type parser Peg {
 
 Grammar <- Spacing? Query Spacing? EndOfFile
 Query <- (Term Spacing BinaryOperator Spacing Query) /
-         ( '(' Spacing? Query Spacing? ')' ) /
          (Term Spacing Query) /
          Term 
 
-Term <- TextQuery /
-        SetGenerator /
-        '-' SetGenerator
+Term <- SetGenerator /
+        '-' SetGenerator /
+        TextQuery /
+        ( '(' Spacing? Query Spacing? ')' )
 
 # Set generators
 TextQuery <- Text /
