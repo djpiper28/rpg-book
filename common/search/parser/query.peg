@@ -5,7 +5,7 @@ type parser Peg {
 
 Grammar <- Spacing? Query Spacing? EndOfFile
 Query <- (Term Spacing BinaryOperator Spacing Query) /
-         ( '(' Term Spacing Query ')' ) /
+         ( '(' Spacing? Query Spacing? ')' ) /
          (Term Spacing Query) /
          Term 
 
