@@ -4,60 +4,64 @@ package parser_test
 
 import (
 	"fmt"
-	"go/parser"
 	"testing"
 
+	"github.com/djpiper28/rpg-book/common/search/parser"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
+func parse(input string) error {
+	return parser.Parse(input)
+}
+
 func TestBasicQuery(t *testing.T) {
-	_, err := parser.ParseExpr("John123")
+	err := parse("John123")
 	require.NoError(t, err)
 }
 
 func TestWhitespaceWrappedQuery(t *testing.T) {
-	_, err := parser.ParseExpr("    John123  \t\n")
+	err := parse("    John123  \t\n")
 	require.NoError(t, err)
 }
 
 func TestQueryThenQuery(t *testing.T) {
-	_, err := parser.ParseExpr("John Smith")
+	err := parse("John Smith")
 	require.NoError(t, err)
 }
 
 func TestAndOperator(t *testing.T) {
-	_, err := parser.ParseExpr("John and Smith")
+	err := parse("John and Smith")
 	require.NoError(t, err)
 }
 
 func TestOrOperator(t *testing.T) {
-	_, err := parser.ParseExpr("John or Smith")
+	err := parse("John or Smith")
 	require.NoError(t, err)
 }
 
 func TestXorOperator(t *testing.T) {
-	_, err := parser.ParseExpr("John xor Smith")
+	err := parse("John xor Smith")
 	require.NoError(t, err)
 }
 
 func TestBrackets(t *testing.T) {
-	_, err := parser.ParseExpr("(red and green)")
+	err := parse("(red and green)")
 	require.NoError(t, err)
 }
 
 func TestNestedBrackets(t *testing.T) {
-	_, err := parser.ParseExpr("((red and green) or blue)")
+	err := parse("((red and green) or blue)")
 	require.NoError(t, err)
 }
 
 func TestSetGenerator(t *testing.T) {
-	_, err := parser.ParseExpr("a:b")
+	err := parse("a:b")
 	require.NoError(t, err)
 }
 
 func TestSetGeneratorQuotedParts(t *testing.T) {
-  _, err := parser.ParseExpr(`"test":"123"`)
+	err := parse(`"test":"123"`)
 	require.NoError(t, err)
 }
 
@@ -67,17 +71,17 @@ func TestSetGenerators(t *testing.T) {
 	}
 
 	for _, operator := range operators {
-		_, err := parser.ParseExpr(fmt.Sprintf("a%sb", operator))
+		err := parse(fmt.Sprintf("a%sb", operator))
 		assert.NoError(t, err)
 	}
 }
 
 func TestNegatedSetGenerator(t *testing.T) {
-	_, err := parser.ParseExpr("-a:b")
+	err := parse("-a:b")
 	require.NoError(t, err)
 }
 
 func TestBigQuery(t *testing.T) {
-	_, err := parser.ParseExpr("red and (green and blue) or test:yes xor (uwu or uwu:owo)")
+	err := parse("red and (green and blue) or test:yes xor (uwu or uwu:owo)")
 	require.NoError(t, err)
 }
