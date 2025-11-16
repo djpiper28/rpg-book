@@ -3,9 +3,11 @@ package parser_test
 // This test only makes sure that things can be parsed. The output is not checked!
 
 import (
+	"fmt"
 	"go/parser"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -50,16 +52,32 @@ func TestNestedBrackets(t *testing.T) {
 }
 
 func TestSetGenerator(t *testing.T) {
-  _, err := parser.ParseExpr("a:b")
+	_, err := parser.ParseExpr("a:b")
 	require.NoError(t, err)
 }
 
+func TestSetGeneratorQuotedParts(t *testing.T) {
+  _, err := parser.ParseExpr(`"test":"123"`)
+	require.NoError(t, err)
+}
+
+func TestSetGenerators(t *testing.T) {
+	operators := []string{
+		"<", "<=", ">", ">=", "~", "=", ":",
+	}
+
+	for _, operator := range operators {
+		_, err := parser.ParseExpr(fmt.Sprintf("a%sb", operator))
+		assert.NoError(t, err)
+	}
+}
+
 func TestNegatedSetGenerator(t *testing.T) {
-  _, err := parser.ParseExpr("-a:b")
+	_, err := parser.ParseExpr("-a:b")
 	require.NoError(t, err)
 }
 
 func TestBigQuery(t *testing.T) {
-  _, err := parser.ParseExpr("red and (green and blue) or test:yes xor (uwu or uwu:owo)")
+	_, err := parser.ParseExpr("red and (green and blue) or test:yes xor (uwu or uwu:owo)")
 	require.NoError(t, err)
 }
