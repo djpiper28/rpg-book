@@ -3,11 +3,10 @@ package parser
 type parser Peg {
 }
 
-Grammer <- Query EndOfFile
-Query <- Spacing* InnerQuery Spacing*
-InnerQuery <- BasicQuery / 
-              (Query Spacing BinaryOperator Spacing Query) / 
-              (Query Spacing Query)
+Grammer <- Spacing* Query Spacing* EndOfFile
+Query <- (Query Spacing+ BinaryOperator Spacing+ Query) / 
+         (Query Spacing+ Query) / 
+         BasicQuery
 
 BasicQuery <- Text 
 
@@ -18,8 +17,7 @@ And <- 'and'
 Xor <- 'xor'
 
 # Tokens
-Spacing <- Space+
-Space <- (' ' / '\t' / '\r\n' / '\n')
+Spacing <- [ \r\n\t]+
 Text <- ([[a-z0-9_]] / '-')+
 
 EndOfFile <- !.
