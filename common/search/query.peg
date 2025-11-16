@@ -1,0 +1,21 @@
+package search
+
+import (
+  "github.com/pointlander/peg/tree"
+)
+
+type Peg Peg {
+ *tree.Tree
+}
+
+Grammer <- Expression END
+Expression <- WhiteSpace? BasicQuery WhiteSpace?
+BasicQuery <- Text
+
+# Tokens
+Text <- [a-zA-Z0-9_-]+
+
+Space	<- ' ' / '\t' / '\r' / '\n'
+WhiteSpace <- Space+
+
+END <- !.

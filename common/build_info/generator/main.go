@@ -50,18 +50,25 @@ func gitStatus() string {
 	return strings.ReplaceAll(readOutput(cmd), "\n", "\\n")
 }
 
+func pegVersion() string {
+	cmd := exec.Command("go", "tool", "peg", "-version")
+	return strings.ReplaceAll(readOutput(cmd), "\n", "\\n")
+}
+
 func generate(packageName string) string {
 	code := fmt.Sprintf(`const (
   GoVersion="%s"
   GitBranch="%s"
   GitCommit="%s"
   GitStatus="%s"
-  Version="Go: "+GoVersion+"; Git: "+GitBranch+"@"+GitCommit+"; Status:\n"+GitStatus
+  PegVersion="%s"
+  Version="Go: "+GoVersion+"; Git: "+GitBranch+"@"+GitCommit+"; Status:\n"+GitStatus+"\nPeg Version:"+PegVersion
 )`,
 		goVersion(),
 		gitBranch(),
 		gitCommit(),
-		gitStatus())
+		gitStatus(),
+		pegVersion())
 
 	return fmt.Sprintf(`package %s
 
