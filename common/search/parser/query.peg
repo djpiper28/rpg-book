@@ -3,5 +3,6 @@ package parser
 type Parser Peg {
 }
 
-Grammar <- 'a' EndOfFile
+Grammar <- Spacing 'a' EndOfFile
+Spacing <- (' ' / '\t' / '\r' / '\n')*
 EndOfFile <- !.
