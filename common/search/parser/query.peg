@@ -1,21 +1,7 @@
-package parser 
+package parser
 
-import (
-  "github.com/pointlander/peg/tree"
-)
-
-type Peg Peg {
- *tree.Tree
+type Parser Peg {
 }
 
-Grammer <- Expression END
-Expression <- WhiteSpace? BasicQuery WhiteSpace?
-BasicQuery <- Text
-
-# Tokens
-Text <- [a-zA-Z0-9_-]+
-
-Space	<- ' ' / '\t' / '\r' / '\n'
-WhiteSpace <- Space+
-
-END <- !.
+Grammar <- 'a' EndOfFile
+EndOfFile <- !.
