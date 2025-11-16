@@ -1,4 +1,4 @@
-package search
+package parser 
 
 import (
   "github.com/pointlander/peg/tree"

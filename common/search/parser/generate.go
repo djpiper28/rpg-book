@@ -1,4 +1,4 @@
-package search
+package parser 
 
 //go:generate echo Generating query language parser...
 
