@@ -46,7 +46,11 @@ type Node struct {
 func Parse(s string) error {
 	p := &parser{
 		Buffer: strings.ToLower(s),
+		root:   &Node{},
+		stack:  make([]*Node, 0),
 	}
+	p.current = p.root
+	p.stack = append(p.stack, p.current)
 
 	p.Init()
 

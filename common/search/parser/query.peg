@@ -1,6 +1,8 @@
 package parser
 
 type parser Peg {
+  root, current *Node
+  stack         []*Node
 }
 
 Grammar <- Spacing? Query Spacing? EndOfFile
