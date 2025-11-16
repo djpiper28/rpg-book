@@ -25,10 +25,10 @@ BinaryOperator <- 'or' /
                   'xor'
 
 GeneratorBinaryOperator <- ':' /
-                           '<' /
                            '<=' /
-                           '>' /
+                           '<' /
                            '>=' /
+                           '>' /
                            '=' /
                            '~'
 
