@@ -29,6 +29,10 @@ type SetGenerator struct {
 	Key, Value string
 }
 
+type TextQuery struct {
+	Value string
+}
+
 type NodeType int
 
 const (
