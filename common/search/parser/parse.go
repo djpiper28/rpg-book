@@ -75,13 +75,7 @@ func Parse(s string) (*Node, error) {
 	}
 
 	p.Execute()
-	defer func() {
-		if reason := recover(); reason != nil {
-			log.Debug("Parser had an action error, recovered")
-			err = fmt.Errorf("%v", reason)
-		}
-	}()
-
+	err = p.Err
 	if err != nil {
 		log.Error("Failed to parse input (action failed)", loggertags.TagError, err, "input", s, "tree", p.SprintSyntaxTree())
 		return nil, err

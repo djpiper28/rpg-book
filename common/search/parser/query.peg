@@ -7,6 +7,7 @@ import (
 type parser Peg {
   root, current *Node
   stack         []*Node
+  Err           error
 }
 
 Grammar <- Spacing? Query Spacing? EndOfFile
@@ -23,7 +24,8 @@ Term <- '-' SetGenerator {p.current.SetGenerator.Negated = true} /
 TextQuery <- QuotedText {
                output, err := UnescapeText(text)
                if err != nil {
-                 panic(errors.Join(fmt.Errorf("Cannot parse quoted string '%s'", text)))
+                 p.Err = errors.Join(fmt.Errorf("Cannot parse quoted string '%s'", text))
+                 return
                }
 
                p.current.TextQuery.Value = output
@@ -47,7 +49,7 @@ GeneratorBinaryOperator <- ':' {p.current.SetGenerator.GeneratorOperator = Gener
 
 # Tokens
 Spacing <- (' ' / '\t' / '\r\n' / '\n')+
-QuotedText <- '"' ([^"\n\r\t] / '\\"')* '"'
-Text <- [^"<>:~=() \n\r\t]+
+QuotedText <- '"' < ([^"\n\r\t] / '\\"')* > '"'
+Text <- < [^"<>:~=() \n\r\t]+ >
 
 EndOfFile <- !.
