@@ -1,30 +1,41 @@
 package parser
 
+import (
+  "errors"
+)
+
 type parser Peg {
   root, current *Node
   stack         []*Node
 }
 
 Grammar <- Spacing? Query Spacing? EndOfFile
-Query <- (Term Spacing BinaryOperator Spacing Query) /
+Query <- (Term Spacing BinaryOperator {p.current.Type = NodeType_BinaryOperator // TODO: handle this} Spacing Query) /
          (Term Spacing Query) /
          Term 
 
-Term <- SetGenerator /
-        '-' SetGenerator /
-        TextQuery /
-        ( '(' Spacing? Query Spacing? ')' )
+Term <- '-' SetGenerator {p.current.SetGenerator.Negated = true} /
+        SetGenerator /
+        TextQuery {p.current.Type = NodeType_Basic} /
+        ( '(' Spacing? Query Spacing? ')' ) {p.current.Type = NodeType_Brackets // TODO: handle this}
 
 # Set generators
-TextQuery <- Text /
-             QuotedText
+TextQuery <- QuotedText {
+               output, err := UnescapeText(text)
+               if err != nil {
+                 panic(errors.Join(fmt.Errorf("Cannot parse quoted string '%s'", text)))
+               }
 
-SetGenerator <- TextQuery GeneratorBinaryOperator TextQuery
+               p.current.TextQuery.Value = output
+             } /
+             Text {p.current.TextQuery.Value = text}
+
+SetGenerator <- TextQuery GeneratorBinaryOperator TextQuery {p.current.Type = NodeType_SetGenerator}
 
 # Binary Operators
 BinaryOperator <- 'or' {p.current.BinaryOperator = BinaryOperator_Or} /
                   'and' {p.current.BinaryOperator = BinaryOperator_And} /
-                  'xor'{p.current.BinaryOperator = BinaryOperator_Xor}
+                  'xor' {p.current.BinaryOperator = BinaryOperator_Xor}
 
 GeneratorBinaryOperator <- ':' {p.current.SetGenerator.GeneratorOperator = GeneratorOperator_Includes} /
                            '<=' {p.current.SetGenerator.GeneratorOperator = GeneratorOperator_LessThanEquals} /
@@ -36,7 +47,7 @@ GeneratorBinaryOperator <- ':' {p.current.SetGenerator.GeneratorOperator = Gener
 
 # Tokens
 Spacing <- (' ' / '\t' / '\r\n' / '\n')+
-QuotedText <- '"' ([^"] / '\\"')+ '"'
-Text <- ([a-zA-Z0-9._] / '-')+
+QuotedText <- '"' ([^"\n\r\t] / '\\"')* '"'
+Text <- [^"<>:~=() \n\r\t]+
 
 EndOfFile <- !.

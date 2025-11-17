@@ -4,6 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/charmbracelet/log"
+	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
 )
 
 type BinaryOperator int
@@ -42,7 +45,7 @@ type NodeType int
 const (
 	NodeType_SetGenerator NodeType = iota + 1
 	NodeType_Basic
-	NodeType_Bracket
+	NodeType_Brackets
 	NodeType_BinaryOperator
 )
 
@@ -54,7 +57,7 @@ type Node struct {
 	BinaryOperator BinaryOperator
 }
 
-func Parse(s string) error {
+func Parse(s string) (*Node, error) {
 	p := &parser{
 		Buffer: strings.ToLower(s),
 		root:   &Node{},
@@ -65,13 +68,25 @@ func Parse(s string) error {
 
 	p.Init()
 
-	if err := p.Parse(); err != nil {
-		return err
+	err := p.Parse()
+	if err != nil {
+		log.Error("Failed to parse input", loggertags.TagError, err, "input", s, "tree", p.SprintSyntaxTree())
+		return nil, err
 	}
 
-	p.Parse()
-	// p.PrintSyntaxTree()
-	return nil
+	p.Execute()
+	defer func() {
+		if reason := recover(); reason != nil {
+			log.Debug("Parser had an action error, recovered")
+			err = fmt.Errorf("%v", reason)
+		}
+	}()
+
+	if err != nil {
+		log.Error("Failed to parse input (action failed)", loggertags.TagError, err, "input", s, "tree", p.SprintSyntaxTree())
+		return nil, err
+	}
+	return p.root, nil
 }
 
 func UnescapeText(text string) (string, error) {

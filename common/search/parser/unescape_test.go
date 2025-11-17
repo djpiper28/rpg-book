@@ -14,6 +14,11 @@ func TestUnescapeBaseCase(t *testing.T) {
 	require.Equal(t, baseCaseText, output)
 }
 
+func TestUnescapeUnknownChar(t *testing.T) {
+	_, err := parser.UnescapeText("\\d")
+	require.Error(t, err)
+}
+
 func TestUnescape1(t *testing.T) {
 	output, err := parser.UnescapeText(`this is a \"test\" of the \'system\'`)
 	require.NoError(t, err)
