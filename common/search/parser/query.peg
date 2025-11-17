@@ -1,0 +1,42 @@
+package parser
+
+type parser Peg {
+  root, current *Node
+  stack         []*Node
+}
+
+Grammar <- Spacing? Query Spacing? EndOfFile
+Query <- (Term Spacing BinaryOperator Spacing Query) /
+         (Term Spacing Query) /
+         Term 
+
+Term <- SetGenerator /
+        '-' SetGenerator /
+        TextQuery /
+        ( '(' Spacing? Query Spacing? ')' )
+
+# Set generators
+TextQuery <- Text /
+             QuotedText
+
+SetGenerator <- TextQuery GeneratorBinaryOperator TextQuery
+
+# Binary Operators
+BinaryOperator <- 'or' /
+                  'and' /
+                  'xor'
+
+GeneratorBinaryOperator <- ':' /
+                           '<=' /
+                           '<' /
+                           '>=' /
+                           '>' /
+                           '=' /
+                           '~'
+
+# Tokens
+Spacing <- (' ' / '\t' / '\r\n' / '\n')+
+QuotedText <- '"' ([^"] / '\\"')+ '"'
+Text <- ([a-zA-Z0-9._] / '-')+
+
+EndOfFile <- !.

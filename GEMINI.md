@@ -56,6 +56,8 @@ log.Info("Something has happened", "what", "a man fell into the river in lego ci
 
 # Installing new packages
 
+You should read go.mod, package.json, and shell.nix before you make any choices about what is needed or not needed.
+
 Check for malware!!! There are a lot of malicious packages IN ALL ECO-SYSTEMS at the moment. They use similar names to useful packages i.e: `core-js-patched`. They may crypto mine, delete things, be ransomware, steal cookies, rootkits, etc...
 
-The best way to avoid these attacks is to NOT INSTALL THINGS unless required. And if needed check the pages downloads, the linked Github repo, and use common sense. If it looks sus DO NOT USE IT.
+The best way to avoid these attacks is to NOT INSTALL THINGS unless required. And if needed check the pages downloads, the linked Github repo, and use common sense. If it looks suspicious DO NOT USE IT.
