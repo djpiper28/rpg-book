@@ -24,12 +24,13 @@ const (
 	GeneratorOperator_LessThanEquals                                 // <=
 	GeneratorOperator_GreaterThan                                    // >
 	GeneratorOperator_GreaterThanEquals                              // >=
-	GeneratorOperator_NotEqual                                       // ~
+	GeneratorOperator_NotEquals                                      // ~
 )
 
 type SetGenerator struct {
-	Negated    bool
-	Key, Value string
+	Negated           bool
+	Key, Value        string
+	GeneratorOperator GeneratorOperator
 }
 
 type TextQuery struct {
@@ -48,9 +49,9 @@ const (
 type Node struct {
 	Left, Right    *Node
 	Type           NodeType
-	SetGenerator   *SetGenerator
-	TextQuery      *TextQuery
-	BinaryOperator *BinaryOperator
+	SetGenerator   SetGenerator
+	TextQuery      TextQuery
+	BinaryOperator BinaryOperator
 }
 
 func Parse(s string) error {

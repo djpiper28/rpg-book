@@ -26,11 +26,12 @@ database, and global settings their own database as well.
 
 #### `common/search/`
 
-This uses [Go Peg](https://github.com/pointlander/peg) to generate the parser. 
- - https://github.com/pointlander/peg/blob/main/README.md
- - https://github.com/pointlander/peg/blob/main/peg.peg
- - https://github.com/pointlander/peg/blob/main/docs/peg-file-syntax.md
- - https://github.com/pointlander/peg/blob/main/docs/links.md
+This uses [Go Peg](https://github.com/pointlander/peg) to generate the parser.
+
+- https://github.com/pointlander/peg/blob/main/README.md
+- https://github.com/pointlander/peg/blob/main/peg.peg
+- https://github.com/pointlander/peg/blob/main/docs/peg-file-syntax.md
+- https://github.com/pointlander/peg/blob/main/docs/links.md
 
 ### `desktop_client/` contains Typescript code for the desktop app
 
