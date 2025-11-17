@@ -1,27 +1,30 @@
 package parser
 
 import (
+	"errors"
+	"fmt"
 	"strings"
 )
 
 type BinaryOperator int
 
 const (
-	BinaryOperator_And = iota + 1
+	BinaryOperator_And BinaryOperator = iota + 1
 	BinaryOperator_Or
 	BinaryOperator_Xor
+	Default_BinaryOperator = BinaryOperator_And
 )
 
 type GeneratorOperator int
 
 const (
-	GeneratorOperator_Includes          = iota + 1 // :
-	GeneratorOperator_Equals                       // =
-	GeneratorOperator_LessThan                     // <
-	GeneratorOperator_LessThanEquals               // <=
-	GeneratorOperator_GreaterThan                  // >
-	GeneratorOperator_GreaterThanEquals            // >=
-	GeneratorOperator_NotEqual                     // ~
+	GeneratorOperator_Includes          GeneratorOperator = iota + 1 // :
+	GeneratorOperator_Equals                                         // =
+	GeneratorOperator_LessThan                                       // <
+	GeneratorOperator_LessThanEquals                                 // <=
+	GeneratorOperator_GreaterThan                                    // >
+	GeneratorOperator_GreaterThanEquals                              // >=
+	GeneratorOperator_NotEqual                                       // ~
 )
 
 type SetGenerator struct {
@@ -36,15 +39,18 @@ type TextQuery struct {
 type NodeType int
 
 const (
-	NodeType_SetGenerator = iota + 1
+	NodeType_SetGenerator NodeType = iota + 1
 	NodeType_Basic
 	NodeType_Bracket
 	NodeType_BinaryOperator
 )
 
 type Node struct {
-	Left, Right *Node
-	Type        NodeType
+	Left, Right    *Node
+	Type           NodeType
+	SetGenerator   *SetGenerator
+	TextQuery      *TextQuery
+	BinaryOperator *BinaryOperator
 }
 
 func Parse(s string) error {
@@ -65,4 +71,42 @@ func Parse(s string) error {
 	p.Parse()
 	// p.PrintSyntaxTree()
 	return nil
+}
+
+func UnescapeText(text string) (string, error) {
+	var output string
+	escaping := false
+
+	for _, c := range text {
+		if escaping {
+			escaping = false
+
+			switch c {
+			case '\\':
+				output += "\\"
+			case 'r':
+				output += "\r"
+			case 'n':
+				output += "\n"
+			case 't':
+				output += "\t"
+			case '"':
+				output += `"`
+			case '\'':
+				output += "'"
+			default:
+				return "", fmt.Errorf("'%c' is an invalid escape character", c)
+			}
+		} else if c == '\\' {
+			escaping = true
+		} else {
+			output += string(c)
+		}
+	}
+
+	if escaping {
+		return "", errors.New("Cannot escape next character due to end of input")
+	}
+
+	return output, nil
 }
