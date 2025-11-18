@@ -4,42 +4,20 @@ import (
 	"os"
 	"testing"
 
-	"github.com/djpiper28/rpg-book/common/search/parser"
 	sqlsearch "github.com/djpiper28/rpg-book/common/search/sql_search"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
 
-func parse(t *testing.T, query string) *parser.Node {
-	t.Helper()
-
-	ast, err := parser.Parse(query)
-	require.NoError(t, err)
-	require.NotEmpty(t, ast)
-	return ast
-}
-
-func asSql[T any](t *testing.T, query string, tableData sqlsearch.SqlTableData, columnMap sqlsearch.SqlColmnMap) (string, []any) {
-	t.Helper()
-
-	res, args, err := sqlsearch.AsSql[T](parse(t, query), tableData, columnMap)
-	require.NoError(t, err)
-	require.NotEmpty(t, res)
-	require.NotEmpty(t, args)
-
-	t.Logf("Query: %s", query)
-	t.Logf("SQL: %s", res)
-	t.Logf("Args: %+v", args)
-	return res, args
-}
-
 func TestBasicQueryText(t *testing.T) {
+	t.Parallel()
+
 	type TestTable struct {
 		Name string `db:"name"`
 	}
 
-	querySql, sqlArgs := asSql[TestTable](t, "test", sqlsearch.SqlTableData{
+	querySql, sqlArgs := asSql(t, "test", sqlsearch.SqlTableData{
 		FieldsToScan: []string{"name"},
 		TableName:    "test",
 	},
@@ -78,11 +56,13 @@ name LIKE ?;`, querySql)
 }
 
 func TestSetGenerator(t *testing.T) {
+	t.Parallel()
+
 	type TestTable struct {
 		Name string `db:"name"`
 	}
 
-	querySql, sqlArgs := asSql[TestTable](t, "name:\"123\"", sqlsearch.SqlTableData{
+	querySql, sqlArgs := asSql(t, "name:\"123\"", sqlsearch.SqlTableData{
 		FieldsToScan: []string{"name"},
 		TableName:    "test",
 	},

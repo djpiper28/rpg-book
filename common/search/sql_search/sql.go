@@ -20,12 +20,12 @@ type SqlColmnMap struct {
 	BasicQueryOperation parser.GeneratorOperator // Defaults to includes
 }
 
-type sqlScanner[T any] struct {
+type sqlScanner struct {
 	SqlColmns   SqlColmnMap
 	OrderedArgs []any // SqlX takes any for the args
 }
 
-func AsSql[T any](query *parser.Node, tableData SqlTableData, columnMap SqlColmnMap) (string, []any, error) {
+func AsSql(query *parser.Node, tableData SqlTableData, columnMap SqlColmnMap) (string, []any, error) {
 	// Setup defaults
 	if columnMap.BasicQueryOperation == 0 {
 		columnMap.BasicQueryOperation = parser.GeneratorOperator_Includes
@@ -56,7 +56,7 @@ func AsSql[T any](query *parser.Node, tableData SqlTableData, columnMap SqlColmn
 	}
 
 	// Generate WHERE clause
-	s := sqlScanner[T]{
+	s := sqlScanner{
 		SqlColmns:   columnMap,
 		OrderedArgs: make([]any, 0),
 	}
@@ -83,7 +83,7 @@ func nSpaces(n int) string {
 
 const termSpaces = 1
 
-func (s *sqlScanner[T]) ProcessBinaryOperator(depth int, node *parser.Node) (string, error) {
+func (s *sqlScanner) ProcessBinaryOperator(depth int, node *parser.Node) (string, error) {
 	output := "\n"
 	output += nSpaces(depth)
 	output += "(\n"
@@ -128,7 +128,7 @@ func (s *sqlScanner[T]) ProcessBinaryOperator(depth int, node *parser.Node) (str
 	return output, nil
 }
 
-func (s *sqlScanner[T]) GetQuery(depth int, node *parser.Node) (string, error) {
+func (s *sqlScanner) GetQuery(depth int, node *parser.Node) (string, error) {
 	switch node.Type {
 	case parser.NodeType_Basic:
 		return s.ProcessSqlSetGenerator(s.SqlColmns.BasicQueryColumn, s.SqlColmns.BasicQueryOperation, node.BasicQuery.Value)
@@ -141,7 +141,7 @@ func (s *sqlScanner[T]) GetQuery(depth int, node *parser.Node) (string, error) {
 	}
 }
 
-func (s *sqlScanner[T]) ProcessSqlSetGenerator(key string, operator parser.GeneratorOperator, value string) (string, error) {
+func (s *sqlScanner) ProcessSqlSetGenerator(key string, operator parser.GeneratorOperator, value string) (string, error) {
 	if key == "" {
 		return "", errors.New("Cannot query with empty keys")
 	}
@@ -155,13 +155,13 @@ func (s *sqlScanner[T]) ProcessSqlSetGenerator(key string, operator parser.Gener
 	if ok {
 		switch operator {
 		case parser.GeneratorOperator_GreaterThan:
-			sqlOperator = "<"
-		case parser.GeneratorOperator_GreaterThanEquals:
-			sqlOperator = "<="
-		case parser.GeneratorOperator_LessThan:
 			sqlOperator = ">"
-		case parser.GeneratorOperator_LessThanEquals:
+		case parser.GeneratorOperator_GreaterThanEquals:
 			sqlOperator = ">="
+		case parser.GeneratorOperator_LessThan:
+			sqlOperator = "<"
+		case parser.GeneratorOperator_LessThanEquals:
+			sqlOperator = "<="
 		default:
 			return "", fmt.Errorf("%d is not a supported generator operator", operator)
 		}
