@@ -85,7 +85,7 @@ func Parse(s string) (*Node, error) {
 }
 
 func NormText(text string) string {
-  return normalisation.Normalise(text)
+	return normalisation.Normalise(text)
 }
 
 func UnescapeText(text string) (string, error) {

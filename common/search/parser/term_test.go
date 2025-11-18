@@ -28,8 +28,14 @@ func TestBasicQueryQuotation(t *testing.T) {
 	ast, err := parser.Parse(`"testing 123\ntest"`)
 	require.NoError(t, err)
 	require.Equal(t, parser.NodeType_Basic, ast.Type)
-	require.Equal(t, `testing 123
-test`, ast.BasicQuery.Value)
+	require.Equal(t, "testing 123test", ast.BasicQuery.Value)
+}
+
+func TestBasicQueryQuotationSpecial(t *testing.T) {
+	ast, err := parser.Parse(`"ÒÓÕÖTEsting 123\ntest"`)
+	require.NoError(t, err)
+	require.Equal(t, parser.NodeType_Basic, ast.Type)
+	require.Equal(t, "ooootesting 123test", ast.BasicQuery.Value)
 }
 
 func TestMixedSetGenerator(t *testing.T) {
