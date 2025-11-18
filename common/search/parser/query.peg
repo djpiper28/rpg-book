@@ -19,7 +19,7 @@ Term <- '-' SetGenerator {p.current.SetGenerator.Negated = true} /
         SetGenerator /
         TextQuery {
           p.current.Type = NodeType_Basic
-          p.current.TextQuery.Value = text
+          p.current.BasicQuery.Value = text
         } /
         ( '(' Spacing? Query Spacing? ')' ) {p.current.Type = NodeType_Brackets // TODO: handle this}
 
