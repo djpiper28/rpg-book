@@ -5,46 +5,42 @@ import (
 )
 
 type parser Peg {
-  root, current *Node
-  stack         []*Node
-  Err           error
+  tempNode *Node
+  stack    []*Node
+  Err      error
 }
 
 Grammar <- Spacing? Query Spacing? EndOfFile
-Query <- (Term Spacing BinaryOperator {p.current.Type = NodeType_BinaryOperator // TODO: handle this} Spacing Query) /
-         (Term Spacing Query) /
+Query <- (Term Spacing BinaryOperator {p.insertOperatorNode()} Spacing Query {p.push(p.finaliseStack())}) /
+         (Term Spacing {p.tempNode.BinaryOperator = BinaryOperator_And; p.insertOperatorNode()} Query {p.push(p.finaliseStack())}) /
          Term 
 
-Term <- '-' SetGenerator {p.current.SetGenerator.Negated = true} /
-        SetGenerator /
-        TextQuery {
-          p.current.Type = NodeType_Basic
-          p.current.BasicQuery.Value = text
-        } /
-        ( '(' Spacing? Query Spacing? ')' ) {p.current.Type = NodeType_Brackets // TODO: handle this}
+Term <- (
+          '-' SetGenerator {p.tempNode.Type = NodeType_SetGenerator; p.tempNode.SetGenerator.Negated = true} /
+          SetGenerator {p.tempNode.Type = NodeType_SetGenerator} /
+          TextQuery {p.tempNode.Type = NodeType_Basic; p.tempNode.BasicQuery.Value = text}
+        ) {p.push(p.tempNode)} /
+        ( '(' Spacing? Query Spacing? ')' ) {p.push(p.finaliseStack())}
 
 # Set generators
 TextQuery <- QuotedText /
              Text
 
-SetGenerator <- TextQuery {p.current.SetGenerator.Key = text} 
-                GeneratorBinaryOperator TextQuery {
-                  p.current.Type = NodeType_SetGenerator
-                  p.current.SetGenerator.Value = text
-                }
+SetGenerator <- TextQuery {p.tempNode.SetGenerator.Key = text}
+                GeneratorBinaryOperator TextQuery {p.tempNode.SetGenerator.Value = text}
 
 # Binary Operators
-BinaryOperator <- 'or' {p.current.BinaryOperator = BinaryOperator_Or} /
-                  'and' {p.current.BinaryOperator = BinaryOperator_And} /
-                  'xor' {p.current.BinaryOperator = BinaryOperator_Xor}
+BinaryOperator <- 'or' {p.tempNode.BinaryOperator = BinaryOperator_Or} /
+                  'and' {p.tempNode.BinaryOperator = BinaryOperator_And} /
+                  'xor' {p.tempNode.BinaryOperator = BinaryOperator_Xor}
 
-GeneratorBinaryOperator <- ':' {p.current.SetGenerator.GeneratorOperator = GeneratorOperator_Includes} /
-                           '<=' {p.current.SetGenerator.GeneratorOperator = GeneratorOperator_LessThanEquals} /
-                           '<' {p.current.SetGenerator.GeneratorOperator = GeneratorOperator_LessThan} /
-                           '>=' {p.current.SetGenerator.GeneratorOperator = GeneratorOperator_GreaterThanEquals} /
-                           '>' {p.current.SetGenerator.GeneratorOperator = GeneratorOperator_GreaterThan} /
-                           '=' {p.current.SetGenerator.GeneratorOperator = GeneratorOperator_Equals} /
-                           '~' {p.current.SetGenerator.GeneratorOperator = GeneratorOperator_NotEquals}
+GeneratorBinaryOperator <- ':' {p.tempNode.SetGenerator.GeneratorOperator = GeneratorOperator_Includes} /
+                           '<=' {p.tempNode.SetGenerator.GeneratorOperator = GeneratorOperator_LessThanEquals} /
+                           '<' {p.tempNode.SetGenerator.GeneratorOperator = GeneratorOperator_LessThan} /
+                           '>=' {p.tempNode.SetGenerator.GeneratorOperator = GeneratorOperator_GreaterThanEquals} /
+                           '>' {p.tempNode.SetGenerator.GeneratorOperator = GeneratorOperator_GreaterThan} /
+                           '=' {p.tempNode.SetGenerator.GeneratorOperator = GeneratorOperator_Equals} /
+                           '~' {p.tempNode.SetGenerator.GeneratorOperator = GeneratorOperator_NotEquals}
 
 # Tokens
 Spacing <- (' ' / '\t' / '\r\n' / '\n')+

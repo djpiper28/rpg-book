@@ -46,7 +46,6 @@ type NodeType int
 const (
 	NodeType_SetGenerator NodeType = iota + 1
 	NodeType_Basic
-	NodeType_Brackets
 	NodeType_BinaryOperator
 )
 
@@ -58,30 +57,102 @@ type Node struct {
 	BinaryOperator BinaryOperator
 }
 
-func Parse(s string) (*Node, error) {
-	p := &parser{
-		Buffer: strings.ToLower(s),
-		root:   &Node{},
-		stack:  make([]*Node, 0),
+func (p *parser) insertOperatorNode() {
+	newNode := &Node{
+		Type:           NodeType_BinaryOperator,
+		BinaryOperator: p.tempNode.BinaryOperator,
 	}
-	p.current = p.root
-	p.stack = append(p.stack, p.current)
+
+	p.stack = append(p.stack, newNode)
+}
+
+func (p *parser) panic(reason error) {
+	log.Error("Panic whilst parsing input",
+		loggertags.TagError, reason,
+		"tree", p.SprintSyntaxTree(),
+		"stack", p.stack,
+		"tempNode", p.tempNode)
+	panic(reason)
+}
+
+func (p *parser) pop() *Node {
+	if len(p.stack) == 0 {
+		p.panic(errors.New("Stack is empty so cannot be popped"))
+	}
+
+	top := p.stack[len(p.stack)-1]
+	p.stack = p.stack[:len(p.stack)-1]
+	return top
+}
+
+func (p *parser) push(node *Node) {
+	p.stack = append(p.stack, node)
+	p.tempNode = &Node{}
+}
+
+func (p *parser) finaliseStack() *Node {
+	if len(p.stack) == 1 {
+		top := p.stack[0]
+		p.stack = make([]*Node, 0)
+		return top
+	}
+
+	operandA := p.pop()
+	operator := p.pop()
+	operandB := p.pop()
+
+	if operator.Type != NodeType_BinaryOperator {
+		p.panic(fmt.Errorf("Expected an operator, found %+v", operator))
+	}
+
+	if operator.Left != nil || operator.Right != nil {
+		p.panic(fmt.Errorf("Expected nil children, found %+v", operator))
+	}
+
+	operator.Left = operandA
+	operator.Right = operandB
+	return operator
+}
+
+func Parse(inputStr string) (*Node, error) {
+	p := &parser{
+		Buffer:   strings.ToLower(inputStr),
+		tempNode: &Node{},
+		stack:    make([]*Node, 0),
+	}
 
 	p.Init()
 
 	err := p.Parse()
 	if err != nil {
-		log.Error("Failed to parse input", loggertags.TagError, err, "input", s, "tree", p.SprintSyntaxTree())
+		log.Error("Failed to parse input",
+			loggertags.TagError, err,
+			"input", inputStr,
+			"tree", p.SprintSyntaxTree())
 		return nil, err
 	}
 
 	p.Execute()
 	err = p.Err
 	if err != nil {
-		log.Error("Failed to parse input (action failed)", loggertags.TagError, err, "input", s, "tree", p.SprintSyntaxTree())
+		log.Error("Failed to parse input (action failed)",
+			loggertags.TagError, err,
+			"input", inputStr,
+			"tree", p.SprintSyntaxTree())
 		return nil, err
 	}
-	return p.root, nil
+
+	top := p.finaliseStack()
+	if len(p.stack) != 0 {
+		err = fmt.Errorf("Expected the stack to be empty after parsing, it has len %d", len(p.stack))
+		log.Error("Failed to parse input (AST creation failed)",
+			loggertags.TagError, err,
+			"input", inputStr,
+			"tree", p.SprintSyntaxTree(),
+			"stack", p.stack)
+		return nil, err
+	}
+	return top, nil
 }
 
 func NormText(text string) string {
