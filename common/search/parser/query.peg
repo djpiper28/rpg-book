@@ -17,7 +17,10 @@ Query <- (Term Spacing BinaryOperator {p.current.Type = NodeType_BinaryOperator 
 
 Term <- '-' SetGenerator {p.current.SetGenerator.Negated = true} /
         SetGenerator /
-        TextQuery {p.current.Type = NodeType_Basic} /
+        TextQuery {
+          p.current.Type = NodeType_Basic
+          p.current.TextQuery.Value = text
+        } /
         ( '(' Spacing? Query Spacing? ')' ) {p.current.Type = NodeType_Brackets // TODO: handle this}
 
 # Set generators
@@ -28,11 +31,15 @@ TextQuery <- QuotedText {
                  return
                }
 
-               p.current.TextQuery.Value = output
+               text = output
              } /
-             Text {p.current.TextQuery.Value = text}
+             Text
 
-SetGenerator <- TextQuery GeneratorBinaryOperator TextQuery {p.current.Type = NodeType_SetGenerator}
+SetGenerator <- TextQuery {p.current.SetGenerator.Key = text} 
+                GeneratorBinaryOperator TextQuery {
+                  p.current.Type = NodeType_SetGenerator
+                  p.current.SetGenerator.Value = text
+                }
 
 # Binary Operators
 BinaryOperator <- 'or' {p.current.BinaryOperator = BinaryOperator_Or} /
