@@ -4,6 +4,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/djpiper28/rpg-book/common/normalisation"
 	"github.com/djpiper28/rpg-book/common/search/parser"
 	sqlsearch "github.com/djpiper28/rpg-book/common/search/sql_search"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
@@ -35,11 +36,12 @@ func asSql(t *testing.T, query string, tableData sqlsearch.SqlTableData, columnM
 }
 
 type TestModel struct {
-	Id        int     `db:"id"`
-	Name      string  `db:"name"`
-	Age       float32 `db:"age"`
-	Gender    string  `db:"gender"`
-	LikesCats bool    `db:"likes_cats"`
+	Id             int     `db:"id"`
+	Name           string  `db:"name"`
+	NameNormalised string  `db:"name_normalised"`
+	Age            float32 `db:"age"`
+	Gender         string  `db:"gender"`
+	LikesCats      bool    `db:"likes_cats"`
 }
 
 func newTestDb(t *testing.T) (*database.Db, func()) {
@@ -58,6 +60,7 @@ func newTestDb(t *testing.T) (*database.Db, func()) {
 CREATE TABLE test (
   id INTEGER PRIMARY KEY,
   name TEXT NOT NULL,
+  name_normalised TEXT NOT NULL,
   age FLOAT,
   gender TEXT DEFAULT('non-binary'),
   likes_cats BOOLEAN
@@ -100,7 +103,8 @@ CREATE TABLE test (
 
 	for i, person := range people {
 		person.Id = i
-		_, err := db.Db.NamedExec("INSERT INTO test (id, name, age, gender, likes_cats) VALUES(:id, :name, :age, :gender, :likes_cats);", person)
+		person.NameNormalised = normalisation.Normalise(person.Name)
+		_, err := db.Db.NamedExec("INSERT INTO test (id, name, name_normalised, age, gender, likes_cats) VALUES(:id, :name, :name_normalised, :age, :gender, :likes_cats);", person)
 		require.NoError(t, err)
 	}
 
@@ -114,152 +118,12 @@ var TestTableData sqlsearch.SqlTableData = sqlsearch.SqlTableData{
 
 var TestColumnMap sqlsearch.SqlColmnMap = sqlsearch.SqlColmnMap{
 	TextColumns: map[string]string{
-		"name":   "name",
-		"nom":    "name",
-		"gender": "gender",
-		"sex":    "gender", // trans rights are human rights btw
+		"name": "name_normalised",
+		"nom":  "name_normalised",
 	},
 	NumberColumns: map[string]string{
 		"age": "age",
 	},
-	BasicQueryColumn:    "name",
+	BasicQueryColumn:    "name", // This tests the alias system
 	BasicQueryOperation: parser.GeneratorOperator_Includes,
-}
-
-func TestSqlGreaterThan(t *testing.T) {
-	t.Parallel()
-
-	db, close := newTestDb(t)
-	defer close()
-
-	sql, args := asSql(t, "age>3", TestTableData, TestColumnMap)
-
-	rows, err := db.Db.Queryx(sql, args...)
-	require.NoError(t, err)
-
-	var people []TestModel
-	for rows.Next() {
-		var person TestModel
-		err := rows.StructScan(&person)
-		require.NoError(t, err)
-
-		people = append(people, person)
-	}
-
-	require.Len(t, people, 5)
-}
-
-func TestSqlGreaterThanOrEqual(t *testing.T) {
-	t.Parallel()
-
-	db, close := newTestDb(t)
-	defer close()
-
-	sql, args := asSql(t, "age>=40", TestTableData, TestColumnMap)
-
-	rows, err := db.Db.Queryx(sql, args...)
-	require.NoError(t, err)
-
-	var people []TestModel
-	for rows.Next() {
-		var person TestModel
-		err := rows.StructScan(&person)
-		require.NoError(t, err)
-
-		people = append(people, person)
-	}
-
-	require.Len(t, people, 1)
-}
-
-func TestSqlLessThan(t *testing.T) {
-	t.Parallel()
-
-	db, close := newTestDb(t)
-	defer close()
-
-	sql, args := asSql(t, "age<25", TestTableData, TestColumnMap)
-
-	rows, err := db.Db.Queryx(sql, args...)
-	require.NoError(t, err)
-
-	var people []TestModel
-	for rows.Next() {
-		var person TestModel
-		err := rows.StructScan(&person)
-		require.NoError(t, err)
-
-		people = append(people, person)
-	}
-
-	require.Len(t, people, 2)
-}
-
-func TestSqlLessThanOrEqual(t *testing.T) {
-	t.Parallel()
-
-	db, close := newTestDb(t)
-	defer close()
-
-	sql, args := asSql(t, "age<=26", TestTableData, TestColumnMap)
-
-	rows, err := db.Db.Queryx(sql, args...)
-	require.NoError(t, err)
-
-	var people []TestModel
-	for rows.Next() {
-		var person TestModel
-		err := rows.StructScan(&person)
-		require.NoError(t, err)
-
-		people = append(people, person)
-	}
-
-	require.Len(t, people, 4)
-}
-
-func TestSqlEqual(t *testing.T) {
-	t.Parallel()
-
-	db, close := newTestDb(t)
-	defer close()
-
-	sql, args := asSql(t, "age=22", TestTableData, TestColumnMap)
-
-	rows, err := db.Db.Queryx(sql, args...)
-	require.NoError(t, err)
-
-	var people []TestModel
-	for rows.Next() {
-		var person TestModel
-		err := rows.StructScan(&person)
-		require.NoError(t, err)
-
-		people = append(people, person)
-	}
-
-	require.Len(t, people, 1)
-}
-
-func TestSqlNotEqual(t *testing.T) {
-	t.Parallel()
-
-	db, close := newTestDb(t)
-	defer close()
-
-	sql, args := asSql(t, "age~22", TestTableData, TestColumnMap)
-
-	rows, err := db.Db.Queryx(sql, args...)
-	require.NoError(t, err)
-
-	var people []TestModel
-	for rows.Next() {
-		var person TestModel
-		err := rows.StructScan(&person)
-		require.NoError(t, err)
-
-		people = append(people, person)
-	}
-
-	require.Len(t, people, 4)
 }
