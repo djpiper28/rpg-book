@@ -123,6 +123,7 @@ var TestColumnMap sqlsearch.SqlColmnMap = sqlsearch.SqlColmnMap{
 	},
 	NumberColumns: map[string]string{
 		"age": "age",
+		"ans": "age",
 	},
 	BasicQueryColumn:    "name", // This tests the alias system
 	BasicQueryOperation: parser.GeneratorOperator_Includes,

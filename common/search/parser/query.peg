@@ -1,8 +1,6 @@
 package parser
 
-import (
-  "errors"
-)
+import "errors"
 
 type parser Peg {
   tempNode *Node
