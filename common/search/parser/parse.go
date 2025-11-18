@@ -53,7 +53,7 @@ type Node struct {
 	Left, Right    *Node
 	Type           NodeType
 	SetGenerator   SetGenerator
-	BasicQuery      TextQuery
+	BasicQuery     TextQuery
 	BinaryOperator BinaryOperator
 }
 
