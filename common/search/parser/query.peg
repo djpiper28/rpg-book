@@ -1,42 +1,55 @@
 package parser
 
+import "errors"
+
 type parser Peg {
-  root, current *Node
-  stack         []*Node
+  tempNode *Node
+  stack    []*Node
+  Err      error
 }
 
 Grammar <- Spacing? Query Spacing? EndOfFile
-Query <- (Term Spacing BinaryOperator Spacing Query) /
-         (Term Spacing Query) /
+Query <- (Term Spacing BinaryOperator {p.insertOperatorNode()} Spacing Query {p.push(p.finaliseStack())}) /
+         (Term Spacing {p.tempNode.BinaryOperator = Default_BinaryOperator; p.insertOperatorNode()} Query {p.push(p.finaliseStack())}) /
          Term 
 
-Term <- SetGenerator /
-        '-' SetGenerator /
-        TextQuery /
-        ( '(' Spacing? Query Spacing? ')' )
+Term <- (
+          '-' SetGenerator {p.tempNode.Type = NodeType_SetGenerator; p.tempNode.SetGenerator.Negated = true} /
+          SetGenerator {p.tempNode.Type = NodeType_SetGenerator} /
+          TextQuery {p.tempNode.Type = NodeType_Basic; p.tempNode.BasicQuery.Value = text}
+        ) {p.push(p.tempNode)} /
+        ( '(' Spacing? Query Spacing? ')' ) {p.push(p.finaliseStack())}
 
 # Set generators
-TextQuery <- Text /
-             QuotedText
+TextQuery <- QuotedText /
+             Text
 
-SetGenerator <- TextQuery GeneratorBinaryOperator TextQuery
+SetGenerator <- TextQuery {p.tempNode.SetGenerator.Key = text}
+                GeneratorBinaryOperator TextQuery {p.tempNode.SetGenerator.Value = text}
 
 # Binary Operators
-BinaryOperator <- 'or' /
-                  'and' /
-                  'xor'
+BinaryOperator <- 'or' {p.tempNode.BinaryOperator = BinaryOperator_Or} /
+                  'and' {p.tempNode.BinaryOperator = BinaryOperator_And}
 
-GeneratorBinaryOperator <- ':' /
-                           '<=' /
-                           '<' /
-                           '>=' /
-                           '>' /
-                           '=' /
-                           '~'
+GeneratorBinaryOperator <- ':' {p.tempNode.SetGenerator.GeneratorOperator = GeneratorOperator_Includes} /
+                           '<=' {p.tempNode.SetGenerator.GeneratorOperator = GeneratorOperator_LessThanEquals} /
+                           '<' {p.tempNode.SetGenerator.GeneratorOperator = GeneratorOperator_LessThan} /
+                           '>=' {p.tempNode.SetGenerator.GeneratorOperator = GeneratorOperator_GreaterThanEquals} /
+                           '>' {p.tempNode.SetGenerator.GeneratorOperator = GeneratorOperator_GreaterThan} /
+                           '=' {p.tempNode.SetGenerator.GeneratorOperator = GeneratorOperator_Equals} /
+                           '~' {p.tempNode.SetGenerator.GeneratorOperator = GeneratorOperator_NotEquals}
 
 # Tokens
 Spacing <- (' ' / '\t' / '\r\n' / '\n')+
-QuotedText <- '"' ([^"] / '\\"')+ '"'
-Text <- ([a-zA-Z0-9._] / '-')+
+QuotedText <- '"' < ([^"\n\r\t] / '\\"')* > '"' {
+               output, err := UnescapeText(text)
+               if err != nil {
+                 p.Err = errors.Join(fmt.Errorf("Cannot parse quoted string '%s'", text))
+                 return
+               }
+
+               text = NormText(output)
+             }
+Text <- < [^"<>:~=() \n\r\t]+ > {text = NormText(text)}
 
 EndOfFile <- !.
