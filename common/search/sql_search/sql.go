@@ -162,8 +162,12 @@ func (s *sqlScanner) ProcessSqlSetGenerator(key string, operator parser.Generato
 			sqlOperator = "<"
 		case parser.GeneratorOperator_LessThanEquals:
 			sqlOperator = "<="
+		case parser.GeneratorOperator_Equals:
+			sqlOperator = "="
+		case parser.GeneratorOperator_NotEquals:
+			sqlOperator = "<>"
 		default:
-			return "", fmt.Errorf("%d is not a supported generator operator", operator)
+			return "", fmt.Errorf("%d is not a supported number generator operator", operator)
 		}
 
 		return fmt.Sprintf("%s %s ?", mappedKey, sqlOperator), nil
@@ -183,7 +187,7 @@ func (s *sqlScanner) ProcessSqlSetGenerator(key string, operator parser.Generato
 		sqlOperator = "LIKE"
 		value = "%" + value + "%"
 	default:
-		return "", fmt.Errorf("%d is not a supported generator operator", operator)
+		return "", fmt.Errorf("%d is not a supported text generator operator", operator)
 	}
 
 	return fmt.Sprintf("%s %s ?", mappedKey, sqlOperator), nil
