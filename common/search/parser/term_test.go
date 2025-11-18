@@ -3,12 +3,21 @@ package parser_test
 import (
 	"testing"
 
+	"github.com/djpiper28/rpg-book/common/normalisation"
 	"github.com/djpiper28/rpg-book/common/search/parser"
 	"github.com/stretchr/testify/require"
 )
 
-func TestBasicQuery(t *testing.T) {
-	const testString = "Testing-123µ"
+func TestBasicQueryNonSpecial(t *testing.T) {
+	testString := normalisation.Normalise("testing-123")
+	ast, err := parser.Parse(testString)
+	require.NoError(t, err)
+	require.Equal(t, parser.NodeType_Basic, ast.Type)
+	require.Equal(t, testString, ast.BasicQuery.Value)
+}
+
+func TestBasicQuerySpecial(t *testing.T) {
+	testString := normalisation.Normalise("Testing-123µ")
 	ast, err := parser.Parse(testString)
 	require.NoError(t, err)
 	require.Equal(t, parser.NodeType_Basic, ast.Type)

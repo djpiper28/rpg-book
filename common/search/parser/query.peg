@@ -55,8 +55,8 @@ QuotedText <- '"' < ([^"\n\r\t] / '\\"')* > '"' {
                  return
                }
 
-               text = output
+               text = NormText(output)
              }
-Text <- < [^"<>:~=() \n\r\t]+ >
+Text <- < [^"<>:~=() \n\r\t]+ > {text = NormText(text)}
 
 EndOfFile <- !.

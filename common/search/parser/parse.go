@@ -7,6 +7,7 @@ import (
 
 	"github.com/charmbracelet/log"
 	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
+	"github.com/djpiper28/rpg-book/common/normalisation"
 )
 
 type BinaryOperator int
@@ -81,6 +82,10 @@ func Parse(s string) (*Node, error) {
 		return nil, err
 	}
 	return p.root, nil
+}
+
+func NormText(text string) string {
+  return normalisation.Normalise(text)
 }
 
 func UnescapeText(text string) (string, error) {
