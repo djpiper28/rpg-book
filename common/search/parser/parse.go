@@ -15,7 +15,6 @@ type BinaryOperator int
 const (
 	BinaryOperator_And BinaryOperator = iota + 1
 	BinaryOperator_Or
-	BinaryOperator_Xor
 	Default_BinaryOperator = BinaryOperator_And
 )
 
@@ -63,7 +62,7 @@ func (p *parser) insertOperatorNode() {
 		BinaryOperator: p.tempNode.BinaryOperator,
 	}
 
-  p.push(newNode)
+	p.push(newNode)
 }
 
 func (p *parser) panic(reason error) {

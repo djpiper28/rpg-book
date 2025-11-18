@@ -73,7 +73,12 @@ func (s *sqlScanner[T]) GetQuery(depth int, node *parser.Node) (string, error) {
 			output += " " + leftRes
 		}
 
-		// TODO: switch the binary operator
+		switch node.BinaryOperator {
+		case parser.BinaryOperator_And:
+		case parser.BinaryOperator_Or:
+		default:
+			return "", fmt.Errorf("%v is not a supported binary operator", node.BinaryOperator)
+		}
 
 		if node.Right != nil {
 			rightRes, err := s.GetQuery(depth+1, node.Right)
@@ -92,18 +97,35 @@ func (s *sqlScanner[T]) GetQuery(depth int, node *parser.Node) (string, error) {
 }
 
 func (s *sqlScanner[T]) ProcessSqlSetGenerator(key string, operator parser.GeneratorOperator, value string) (string, error) {
-	mappedKey, ok := s.SqlColmns.TextColumns[key]
+	sqlOperator := ""
+	mappedKey, ok := s.SqlColmns.NumberColumns[key]
+	if ok {
+		switch operator {
+		case parser.GeneratorOperator_GreaterThan:
+		case parser.GeneratorOperator_GreaterThanEquals:
+		case parser.GeneratorOperator_LessThan:
+		case parser.GeneratorOperator_LessThanEquals:
+		default:
+			return "", fmt.Errorf("%d is not a supported generator operator", operator)
+		}
+
+		return fmt.Sprintf("%s%s?", mappedKey, sqlOperator), nil
+	}
+
+	mappedKey, ok = s.SqlColmns.TextColumns[key]
 	if !ok {
 		return "", fmt.Errorf("'%s' is not in the column map", key)
 	}
 
-  // TODO: number columns
+	// TODO: number columns
 
-	operator := ""
 	switch operator {
+	case parser.GeneratorOperator_Equals:
+	case parser.GeneratorOperator_NotEquals:
+	case parser.GeneratorOperator_Includes:
 	default:
-		return "", fmt.Errorf("%d is not a supported operator", operator)
+		return "", fmt.Errorf("%d is not a supported generator operator", operator)
 	}
 
-	return fmt.Sprintf("%s%s?", mappedKey, operator)
+	return fmt.Sprintf("%s%s?", mappedKey, sqlOperator), nil
 }

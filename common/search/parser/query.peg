@@ -31,8 +31,7 @@ SetGenerator <- TextQuery {p.tempNode.SetGenerator.Key = text}
 
 # Binary Operators
 BinaryOperator <- 'or' {p.tempNode.BinaryOperator = BinaryOperator_Or} /
-                  'and' {p.tempNode.BinaryOperator = BinaryOperator_And} /
-                  'xor' {p.tempNode.BinaryOperator = BinaryOperator_Xor}
+                  'and' {p.tempNode.BinaryOperator = BinaryOperator_And}
 
 GeneratorBinaryOperator <- ':' {p.tempNode.SetGenerator.GeneratorOperator = GeneratorOperator_Includes} /
                            '<=' {p.tempNode.SetGenerator.GeneratorOperator = GeneratorOperator_LessThanEquals} /

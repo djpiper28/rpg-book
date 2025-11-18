@@ -64,11 +64,6 @@ func TestOrOperator(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestXorOperator(t *testing.T) {
-	err := blindParse(t, "John xor Smith")
-	require.NoError(t, err)
-}
-
 func TestBrackets(t *testing.T) {
 	err := blindParse(t, "(red and green)")
 	require.NoError(t, err)
@@ -106,7 +101,7 @@ func TestNegatedSetGenerator(t *testing.T) {
 }
 
 func TestBigQuery1(t *testing.T) {
-	err := blindParse(t, "red and (green and blue) or test:yes xor (uwu or uwu:owo)")
+	err := blindParse(t, "red and (green and blue) or test:yes or (uwu or uwu:owo)")
 	require.NoError(t, err)
 }
 
