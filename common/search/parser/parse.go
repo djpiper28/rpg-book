@@ -63,7 +63,7 @@ func (p *parser) insertOperatorNode() {
 		BinaryOperator: p.tempNode.BinaryOperator,
 	}
 
-	p.stack = append(p.stack, newNode)
+  p.push(newNode)
 }
 
 func (p *parser) panic(reason error) {

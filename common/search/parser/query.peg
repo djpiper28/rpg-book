@@ -12,7 +12,7 @@ type parser Peg {
 
 Grammar <- Spacing? Query Spacing? EndOfFile
 Query <- (Term Spacing BinaryOperator {p.insertOperatorNode()} Spacing Query {p.push(p.finaliseStack())}) /
-         (Term Spacing {p.tempNode.BinaryOperator = BinaryOperator_And; p.insertOperatorNode()} Query {p.push(p.finaliseStack())}) /
+         (Term Spacing {p.tempNode.BinaryOperator = Default_BinaryOperator; p.insertOperatorNode()} Query {p.push(p.finaliseStack())}) /
          Term 
 
 Term <- (

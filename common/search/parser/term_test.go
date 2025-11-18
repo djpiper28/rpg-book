@@ -57,3 +57,13 @@ func TestNegatedMixedSetGenerator(t *testing.T) {
 	require.True(t, ast.SetGenerator.Negated)
 	require.Equal(t, parser.GeneratorOperator_GreaterThanEquals, ast.SetGenerator.GeneratorOperator)
 }
+
+func TestBracketedExpression(t *testing.T) {
+	ast, err := parser.Parse(`("test":value-123)`)
+	require.NoError(t, err)
+	require.Equal(t, parser.NodeType_SetGenerator, ast.Type)
+	require.Equal(t, "test", ast.SetGenerator.Key)
+	require.Equal(t, "value-123", ast.SetGenerator.Value)
+	require.False(t, ast.SetGenerator.Negated)
+	require.Equal(t, parser.GeneratorOperator_Includes, ast.SetGenerator.GeneratorOperator)
+}
