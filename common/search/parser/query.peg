@@ -24,15 +24,7 @@ Term <- '-' SetGenerator {p.current.SetGenerator.Negated = true} /
         ( '(' Spacing? Query Spacing? ')' ) {p.current.Type = NodeType_Brackets // TODO: handle this}
 
 # Set generators
-TextQuery <- QuotedText {
-               output, err := UnescapeText(text)
-               if err != nil {
-                 p.Err = errors.Join(fmt.Errorf("Cannot parse quoted string '%s'", text))
-                 return
-               }
-
-               text = output
-             } /
+TextQuery <- QuotedText /
              Text
 
 SetGenerator <- TextQuery {p.current.SetGenerator.Key = text} 
@@ -49,14 +41,22 @@ BinaryOperator <- 'or' {p.current.BinaryOperator = BinaryOperator_Or} /
 GeneratorBinaryOperator <- ':' {p.current.SetGenerator.GeneratorOperator = GeneratorOperator_Includes} /
                            '<=' {p.current.SetGenerator.GeneratorOperator = GeneratorOperator_LessThanEquals} /
                            '<' {p.current.SetGenerator.GeneratorOperator = GeneratorOperator_LessThan} /
-                           '>=' {p.current.SetGenerator.GeneratorOperator = GeneratorOperator_GreaterThan} /
-                           '>' {p.current.SetGenerator.GeneratorOperator = GeneratorOperator_GreaterThanEquals} /
+                           '>=' {p.current.SetGenerator.GeneratorOperator = GeneratorOperator_GreaterThanEquals} /
+                           '>' {p.current.SetGenerator.GeneratorOperator = GeneratorOperator_GreaterThan} /
                            '=' {p.current.SetGenerator.GeneratorOperator = GeneratorOperator_Equals} /
                            '~' {p.current.SetGenerator.GeneratorOperator = GeneratorOperator_NotEquals}
 
 # Tokens
 Spacing <- (' ' / '\t' / '\r\n' / '\n')+
-QuotedText <- '"' < ([^"\n\r\t] / '\\"')* > '"'
+QuotedText <- '"' < ([^"\n\r\t] / '\\"')* > '"' {
+               output, err := UnescapeText(text)
+               if err != nil {
+                 p.Err = errors.Join(fmt.Errorf("Cannot parse quoted string '%s'", text))
+                 return
+               }
+
+               text = output
+             }
 Text <- < [^"<>:~=() \n\r\t]+ >
 
 EndOfFile <- !.
