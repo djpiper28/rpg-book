@@ -22,94 +22,151 @@ type SqlColmnMap struct {
 
 type sqlScanner[T any] struct {
 	SqlColmns   SqlColmnMap
-	OrderedArgs []string
+	OrderedArgs []any // SqlX takes any for the args
 }
 
-func AsSql[T any](query *parser.Node, tableData SqlTableData, columnMap SqlColmnMap) (string, error) {
-	selectClause := "SELECT "
-	fromClause := fmt.Sprintf("FROM %s", tableData.TableName)
-
-	if tableData.JoinClauses != "" {
-		fromClause += "\n" + tableData.JoinClauses
-	}
-
+func AsSql[T any](query *parser.Node, tableData SqlTableData, columnMap SqlColmnMap) (string, []any, error) {
 	// Setup defaults
 	if columnMap.BasicQueryOperation == 0 {
 		columnMap.BasicQueryOperation = parser.GeneratorOperator_Includes
 	}
 
+	if columnMap.NumberColumns == nil {
+		columnMap.NumberColumns = make(map[string]string)
+	}
+
+	if columnMap.TextColumns == nil {
+		columnMap.TextColumns = make(map[string]string)
+	}
+
+	// Generate SELECT clause
+	selectClause := "SELECT "
+	for i, field := range tableData.FieldsToScan {
+		selectClause += field
+		if i < len(tableData.FieldsToScan)-1 {
+			selectClause += ", "
+		}
+	}
+
+	// Generate FROM caluse
+	fromClause := fmt.Sprintf("FROM %s", tableData.TableName)
+
+	if tableData.JoinClauses != "" {
+		fromClause += "\n" + tableData.JoinClauses + "\n"
+	}
+
 	// Generate WHERE clause
 	s := sqlScanner[T]{
-		SqlColmns: columnMap,
+		SqlColmns:   columnMap,
+		OrderedArgs: make([]any, 0),
 	}
 
 	whereClause, err := s.GetQuery(0, query)
 	if err != nil {
-		return "", errors.Join(errors.New("Cannot create WHERE clause"), err)
+		return "", nil, errors.Join(errors.New("Cannot create WHERE clause"), err)
 	}
 
-	return selectClause + "\n" + fromClause + "\n" + whereClause + ";", nil
+	whereClause = "WHERE\n" + whereClause
+
+	return selectClause + "\n" + fromClause + "\n" + whereClause + ";", s.OrderedArgs, nil
+}
+
+func nSpaces(n int) string {
+	const tabWidth = 2
+
+	output := ""
+	for range n * tabWidth {
+		output += "  "
+	}
+	return output
+}
+
+const termSpaces = 1
+
+func (s *sqlScanner[T]) ProcessBinaryOperator(depth int, node *parser.Node) (string, error) {
+	output := "\n"
+	output += nSpaces(depth)
+	output += "(\n"
+
+	output += nSpaces(depth + termSpaces)
+	if node.Left != nil {
+		leftRes, err := s.GetQuery(depth+1, node.Left)
+		if err != nil {
+			return "", errors.Join(fmt.Errorf("Cannot process left child of node %d (type %v)", depth, node.Type), err)
+		}
+
+		output += " " + leftRes
+	}
+
+	output += "\n"
+	output += nSpaces(depth)
+
+	switch node.BinaryOperator {
+	case parser.BinaryOperator_And:
+		output += "AND"
+	case parser.BinaryOperator_Or:
+		output += "OR"
+	default:
+		return "", fmt.Errorf("%v is not a supported binary operator", node.BinaryOperator)
+	}
+
+	output += "\n"
+	output += nSpaces(depth + termSpaces)
+
+	if node.Right != nil {
+		rightRes, err := s.GetQuery(depth+1, node.Right)
+		if err != nil {
+			return "", errors.Join(fmt.Errorf("Cannot process right child of node %d (type %v)", depth, node.Type), err)
+		}
+
+		output += " " + rightRes
+	}
+
+	output += "\n"
+	output += nSpaces(depth)
+	output += ")"
+	return output, nil
 }
 
 func (s *sqlScanner[T]) GetQuery(depth int, node *parser.Node) (string, error) {
 	switch node.Type {
 	case parser.NodeType_Basic:
-		return "", errors.ErrUnsupported
+		return s.ProcessSqlSetGenerator(s.SqlColmns.BasicQueryColumn, s.SqlColmns.BasicQueryOperation, node.BasicQuery.Value)
 	case parser.NodeType_SetGenerator:
-		return "", errors.ErrUnsupported
+		return s.ProcessSqlSetGenerator(node.SetGenerator.Key, node.SetGenerator.GeneratorOperator, node.SetGenerator.Value)
 	case parser.NodeType_BinaryOperator:
-		output := "\n"
-		for range depth {
-			output += "  "
-		}
-		output += "("
-
-		if node.Left != nil {
-			leftRes, err := s.GetQuery(depth+1, node.Left)
-			if err != nil {
-				return "", errors.Join(fmt.Errorf("Cannot process left child of node %d (type %v)", depth, node.Type), err)
-			}
-
-			output += " " + leftRes
-		}
-
-		switch node.BinaryOperator {
-		case parser.BinaryOperator_And:
-		case parser.BinaryOperator_Or:
-		default:
-			return "", fmt.Errorf("%v is not a supported binary operator", node.BinaryOperator)
-		}
-
-		if node.Right != nil {
-			rightRes, err := s.GetQuery(depth+1, node.Right)
-			if err != nil {
-				return "", errors.Join(fmt.Errorf("Cannot process right child of node %d (type %v)", depth, node.Type), err)
-			}
-
-			output += " " + rightRes
-		}
-
-		output += ")\n"
-		return output, nil
+		return s.ProcessBinaryOperator(depth, node)
 	default:
 		return "", fmt.Errorf("Unsupported node type %v", node.Type)
 	}
 }
 
 func (s *sqlScanner[T]) ProcessSqlSetGenerator(key string, operator parser.GeneratorOperator, value string) (string, error) {
+	if key == "" {
+		return "", errors.New("Cannot query with empty keys")
+	}
+
+	defer func() {
+		s.OrderedArgs = append(s.OrderedArgs, value)
+	}()
+
 	sqlOperator := ""
 	mappedKey, ok := s.SqlColmns.NumberColumns[key]
 	if ok {
 		switch operator {
 		case parser.GeneratorOperator_GreaterThan:
+			sqlOperator = "<"
 		case parser.GeneratorOperator_GreaterThanEquals:
+			sqlOperator = "<="
 		case parser.GeneratorOperator_LessThan:
+			sqlOperator = ">"
 		case parser.GeneratorOperator_LessThanEquals:
+			sqlOperator = ">="
 		default:
 			return "", fmt.Errorf("%d is not a supported generator operator", operator)
 		}
 
-		return fmt.Sprintf("%s%s?", mappedKey, sqlOperator), nil
+		return fmt.Sprintf("%s %s ?", mappedKey, sqlOperator), nil
 	}
 
 	mappedKey, ok = s.SqlColmns.TextColumns[key]
@@ -117,15 +174,17 @@ func (s *sqlScanner[T]) ProcessSqlSetGenerator(key string, operator parser.Gener
 		return "", fmt.Errorf("'%s' is not in the column map", key)
 	}
 
-	// TODO: number columns
-
 	switch operator {
 	case parser.GeneratorOperator_Equals:
+		sqlOperator = "="
 	case parser.GeneratorOperator_NotEquals:
+		sqlOperator = "<>"
 	case parser.GeneratorOperator_Includes:
+		sqlOperator = "LIKE"
+		value = "%" + value + "%"
 	default:
 		return "", fmt.Errorf("%d is not a supported generator operator", operator)
 	}
 
-	return fmt.Sprintf("%s%s?", mappedKey, sqlOperator), nil
+	return fmt.Sprintf("%s %s ?", mappedKey, sqlOperator), nil
 }
