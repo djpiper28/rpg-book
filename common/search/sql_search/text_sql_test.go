@@ -83,7 +83,7 @@ func TestSqlTextBasic2(t *testing.T) {
 
 	sql, args := asSql(t, `Danny Piper`, TestTableData, TestColumnMap)
 
-  require.Contains(t, sql, "AND")
+	require.Contains(t, sql, "AND")
 
 	rows, err := db.Db.Queryx(sql, args...)
 	require.NoError(t, err)
