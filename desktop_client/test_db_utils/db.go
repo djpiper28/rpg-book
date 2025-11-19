@@ -3,15 +3,15 @@ package testdbutils
 import (
 	"os"
 
+	"github.com/djpiper28/rpg-book/common/database/sqlite3"
 	"github.com/djpiper28/rpg-book/desktop_client/backend"
-	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/project"
 	"github.com/google/uuid"
 )
 
-func GetPrimaryDb() (*database.Db, func()) {
-	name := uuid.New().String() + database.DbExtension
-	db, err := database.New(name)
+func GetPrimaryDb() (*sqlite3.Db, func()) {
+	name := uuid.New().String() + sqlite3.DbExtension
+	db, err := sqlite3.New(name)
 	if err != nil {
 		panic(err)
 	}
@@ -26,9 +26,9 @@ func GetPrimaryDb() (*database.Db, func()) {
 	}
 }
 
-func GetProjectDb() (*database.Db, func()) {
-	name := uuid.New().String() + database.DbExtension
-	db, err := database.New(name)
+func GetProjectDb() (*sqlite3.Db, func()) {
+	name := uuid.New().String() + sqlite3.DbExtension
+	db, err := sqlite3.New(name)
 	if err != nil {
 		panic(err)
 	}

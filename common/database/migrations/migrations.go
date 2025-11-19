@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/charmbracelet/log"
+	"github.com/djpiper28/rpg-book/common/database"
 	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
-	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -26,8 +26,8 @@ func New(migrations []Migration) *DbMigrator {
 	return &DbMigrator{migrations: migrations}
 }
 
-func (m *DbMigrator) Migrate(db *database.Db) error {
-	tx, err := db.Db.Beginx()
+func (m *DbMigrator) Migrate(db database.Database) error {
+	tx, err := db.GetSqlxDb().Beginx()
 	if err != nil {
 		return errors.Join(errors.New("Cannot start transaction"), err)
 	}

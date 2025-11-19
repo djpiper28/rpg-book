@@ -1,4 +1,4 @@
-package database
+package sqlite3
 
 import (
 	"context"
@@ -75,4 +75,8 @@ func (d *Db) prepareMigrations() error {
 func (d *Db) Close() {
 	d.Db.Close()
 	log.Info("Disconnected from database", loggertags.TagFileName, d.filename)
+}
+
+func (d *Db) GetSqlxDb() *sqlx.DB {
+	return d.Db
 }

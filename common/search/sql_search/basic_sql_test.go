@@ -4,8 +4,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/djpiper28/rpg-book/common/database/sqlite3"
 	sqlsearch "github.com/djpiper28/rpg-book/common/search/sql_search"
-	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
@@ -33,10 +33,10 @@ FROM test
 WHERE
 name LIKE ?;`, querySql)
 
-	dbName := uuid.NewString() + database.DbExtension
+	dbName := uuid.NewString() + sqlite3.DbExtension
 	defer os.Remove(dbName)
 
-	db, err := database.New(dbName)
+	db, err := sqlite3.New(dbName)
 	require.NoError(t, err)
 	defer db.Close()
 
@@ -78,10 +78,10 @@ FROM test
 WHERE
 name LIKE ?;`, querySql)
 
-	dbName := uuid.NewString() + database.DbExtension
+	dbName := uuid.NewString() + sqlite3.DbExtension
 	defer os.Remove(dbName)
 
-	db, err := database.New(dbName)
+	db, err := sqlite3.New(dbName)
 	require.NoError(t, err)
 	defer db.Close()
 

@@ -4,24 +4,24 @@ import (
 	"os"
 	"testing"
 
+	"github.com/djpiper28/rpg-book/common/database/sqlite3"
 	imagecompression "github.com/djpiper28/rpg-book/common/image/image_compression"
 	testutils "github.com/djpiper28/rpg-book/common/test_utils"
-	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/project"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
 
 func TestOpenProjectNotFound(t *testing.T) {
-	name := uuid.New().String() + database.DbExtension
-	defer os.Remove(name)
+	dbName := uuid.NewString() + sqlite3.DbExtension
+	defer os.Remove(dbName)
 
-	_, err := project.Open(name)
+	_, err := project.Open(dbName)
 	require.Error(t, err)
 }
 
 func TestCreateNewProject(t *testing.T) {
-	filename := uuid.New().String() + database.DbExtension
+	filename := uuid.New().String() + sqlite3.DbExtension
 	defer os.Remove(filename)
 
 	name := uuid.New().String()
@@ -34,7 +34,7 @@ func TestCreateNewProject(t *testing.T) {
 }
 
 func TestReOpenProject(t *testing.T) {
-	filename := uuid.New().String() + database.DbExtension
+	filename := uuid.New().String() + sqlite3.DbExtension
 	defer os.Remove(filename)
 
 	name := uuid.New().String()
