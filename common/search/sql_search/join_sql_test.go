@@ -30,7 +30,7 @@ type UserOrder struct {
 func newJoinTestDb(t *testing.T) (*database.Db, func()) {
 	t.Helper()
 
-	dbName := uuid.NewString()
+	dbName := uuid.NewString() + database.DbExtension
 	db, err := database.New(dbName)
 	require.NoError(t, err)
 

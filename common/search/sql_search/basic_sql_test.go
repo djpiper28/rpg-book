@@ -33,7 +33,7 @@ FROM test
 WHERE
 name LIKE ?;`, querySql)
 
-	dbName := uuid.NewString()
+	dbName := uuid.NewString() + database.DbExtension
 	defer os.Remove(dbName)
 
 	db, err := database.New(dbName)
@@ -78,7 +78,7 @@ FROM test
 WHERE
 name LIKE ?;`, querySql)
 
-	dbName := uuid.NewString()
+	dbName := uuid.NewString() + database.DbExtension
 	defer os.Remove(dbName)
 
 	db, err := database.New(dbName)
