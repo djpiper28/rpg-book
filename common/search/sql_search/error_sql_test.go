@@ -66,7 +66,7 @@ func TestInvalidIncludesSyntax(t *testing.T) {
 	weirdInput := "%_'"
 	sql, args := asSql(t, `"`+weirdInput+`"`, TestTableData, TestColumnMap)
 
-	require.Contains(t, sql, "name LIKE ?")
+	require.Contains(t, sql, "name_normalised LIKE ?")
 	require.Len(t, args, 1)
 	// It should be wrapped in %
 	require.Equal(t, "%"+weirdInput+"%", args[0])
