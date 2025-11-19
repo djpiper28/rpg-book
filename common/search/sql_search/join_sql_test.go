@@ -104,6 +104,7 @@ func TestJoinSql(t *testing.T) {
 
 	rows, err := db.Db.Queryx(sql, args...)
 	require.NoError(t, err)
+	defer rows.Close()
 
 	var results []UserOrder
 	for rows.Next() {
@@ -122,6 +123,7 @@ func TestJoinSql(t *testing.T) {
 
 	rows, err = db.Db.Queryx(sql, args...)
 	require.NoError(t, err)
+	defer rows.Close()
 
 	results = nil
 	for rows.Next() {
