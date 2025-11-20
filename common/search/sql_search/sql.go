@@ -10,7 +10,7 @@ import (
 type SqlTableData struct {
 	FieldsToScan []string // i.e: []string{"name", "description", ... }; You should use the SqlColmnMap to get the keys of set generators (or the basic query) to map to these
 	TableName    string   // i.e: example_table
-	JoinClauses  string   // i.e: INNER JOIN Customers ON Orders.CustomerID=Customers.CustomerID;
+	JoinClauses  string   // i.e: LEFT JOIN Customers ON Orders.CustomerID=Customers.CustomerID;
 }
 
 type SqlColmnMap struct {
