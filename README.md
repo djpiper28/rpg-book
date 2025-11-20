@@ -38,6 +38,7 @@ This uses [Go Peg](https://github.com/pointlander/peg) to generate the parser.
 ## Building, Testing, and Dev Stuff
 
 ```sh
+nix-shell shell.nix # You may with to use the `--pure` flag if you have issues
 make -j # Builds the backend and frontend
 # The frontend is in ./desktop_client/app/release/
 # The launcher is in ./desktop_client/launcher/launcher
