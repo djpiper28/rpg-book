@@ -49,7 +49,7 @@ export const useProjectStore = create<ProjectStore>()(
         );
 
         if (oldCharacter) {
-          project.characters[oldCharacter] = structuredClone(character);
+          project.characters[oldCharacter] = character;
         } else {
           project.characters.push(character);
         }
