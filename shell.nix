@@ -12,6 +12,8 @@ pkgs.mkShell {
     electron
     p7zip
     protobuf_27
+    protoc-gen-go
+    protoc-gen-go-grpc
     grpc-tools
   ];
 }
