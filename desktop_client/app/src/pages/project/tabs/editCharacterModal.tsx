@@ -87,9 +87,9 @@ export default function EditCharacterModal(props: Readonly<Props>): ReactNode {
                 setIcon: dirtyIcon,
               });
 
-              props.closeDialog();
-
               projectStore.addCharacter(projectHandle, characterDetails);
+
+              props.closeDialog();
             } catch (error: unknown) {
               getLogger().error("Cannot edit character", {
                 error: String(error),
