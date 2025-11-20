@@ -4,9 +4,9 @@ import (
 	"os"
 	"testing"
 
+	"github.com/djpiper28/rpg-book/common/database/sqlite3"
 	"github.com/djpiper28/rpg-book/common/search/parser"
 	sqlsearch "github.com/djpiper28/rpg-book/common/search/sql_search"
-	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
@@ -27,11 +27,11 @@ type UserOrder struct {
 	Item string `db:"item"`
 }
 
-func newJoinTestDb(t *testing.T) (*database.Db, func()) {
+func newJoinTestDb(t *testing.T) (*sqlite3.Db, func()) {
 	t.Helper()
 
-	dbName := uuid.NewString() + database.DbExtension
-	db, err := database.New(dbName)
+	dbName := uuid.NewString() + sqlite3.DbExtension
+	db, err := sqlite3.New(dbName)
 	require.NoError(t, err)
 
 	closeFn := func() {

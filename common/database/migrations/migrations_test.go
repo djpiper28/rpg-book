@@ -5,18 +5,18 @@ import (
 	"os"
 	"testing"
 
-	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
-	"github.com/djpiper28/rpg-book/desktop_client/backend/database/migrations"
+	"github.com/djpiper28/rpg-book/common/database/migrations"
+	"github.com/djpiper28/rpg-book/common/database/sqlite3"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/require"
 )
 
 func TestMigrationsEmptyList(t *testing.T) {
-	name := uuid.New().String() + database.DbExtension
+	name := uuid.New().String() + sqlite3.DbExtension
 	defer os.Remove(name)
 
-	db, err := database.New(name)
+	db, err := sqlite3.New(name)
 	defer db.Close()
 	require.NoError(t, err)
 
@@ -26,10 +26,10 @@ func TestMigrationsEmptyList(t *testing.T) {
 }
 
 func TestMigrationsOneTable(t *testing.T) {
-	name := uuid.New().String() + database.DbExtension
+	name := uuid.New().String() + sqlite3.DbExtension
 	defer os.Remove(name)
 
-	db, err := database.New(name)
+	db, err := sqlite3.New(name)
 	defer db.Close()
 	require.NoError(t, err)
 
@@ -72,10 +72,10 @@ func TestMigrationsOneTable(t *testing.T) {
 }
 
 func TestMigrationsNilFunctions(t *testing.T) {
-	name := uuid.New().String() + database.DbExtension
+	name := uuid.New().String() + sqlite3.DbExtension
 	defer os.Remove(name)
 
-	db, err := database.New(name)
+	db, err := sqlite3.New(name)
 	defer db.Close()
 	require.NoError(t, err)
 
@@ -98,10 +98,10 @@ func TestMigrationsNilFunctions(t *testing.T) {
 }
 
 func TestMigrationsTwo(t *testing.T) {
-	name := uuid.New().String() + database.DbExtension
+	name := uuid.New().String() + sqlite3.DbExtension
 	defer os.Remove(name)
 
-	db, err := database.New(name)
+	db, err := sqlite3.New(name)
 	defer db.Close()
 	require.NoError(t, err)
 
@@ -129,10 +129,10 @@ func TestMigrationsTwo(t *testing.T) {
 }
 
 func TestExecutedMigrationsAreNotExecutedAgain(t *testing.T) {
-	name := uuid.New().String() + database.DbExtension
+	name := uuid.New().String() + sqlite3.DbExtension
 	defer os.Remove(name)
 
-	db, err := database.New(name)
+	db, err := sqlite3.New(name)
 	require.NoError(t, err)
 
 	m := migrations.New([]migrations.Migration{
@@ -154,7 +154,7 @@ func TestExecutedMigrationsAreNotExecutedAgain(t *testing.T) {
 
 	db.Close()
 
-	db, err = database.New(name)
+	db, err = sqlite3.New(name)
 	defer db.Close()
 	require.NoError(t, err)
 
@@ -180,10 +180,10 @@ func TestExecutedMigrationsAreNotExecutedAgain(t *testing.T) {
 }
 
 func TestMigrationsDifferentTransactions(t *testing.T) {
-	name := uuid.New().String() + database.DbExtension
+	name := uuid.New().String() + sqlite3.DbExtension
 	defer os.Remove(name)
 
-	db, err := database.New(name)
+	db, err := sqlite3.New(name)
 	require.NoError(t, err)
 
 	m := migrations.New([]migrations.Migration{
@@ -205,7 +205,7 @@ func TestMigrationsDifferentTransactions(t *testing.T) {
 
 	db.Close()
 
-	db, err = database.New(name)
+	db, err = sqlite3.New(name)
 	defer db.Close()
 	require.NoError(t, err)
 
@@ -233,10 +233,10 @@ func TestMigrationsDifferentTransactions(t *testing.T) {
 }
 
 func TestPreProcessError(t *testing.T) {
-	name := uuid.New().String() + database.DbExtension
+	name := uuid.New().String() + sqlite3.DbExtension
 	defer os.Remove(name)
 
-	db, err := database.New(name)
+	db, err := sqlite3.New(name)
 	defer db.Close()
 	require.NoError(t, err)
 
@@ -255,10 +255,10 @@ func TestPreProcessError(t *testing.T) {
 }
 
 func TestSqlError(t *testing.T) {
-	name := uuid.New().String() + database.DbExtension
+	name := uuid.New().String() + sqlite3.DbExtension
 	defer os.Remove(name)
 
-	db, err := database.New(name)
+	db, err := sqlite3.New(name)
 	defer db.Close()
 	require.NoError(t, err)
 
@@ -274,10 +274,10 @@ func TestSqlError(t *testing.T) {
 }
 
 func TestPostProcessError(t *testing.T) {
-	name := uuid.New().String() + database.DbExtension
+	name := uuid.New().String() + sqlite3.DbExtension
 	defer os.Remove(name)
 
-	db, err := database.New(name)
+	db, err := sqlite3.New(name)
 	defer db.Close()
 	require.NoError(t, err)
 
@@ -298,10 +298,10 @@ func TestPostProcessError(t *testing.T) {
 }
 
 func TestSqlTestError(t *testing.T) {
-	name := uuid.New().String() + database.DbExtension
+	name := uuid.New().String() + sqlite3.DbExtension
 	defer os.Remove(name)
 
-	db, err := database.New(name)
+	db, err := sqlite3.New(name)
 	defer db.Close()
 	require.NoError(t, err)
 

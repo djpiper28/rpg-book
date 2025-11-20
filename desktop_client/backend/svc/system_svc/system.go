@@ -9,9 +9,9 @@ import (
 
 	"github.com/charmbracelet/log"
 	buildinfo "github.com/djpiper28/rpg-book/common/build_info"
+	"github.com/djpiper28/rpg-book/common/database/sqlite3"
 	"github.com/djpiper28/rpg-book/common/image"
 	imagecompression "github.com/djpiper28/rpg-book/common/image/image_compression"
-	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/model"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_common"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_system"
@@ -19,10 +19,10 @@ import (
 
 type SystemSvc struct {
 	pb_system.UnimplementedSystemSvcServer
-	db *database.Db
+	db *sqlite3.Db
 }
 
-func New(db *database.Db) *SystemSvc {
+func New(db *sqlite3.Db) *SystemSvc {
 	return &SystemSvc{
 		db: db,
 	}

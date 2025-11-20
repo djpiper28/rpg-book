@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
+	"github.com/djpiper28/rpg-book/common/database/sqlite3"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/project"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
@@ -36,7 +36,7 @@ func NewTestImage(w, h int) image.Image {
 }
 
 func NewProject(t *testing.T) (*project.Project, func()) {
-	filename := uuid.New().String() + database.DbExtension
+	filename := uuid.New().String() + sqlite3.DbExtension
 
 	projectName := uuid.New().String()
 

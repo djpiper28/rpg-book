@@ -7,8 +7,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/djpiper28/rpg-book/common/database/sqlite3"
 	testutils "github.com/djpiper28/rpg-book/common/test_utils"
-	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_common"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_project"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_project_character"
@@ -76,7 +76,7 @@ func TestProjectSvc(t *testing.T) {
 	})
 
 	t.Run("Test create new project", func(t *testing.T) {
-		filename := uuid.New().String() + database.DbExtension
+		filename := uuid.New().String() + sqlite3.DbExtension
 		name := uuid.New().String()
 
 		handle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
@@ -99,7 +99,7 @@ func TestProjectSvc(t *testing.T) {
 	})
 
 	t.Run("Open project after create", func(t *testing.T) {
-		filename := uuid.New().String() + database.DbExtension
+		filename := uuid.New().String() + sqlite3.DbExtension
 		name := uuid.New().String()
 
 		handle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
@@ -126,7 +126,7 @@ func TestProjectSvc(t *testing.T) {
 	})
 
 	t.Run("Test open project that is not tracked", func(t *testing.T) {
-		filename := uuid.New().String() + database.DbExtension
+		filename := uuid.New().String() + sqlite3.DbExtension
 		name := uuid.New().String()
 
 		handle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
@@ -173,7 +173,7 @@ func TestProjectSvc(t *testing.T) {
 	})
 
 	t.Run("Test created project appears in recently openeed projects", func(t *testing.T) {
-		filename := uuid.New().String() + database.DbExtension
+		filename := uuid.New().String() + sqlite3.DbExtension
 		name := uuid.New().String()
 
 		handle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
@@ -198,7 +198,7 @@ func TestProjectSvc(t *testing.T) {
 	})
 
 	t.Run("Test create character in project", func(t *testing.T) {
-		filename := uuid.New().String() + database.DbExtension
+		filename := uuid.New().String() + sqlite3.DbExtension
 		projectName := uuid.New().String()
 		characterName := uuid.New().String()
 		characterDescription := uuid.New().String()
@@ -234,7 +234,7 @@ func TestProjectSvc(t *testing.T) {
 	})
 
 	t.Run("Test get character after create", func(t *testing.T) {
-		filename := uuid.New().String() + database.DbExtension
+		filename := uuid.New().String() + sqlite3.DbExtension
 		projectName := uuid.New().String()
 		characterName := uuid.New().String()
 		characterDescription := uuid.New().String()
@@ -272,7 +272,7 @@ func TestProjectSvc(t *testing.T) {
 	})
 
 	t.Run("Test update character with icon set", func(t *testing.T) {
-		filename := uuid.New().String() + database.DbExtension
+		filename := uuid.New().String() + sqlite3.DbExtension
 		projectName := uuid.New().String()
 		characterName := uuid.New().String()
 		characterDescription := uuid.New().String()
@@ -326,7 +326,7 @@ func TestProjectSvc(t *testing.T) {
 	})
 
 	t.Run("Test update character without icon set", func(t *testing.T) {
-		filename := uuid.New().String() + database.DbExtension
+		filename := uuid.New().String() + sqlite3.DbExtension
 		projectName := uuid.New().String()
 		characterName := uuid.New().String()
 		characterDescription := uuid.New().String()
@@ -378,7 +378,7 @@ func TestProjectSvc(t *testing.T) {
 	})
 
 	t.Run("Test delete character", func(t *testing.T) {
-		filename := uuid.New().String() + database.DbExtension
+		filename := uuid.New().String() + sqlite3.DbExtension
 		projectName := uuid.New().String()
 		characterName := uuid.New().String()
 		characterDescription := uuid.New().String()

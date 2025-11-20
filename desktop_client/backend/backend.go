@@ -17,8 +17,8 @@ import (
 	"time"
 
 	"github.com/charmbracelet/log"
+	"github.com/djpiper28/rpg-book/common/database/sqlite3"
 	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
-	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_project"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_system"
 	projectsvc "github.com/djpiper28/rpg-book/desktop_client/backend/svc/project_svc"
@@ -61,7 +61,7 @@ type Server struct {
 	certKeys   *rsa.PrivateKey
 	cancel     func()
 	server     *grpc.Server
-	primaryDb  *database.Db
+	primaryDb  *sqlite3.Db
 	projectSvc *projectsvc.ProjectSvc
 }
 
@@ -111,7 +111,7 @@ func New(port int) (*Server, error) {
 		return nil, errors.Join(errors.New("Cannot create x509 certificate for gRPC"), err)
 	}
 
-	db, err := database.New(primaryDb)
+	db, err := sqlite3.New(primaryDb)
 	if err != nil {
 		return nil, errors.Join(fmt.Errorf("Cannot create primaryDb (%s)", primaryDb), err)
 	}

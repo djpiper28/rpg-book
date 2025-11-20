@@ -3,11 +3,11 @@ package project
 import (
 	"errors"
 
-	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
-	"github.com/djpiper28/rpg-book/desktop_client/backend/database/migrations"
+	"github.com/djpiper28/rpg-book/common/database"
+	"github.com/djpiper28/rpg-book/common/database/migrations"
 )
 
-func Migrate(db *database.Db) error {
+func Migrate(db database.Database) error {
 	m := migrations.New([]migrations.Migration{
 		{
 			Sql: `

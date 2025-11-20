@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/charmbracelet/log"
+	"github.com/djpiper28/rpg-book/common/database/sqlite3"
 	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
-	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/model"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_common"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_project"
@@ -21,12 +21,12 @@ import (
 
 type ProjectSvc struct {
 	pb_project.UnimplementedProjectSvcServer
-	primaryDb *database.Db
+	primaryDb *sqlite3.Db
 	projects  map[uuid.UUID]*project.Project
 	lock      sync.Mutex
 }
 
-func New(db *database.Db) *ProjectSvc {
+func New(db *sqlite3.Db) *ProjectSvc {
 	return &ProjectSvc{
 		primaryDb: db,
 		projects:  make(map[uuid.UUID]*project.Project),

@@ -1,7 +1,7 @@
 packages:
   - path: "github.com/djpiper28/rpg-book/desktop_client/launcher"
     output_path: "./desktop_client/app/src/lib/launcherTypes"
-  - path: "github.com/djpiper28/rpg-book/desktop_client/backend/database"
+  - path: "github.com/djpiper28/rpg-book/common/database/sqlite3"
     output_path: "./desktop_client/app/src/lib/databaseTypes"
     type_mappings:
       time.Duration: "number"

@@ -5,30 +5,16 @@ import (
 	"os"
 
 	"github.com/charmbracelet/log"
+	"github.com/djpiper28/rpg-book/common/database/sqlite3"
 	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
-	"github.com/djpiper28/rpg-book/desktop_client/backend/database"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/project/model"
 	"github.com/google/uuid"
 )
 
 type Project struct {
-	db       *database.Db
+	db       *sqlite3.Db
 	Settings model.ProjectSettings
 	Filename string
-}
-
-func openDatabase(filename string) (*database.Db, error) {
-	db, err := database.New(filename)
-	if err != nil {
-		return nil, errors.Join(errors.New("Cannot open project database"), err)
-	}
-
-	err = Migrate(db)
-	if err != nil {
-		return nil, errors.Join(errors.New("Cannot migrate project database"), err)
-	}
-
-	return db, err
 }
 
 func Open(filename string) (*Project, error) {
@@ -56,6 +42,20 @@ func Open(filename string) (*Project, error) {
 		Settings: settings,
 		Filename: filename,
 	}, nil
+}
+
+func openDatabase(filename string) (*sqlite3.Db, error) {
+	db, err := sqlite3.New(filename)
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot open project database"), err)
+	}
+
+	err = Migrate(db)
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot migrate project database"), err)
+	}
+
+	return db, nil
 }
 
 func Create(filename string, projectName string) (*Project, error) {

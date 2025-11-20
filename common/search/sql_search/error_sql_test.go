@@ -34,7 +34,7 @@ func TestSqlInjection(t *testing.T) {
 	maliciousInput := "'; DROP TABLE test; --"
 	// We use a text column so it goes through the text path
 	// The query will be: name LIKE '%'; DROP TABLE test; --%'
-	// This is a valid string literal for LIKE, so it should execute as a search.
+	// This is 	dbName := uuid.NewString() + sqlite3.DbExtensionr LIKE, so it should execute as a search.
 	// It should NOT execute the DROP TABLE command.
 	sql, args := asSql(t, `name:"`+maliciousInput+`"`, TestTableData, TestColumnMap)
 
