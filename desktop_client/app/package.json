@@ -42,7 +42,7 @@
     "@repodog/eslint-config-react": "^9.0.5",
     "@storybook/addon-onboarding": "^9.1.4",
     "@storybook/react-vite": "^9.1.4",
-    "@tailwindcss/vite": "^4.1.2",
+    "@tailwindcss/vite": "^4.1.17",
     "@testing-library/react": "^16.3.0",
     "@types/node": "^24.10.0",
     "@types/react": "^19.1.11",
