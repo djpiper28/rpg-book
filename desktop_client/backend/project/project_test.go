@@ -6,6 +6,7 @@ import (
 
 	"github.com/djpiper28/rpg-book/common/database/sqlite3"
 	imagecompression "github.com/djpiper28/rpg-book/common/image/image_compression"
+	"github.com/djpiper28/rpg-book/common/normalisation"
 	testutils "github.com/djpiper28/rpg-book/common/test_utils"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/project"
 	"github.com/google/uuid"
@@ -65,6 +66,9 @@ func TestCreateCharacter(t *testing.T) {
 
 	require.Equal(t, name, c.Name)
 	require.Equal(t, desc, c.Description)
+	require.Equal(t, normalisation.Normalise(name), c.NameNormalised)
+	require.Equal(t, desc, c.Description)
+	require.Equal(t, normalisation.Normalise(desc), c.DescriptionNormalised)
 	require.Equal(t, icon, c.Icon)
 	require.NotEmpty(t, c.Created)
 	require.NotEmpty(t, c.Id)

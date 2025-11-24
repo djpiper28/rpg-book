@@ -92,11 +92,12 @@ func (p *Project) CreateCharacter(name, description string, icon []byte) (*model
 	character := model.NewCharacter(name)
 	character.Description = description
 	character.Icon = icon
+	character.Normalise()
 
 	_, err := p.db.Db.NamedExec(`
     INSERT INTO 
-    characters (id, name, created, description, icon)
-    VALUES(:id, :name, :created, :description, :icon);`,
+    characters (id, name, name_normalised, created, description, description_normalised, icon)
+    VALUES(:id, :name, :name_normalised, :created, :description, :description_normalised, :icon);`,
 		character)
 	if err != nil {
 		return nil, errors.Join(errors.New("Cannot create character"), err)
@@ -139,15 +140,19 @@ func (p *Project) GetCharacter(id uuid.UUID) (*model.Character, error) {
 }
 
 func (p *Project) UpdateCharacter(character *model.Character, setIcon bool) error {
+	character.Normalise()
+
 	sql := `
     UPDATE characters
-      SET icon=:icon, name=:name, description=:description
+      SET icon=:icon, name=:name, description=:description,
+          name_normalised=:name_normalised, description_normalised=:description_normalised
       WHERE id=:id;
     `
 	if !setIcon {
 		sql = `
     UPDATE characters
-      SET name=:name, description=:description
+      SET name=:name, description=:description,
+          name_normalised=:name_normalised, description_normalised=:description_normalised
       WHERE id=:id;
     `
 	}
