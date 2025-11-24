@@ -7,6 +7,8 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/djpiper28/rpg-book/common/database/sqlite3"
 	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
+	"github.com/djpiper28/rpg-book/common/search/parser"
+	sqlsearch "github.com/djpiper28/rpg-book/common/search/sql_search"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/project/model"
 	"github.com/google/uuid"
 )
@@ -176,4 +178,52 @@ func (p *Project) DeleteCharacter(id uuid.UUID) error {
 
 func (p *Project) Close() {
 	defer p.db.Close()
+}
+
+func (p *Project) SearchCharacter(query string) ([]model.Character, error) {
+	ast, err := parser.Parse(query)
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot parse query"), err)
+	}
+
+	const (
+		description = "description"
+		name        = "name"
+	)
+
+	sql, args, err := sqlsearch.AsSql(ast,
+		sqlsearch.SqlTableData{
+			FieldsToScan: []string{"id", "name", "description"},
+			TableName:    "characters",
+		},
+		sqlsearch.SqlColmnMap{
+			TextColumns: map[string]string{
+				"name":        name,
+				"desc":        description,
+				"description": description,
+			},
+			BasicQueryColumn: name,
+		})
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot process query"), err)
+	}
+
+	rows, err := p.db.Db.Queryx(sql, args...)
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot execute SQL query"), err)
+	}
+
+	defer rows.Close()
+	characters := make([]model.Character, 0)
+	for rows.Next() {
+		character := model.Character{}
+		err = rows.StructScan(&character)
+		if err != nil {
+			return nil, errors.Join(errors.New("Cannot read characters"), err)
+		}
+
+		characters = append(characters, character)
+	}
+
+	return characters, nil
 }

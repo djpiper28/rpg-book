@@ -19,13 +19,13 @@ type Character struct {
 }
 
 func NewCharacter(name string) *Character {
-  c := &Character{
+	c := &Character{
 		Id:      uuid.New(),
 		Name:    name,
 		Created: time.Now().String(),
 	}
-  c.Normalise()
-  return c
+	c.Normalise()
+	return c
 }
 
 func (c *Character) Normalise() {

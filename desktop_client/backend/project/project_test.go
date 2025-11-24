@@ -1,6 +1,7 @@
 package project_test
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -172,4 +173,64 @@ func TestDeleteCharacter(t *testing.T) {
 
 	_, err = project.GetCharacter(character.Id)
 	require.Error(t, err)
+}
+
+func TestSearchCharacterBasic(t *testing.T) {
+	project, remove := testutils.NewProject(t)
+	defer remove()
+
+	name := uuid.New().String()
+	desc := uuid.New().String()
+	character, err := project.CreateCharacter(name, desc, nil)
+	require.NoError(t, err)
+
+	res, err := project.SearchCharacter(name)
+	require.NoError(t, err)
+	require.Len(t, res, 1)
+	require.Equal(t, character.ToPb(), res[0].ToPb())
+}
+
+func TestSearchCharacterName(t *testing.T) {
+	project, remove := testutils.NewProject(t)
+	defer remove()
+
+	name := uuid.New().String()
+	desc := uuid.New().String()
+	character, err := project.CreateCharacter(name, desc, nil)
+	require.NoError(t, err)
+
+	res, err := project.SearchCharacter(fmt.Sprintf("name:%s", name))
+	require.NoError(t, err)
+	require.Len(t, res, 1)
+	require.Equal(t, character.ToPb(), res[0].ToPb())
+}
+
+func TestSearchCharacterDesc(t *testing.T) {
+	project, remove := testutils.NewProject(t)
+	defer remove()
+
+	name := uuid.New().String()
+	desc := uuid.New().String()
+	character, err := project.CreateCharacter(name, desc, nil)
+	require.NoError(t, err)
+
+	res, err := project.SearchCharacter(fmt.Sprintf("desc:%s", desc))
+	require.NoError(t, err)
+	require.Len(t, res, 1)
+	require.Equal(t, character.ToPb(), res[0].ToPb())
+}
+
+func TestSearchCharacterDescription(t *testing.T) {
+	project, remove := testutils.NewProject(t)
+	defer remove()
+
+	name := uuid.New().String()
+	desc := uuid.New().String()
+	character, err := project.CreateCharacter(name, desc, nil)
+	require.NoError(t, err)
+
+	res, err := project.SearchCharacter(fmt.Sprintf("description:%s", desc))
+	require.NoError(t, err)
+	require.Len(t, res, 1)
+	require.Equal(t, character.ToPb(), res[0].ToPb())
 }

@@ -79,13 +79,13 @@ func (p *ProjectSvc) UpdateCharacter(ctx context.Context, in *pb_project.UpdateC
 
 	project, err := p.getProject(in.Project)
 	if err != nil {
-		log.Error("Cannot get projecct id")
+		log.Error("Cannot get projecct id", loggertags.TagError, err)
 		return nil, updateError
 	}
 
 	characterId, err := uuid.Parse(in.Handle.Id)
 	if err != nil {
-		log.Error("Cannot get character id")
+		log.Error("Cannot get character id", loggertags.TagError, err)
 		return nil, errors.Join(updateError, err)
 	}
 
@@ -112,7 +112,7 @@ func (p *ProjectSvc) UpdateCharacter(ctx context.Context, in *pb_project.UpdateC
 func (p *ProjectSvc) GetCharacter(ctx context.Context, in *pb_project.GetCharacterReq) (*pb_project.GetCharacterResp, error) {
 	project, err := p.getProject(in.Project)
 	if err != nil {
-		log.Error("Cannot get character")
+		log.Error("Cannot get character", loggertags.TagError, err)
 		return nil, errors.New("Cannot find project")
 	}
 
@@ -137,7 +137,7 @@ func (p *ProjectSvc) GetCharacter(ctx context.Context, in *pb_project.GetCharact
 func (p *ProjectSvc) DeleteCharacter(ctx context.Context, in *pb_project.DeleteCharacterReq) (*pb_common.Empty, error) {
 	project, err := p.getProject(in.Project)
 	if err != nil {
-		log.Error("Cannot get character")
+		log.Error("Cannot get character", loggertags.TagError, err)
 		return nil, errors.New("Cannot find project")
 	}
 
@@ -154,4 +154,28 @@ func (p *ProjectSvc) DeleteCharacter(ctx context.Context, in *pb_project.DeleteC
 	}
 
 	return &pb_common.Empty{}, nil
+}
+
+func (p *ProjectSvc) SearchCharacter(ctx context.Context, in *pb_project.SearchCharacterReq) (*pb_project.SearchCharacterResp, error) {
+	project, err := p.getProject(in.Project)
+	if err != nil {
+		log.Error("Cannot search character", loggertags.TagError, err)
+		return nil, errors.New("Cannot find project")
+	}
+
+	characters, err := project.SearchCharacter(in.Query)
+	if err != nil {
+		log.Error("Cannot search character", loggertags.TagError, err)
+		return nil, errors.Join(errors.New("Cannot perform search"), err)
+	}
+
+	resp := &pb_project.SearchCharacterResp{
+		Details: make([]*pb_project_character.BasicCharacterDetails, len(characters)),
+	}
+
+	for i, character := range characters {
+		resp.Details[i] = character.ToPb()
+	}
+
+	return resp, nil
 }

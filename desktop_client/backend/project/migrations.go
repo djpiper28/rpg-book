@@ -57,7 +57,6 @@ func Migrate(db database.Database) error {
 						character.NameNormalised,
 						character.DescriptionNormalised,
 						character.Id)
-
 					if err != nil {
 						return errors.Join(fmt.Errorf("Cannot update character %s (id %s)", character.Name, character.Id), err)
 					}
