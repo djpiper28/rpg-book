@@ -91,6 +91,12 @@ const router = createHashRouter([
     path: "/",
     ...routesCommon,
   },
+  {
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+    lazy: () => import("./pages/help/search/search.tsx"),
+    path: "/help/search",
+    ...routesCommon,
+  },
 ]);
 
 function Loader(): ReactNode {

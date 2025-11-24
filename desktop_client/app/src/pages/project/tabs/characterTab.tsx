@@ -145,28 +145,28 @@ export function CharacterTab(): ReactNode {
                 <Table.Th>Name</Table.Th>
                 <Table.Th>Factions</Table.Th>
               </Table.Tr>
-              {thisProject.project.characters.map((character): ReactNode => {
-                const id = character.handle?.id ?? "";
-                const selected = selectedCharacterId == id;
-
-                return (
-                  <Table.Tr
-                    className={selected ? "bg-gray-500" : ""}
-                    key={id}
-                    onClick={() => {
-                      setSelectedCharacterId(id);
-                    }}
-                  >
-                    <Table.Th>
-                      <div className="flex flex-row gap-2">
-                        <P className="text-wrap">{character.name}</P>
-                      </div>
-                    </Table.Th>
-                    <Table.Th>TODO: Change me</Table.Th>
-                  </Table.Tr>
-                );
-              })}
             </Table.Thead>
+            {thisProject.project.characters.map((character): ReactNode => {
+              const id = character.handle?.id ?? "";
+              const selected = selectedCharacterId == id;
+
+              return (
+                <Table.Tr
+                  className={selected ? "bg-gray-500" : ""}
+                  key={id}
+                  onClick={() => {
+                    setSelectedCharacterId(id);
+                  }}
+                >
+                  <Table.Th>
+                    <div className="flex flex-row gap-2">
+                      <P className="text-wrap">{character.name}</P>
+                    </div>
+                  </Table.Th>
+                  <Table.Th>TODO: Change me</Table.Th>
+                </Table.Tr>
+              );
+            })}
           </Table>
         </div>
 
