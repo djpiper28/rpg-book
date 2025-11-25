@@ -187,7 +187,7 @@ func TestSearchCharacterBasic(t *testing.T) {
 	res, err := project.SearchCharacter(name)
 	require.NoError(t, err)
 	require.Len(t, res, 1)
-	require.Equal(t, character.ToPb(), res[0].ToPb())
+	require.Equal(t, character.Id, res[0])
 }
 
 func TestSearchCharacterName(t *testing.T) {
@@ -202,7 +202,7 @@ func TestSearchCharacterName(t *testing.T) {
 	res, err := project.SearchCharacter(fmt.Sprintf("name:%s", name))
 	require.NoError(t, err)
 	require.Len(t, res, 1)
-	require.Equal(t, character.ToPb(), res[0].ToPb())
+	require.Equal(t, character.Id, res[0])
 }
 
 func TestSearchCharacterDesc(t *testing.T) {
@@ -217,7 +217,7 @@ func TestSearchCharacterDesc(t *testing.T) {
 	res, err := project.SearchCharacter(fmt.Sprintf("desc:%s", desc))
 	require.NoError(t, err)
 	require.Len(t, res, 1)
-	require.Equal(t, character.ToPb(), res[0].ToPb())
+	require.Equal(t, character.Id, res[0])
 }
 
 func TestSearchCharacterDescription(t *testing.T) {
@@ -232,5 +232,5 @@ func TestSearchCharacterDescription(t *testing.T) {
 	res, err := project.SearchCharacter(fmt.Sprintf("description:%s", desc))
 	require.NoError(t, err)
 	require.Len(t, res, 1)
-	require.Equal(t, character.ToPb(), res[0].ToPb())
+	require.Equal(t, character.Id, res[0])
 }
