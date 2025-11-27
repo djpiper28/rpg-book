@@ -227,7 +227,7 @@ export function CharacterTab(): ReactNode {
                   createOpen();
                 }}
               >
-                Create Character
+                Add Character
               </Button>
             }
             searchRes={queryResult}

@@ -85,6 +85,7 @@ const router = createHashRouter([
         path: "search",
       },
     ],
+    element: <Layout />,
     path: helpPath,
     ...routesCommon,
   },

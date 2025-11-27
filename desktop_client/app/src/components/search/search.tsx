@@ -3,6 +3,7 @@ import { HelpCircleIcon } from "lucide-react";
 import { type ReactNode } from "react";
 import { P } from "@/components/typography/P";
 import { searchHelpPath } from "@/pages/help/search/path";
+import { useNavigate } from "react-router";
 
 interface Props<T> {
   elementWrapper: (children: ReactNode[]) => ReactNode;
@@ -15,6 +16,8 @@ interface Props<T> {
 }
 
 export function Search<T>(props: Readonly<Props<T>>): ReactNode {
+  const navigate = useNavigate();
+
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-row gap-2 justify-between">
@@ -28,8 +31,7 @@ export function Search<T>(props: Readonly<Props<T>>): ReactNode {
         <button
           className="cursor-pointer"
           onClick={() => {
-            const w = window.open(searchHelpPath, "_blank");
-            w?.focus();
+            navigate(searchHelpPath);
           }}
         >
           <HelpCircleIcon />
