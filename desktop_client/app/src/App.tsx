@@ -21,6 +21,7 @@ import {
 } from "./lib/grpcClient/client";
 import { mustVoid } from "./lib/utils/errorHandlers.tsx";
 import { createProjectPath } from "./pages/createProject/path.ts";
+import { helpPath } from "./pages/help/path.ts";
 import { indexPath, withLayoutPath } from "./pages/path.ts";
 import { projectPath } from "./pages/project/path.ts";
 import { settingsPath } from "./pages/settings/path.ts";
@@ -28,7 +29,6 @@ import { useGlobalErrorStore } from "./stores/globalErrorStore";
 import { useProjectStore } from "./stores/projectStore.ts";
 import { useSettingsStore } from "./stores/settingsStore";
 import { useTabStore } from "./stores/tabStore";
-import { helpPath } from "./pages/help/path.ts";
 
 function IndexRedirect(): ReactNode {
   const navigate = useNavigate();
@@ -80,6 +80,17 @@ const router = createHashRouter([
   {
     children: [
       {
+        // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+        lazy: () => import("./pages/help/search/search.tsx"),
+        path: "search",
+      },
+    ],
+    path: helpPath,
+    ...routesCommon,
+  },
+  {
+    children: [
+      {
         element: <Loader />,
         path: "loading",
       },
@@ -90,17 +101,6 @@ const router = createHashRouter([
   {
     element: <IndexRedirect />,
     path: "/",
-    ...routesCommon,
-  },
-  {
-    children: [
-      {
-        // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-        lazy: () => import("./pages/help/search/search.tsx"),
-        path: "search",
-      },
-    ],
-    path: helpPath,
     ...routesCommon,
   },
 ]);
@@ -290,7 +290,7 @@ export default function App(): ReactNode {
           error: JSON.stringify(error),
         });
       });
-  }, []);
+  }, [projects, tabs]);
 
   return (
     <MantineProvider
