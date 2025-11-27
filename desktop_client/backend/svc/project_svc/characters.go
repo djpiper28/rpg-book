@@ -163,18 +163,20 @@ func (p *ProjectSvc) SearchCharacter(ctx context.Context, in *pb_project.SearchC
 		return nil, errors.New("Cannot find project")
 	}
 
-	characters, err := project.SearchCharacter(in.Query)
+	characterIds, err := project.SearchCharacter(in.Query)
 	if err != nil {
 		log.Error("Cannot search character", loggertags.TagError, err)
 		return nil, errors.Join(errors.New("Cannot perform search"), err)
 	}
 
 	resp := &pb_project.SearchCharacterResp{
-		Details: make([]*pb_project_character.BasicCharacterDetails, len(characters)),
+		Details: make([]*pb_project_character.CharacterHandle, len(characterIds)),
 	}
 
-	for i, character := range characters {
-		resp.Details[i] = character.ToPb()
+	for i, characterId := range characterIds {
+		resp.Details[i] = &pb_project_character.CharacterHandle{
+			Id: characterId.String(),
+		}
 	}
 
 	return resp, nil

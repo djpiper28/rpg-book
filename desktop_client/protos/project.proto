@@ -80,5 +80,5 @@ message SearchCharacterReq {
 }
 
 message SearchCharacterResp {
-  repeated BasicCharacterDetails details = 1;
+  repeated CharacterHandle details = 1;
 }

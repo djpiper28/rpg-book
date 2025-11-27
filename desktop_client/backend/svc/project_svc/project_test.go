@@ -472,6 +472,6 @@ func TestProjectSvc(t *testing.T) {
 
 		require.NoError(t, err)
 		require.Len(t, searchRes.Details, 1)
-		require.Equal(t, characterHandle, searchRes.Details[0].Handle)
+		require.Equal(t, characterHandle, searchRes.Details[0])
 	})
 }

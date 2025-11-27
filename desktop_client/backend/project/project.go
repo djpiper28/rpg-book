@@ -180,7 +180,7 @@ func (p *Project) Close() {
 	defer p.db.Close()
 }
 
-func (p *Project) SearchCharacter(query string) ([]model.Character, error) {
+func (p *Project) SearchCharacter(query string) ([]uuid.UUID, error) {
 	ast, err := parser.Parse(query)
 	if err != nil {
 		return nil, errors.Join(errors.New("Cannot parse query"), err)
@@ -193,7 +193,7 @@ func (p *Project) SearchCharacter(query string) ([]model.Character, error) {
 
 	sql, args, err := sqlsearch.AsSql(ast,
 		sqlsearch.SqlTableData{
-			FieldsToScan: []string{"id", "name", "description"},
+			FieldsToScan: []string{"id"},
 			TableName:    "characters",
 		},
 		sqlsearch.SqlColmnMap{
@@ -214,16 +214,16 @@ func (p *Project) SearchCharacter(query string) ([]model.Character, error) {
 	}
 
 	defer rows.Close()
-	characters := make([]model.Character, 0)
+	characterIds := make([]uuid.UUID, 0)
 	for rows.Next() {
-		character := model.Character{}
-		err = rows.StructScan(&character)
+		var id uuid.UUID
+		err = rows.Scan(&id)
 		if err != nil {
 			return nil, errors.Join(errors.New("Cannot read characters"), err)
 		}
 
-		characters = append(characters, character)
+		characterIds = append(characterIds, id)
 	}
 
-	return characters, nil
+	return characterIds, nil
 }
