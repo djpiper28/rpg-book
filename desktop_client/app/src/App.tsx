@@ -28,6 +28,7 @@ import { useGlobalErrorStore } from "./stores/globalErrorStore";
 import { useProjectStore } from "./stores/projectStore.ts";
 import { useSettingsStore } from "./stores/settingsStore";
 import { useTabStore } from "./stores/tabStore";
+import { helpPath } from "./pages/help/path.ts";
 
 function IndexRedirect(): ReactNode {
   const navigate = useNavigate();
@@ -92,9 +93,14 @@ const router = createHashRouter([
     ...routesCommon,
   },
   {
-    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-    lazy: () => import("./pages/help/search/search.tsx"),
-    path: "/help/search",
+    children: [
+      {
+        // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+        lazy: () => import("./pages/help/search/search.tsx"),
+        path: "search",
+      },
+    ],
+    path: helpPath,
     ...routesCommon,
   },
 ]);

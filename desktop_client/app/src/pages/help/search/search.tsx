@@ -7,7 +7,7 @@ import { P } from "@/components/typography/P";
 
 export function Component(): ReactNode {
   return (
-    <>
+    <div className="flex flex-col gap-3 p-10">
       <H1>Search Help</H1>
       <H2>General Syntax</H2>
       <P>
@@ -123,6 +123,6 @@ export function Component(): ReactNode {
           </Table.Th>
         </Table.Tr>
       </Table>
-    </>
+    </div>
   );
 }

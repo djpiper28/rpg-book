@@ -1,1 +1,1 @@
-export const helpPath = "help";
+export const helpPath = "/help";

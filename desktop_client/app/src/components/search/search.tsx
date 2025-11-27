@@ -2,7 +2,7 @@ import { Input } from "@mantine/core";
 import { HelpCircleIcon } from "lucide-react";
 import { type ReactNode } from "react";
 import { P } from "@/components/typography/P";
-import { searchHelpPathath as searchHelpPath } from "@/pages/help/search/path";
+import { searchHelpPath } from "@/pages/help/search/path";
 
 interface Props<T> {
   elementWrapper: (children: ReactNode[]) => ReactNode;
