@@ -21,6 +21,7 @@ import {
 } from "./lib/grpcClient/client";
 import { mustVoid } from "./lib/utils/errorHandlers.tsx";
 import { createProjectPath } from "./pages/createProject/path.ts";
+import { helpPath } from "./pages/help/path.ts";
 import { indexPath, withLayoutPath } from "./pages/path.ts";
 import { projectPath } from "./pages/project/path.ts";
 import { settingsPath } from "./pages/settings/path.ts";
@@ -74,6 +75,17 @@ const router = createHashRouter([
     ],
     element: <Layout />,
     path: withLayoutPath,
+    ...routesCommon,
+  },
+  {
+    children: [
+      {
+        // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+        lazy: () => import("./pages/help/search/search.tsx"),
+        path: "search",
+      },
+    ],
+    path: helpPath,
     ...routesCommon,
   },
   {
@@ -278,7 +290,7 @@ export default function App(): ReactNode {
           error: JSON.stringify(error),
         });
       });
-  }, []);
+  }, [projects, tabs]);
 
   return (
     <MantineProvider

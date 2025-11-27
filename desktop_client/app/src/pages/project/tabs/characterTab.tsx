@@ -1,10 +1,11 @@
-import { Button, Input, Table } from "@mantine/core";
+import { Button, Table } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { type ReactNode, useEffect, useState } from "react";
 import { EditDelete } from "@/components/buttons/editDelete";
 import { ConfirmModal } from "@/components/modal/confirmModal";
 import { Modal } from "@/components/modal/modal";
 import MarkdownRenderer from "@/components/renderers/markdown";
+import { Search } from "@/components/search/search";
 import { H2 } from "@/components/typography/H2";
 import { P } from "@/components/typography/P";
 import { getLogger, getProjectClient } from "@/lib/grpcClient/client";
@@ -34,8 +35,61 @@ export function CharacterTab(): ReactNode {
 
   const projectHandle = useTabStore((x) => x.selectedTab);
   const projectStore = useProjectStore((x) => x);
+  const thisProject = projectHandle && projectStore.getProject(projectHandle);
   const errorStore = useGlobalErrorStore((x) => x);
   const [iconB64, setIconB64] = useState("");
+  const [queryText, setQueryText] = useState("");
+  const [queryResult, setQueryResult] = useState<BasicCharacterDetails[]>([]);
+  const [queryError, setQueryError] = useState("");
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+    const sync = async () => {
+      if (!projectHandle) {
+        return;
+      }
+
+      if (!thisProject) {
+        return;
+      }
+
+      if (queryText === "") {
+        setQueryResult(thisProject.project.characters);
+        setQueryError("");
+        return;
+      }
+
+      try {
+        const resp = await getProjectClient().searchCharacter({
+          project: projectHandle,
+          query: queryText,
+        });
+
+        setQueryResult(
+          thisProject.project.characters.filter((allCharacters) => {
+            const inSearchRes = resp.response.details.find(
+              (c) => c.id === allCharacters.handle?.id,
+            );
+
+            return !!inSearchRes;
+          }),
+        );
+
+        setQueryError("");
+      } catch (error: unknown) {
+        getLogger().error("Cannot search characters", {
+          error: JSON.stringify(error),
+          project: JSON.stringify(projectHandle),
+          query: queryText,
+        });
+
+        setQueryError(JSON.stringify(error));
+      }
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    sync();
+  }, [projectHandle, queryText, thisProject, thisProject?.project.characters]);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -74,8 +128,6 @@ export function CharacterTab(): ReactNode {
   if (!projectHandle) {
     return "No project selected";
   }
-
-  const thisProject = projectStore.getProject(projectHandle);
 
   if (!thisProject) {
     return "Project not found";
@@ -129,45 +181,57 @@ export function CharacterTab(): ReactNode {
 
       <div className="flex flex-row gap-2 pt-2 justify-between">
         <div className="flex flex-col gap-2 flex-1">
-          <div className="flex flex-row gap-2 justify-between">
-            <Input className="flex-grow" placeholder="TODO Search bar" />
-            <Button
-              onClick={() => {
-                createOpen();
-              }}
-            >
-              Create Character
-            </Button>
-          </div>
-          <Table variant="vertical">
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>Name</Table.Th>
-                <Table.Th>Factions</Table.Th>
-              </Table.Tr>
-              {thisProject.project.characters.map((character): ReactNode => {
-                const id = character.handle?.id ?? "";
-                const selected = selectedCharacterId == id;
+          <Search<BasicCharacterDetails>
+            elementWrapper={(children: ReactNode[]): ReactNode => {
+              return (
+                <Table variant="vertical">
+                  <Table.Thead>
+                    <Table.Tr>
+                      <Table.Th>Name</Table.Th>
+                      <Table.Th>Factions</Table.Th>
+                    </Table.Tr>
+                  </Table.Thead>
+                  {children}
+                </Table>
+              );
+            }}
+            error={queryError}
+            onChange={(txt: string) => {
+              setQueryText(txt);
+            }}
+            placeholder="search:here or click help"
+            render={(character: BasicCharacterDetails) => {
+              const id = character.handle?.id ?? "";
+              const selected = selectedCharacterId == id;
 
-                return (
-                  <Table.Tr
-                    className={selected ? "bg-gray-500" : ""}
-                    key={id}
-                    onClick={() => {
-                      setSelectedCharacterId(id);
-                    }}
-                  >
-                    <Table.Th>
-                      <div className="flex flex-row gap-2">
-                        <P className="text-wrap">{character.name}</P>
-                      </div>
-                    </Table.Th>
-                    <Table.Th>TODO: Change me</Table.Th>
-                  </Table.Tr>
-                );
-              })}
-            </Table.Thead>
-          </Table>
+              return (
+                <Table.Tr
+                  className={selected ? "bg-gray-500" : ""}
+                  key={id}
+                  onClick={() => {
+                    setSelectedCharacterId(id);
+                  }}
+                >
+                  <Table.Th>
+                    <div className="flex flex-row gap-2">
+                      <P className="text-wrap">{character.name}</P>
+                    </div>
+                  </Table.Th>
+                  <Table.Th>TODO: Change me</Table.Th>
+                </Table.Tr>
+              );
+            }}
+            rightElement={
+              <Button
+                onClick={() => {
+                  createOpen();
+                }}
+              >
+                Create Character
+              </Button>
+            }
+            searchRes={queryResult}
+          />
         </div>
 
         <div className="flex-1 gap-3 overflow-y-auto flex flex-col">

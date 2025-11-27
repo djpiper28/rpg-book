@@ -7,6 +7,8 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/djpiper28/rpg-book/common/database/sqlite3"
 	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
+	"github.com/djpiper28/rpg-book/common/search/parser"
+	sqlsearch "github.com/djpiper28/rpg-book/common/search/sql_search"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/project/model"
 	"github.com/google/uuid"
 )
@@ -92,11 +94,12 @@ func (p *Project) CreateCharacter(name, description string, icon []byte) (*model
 	character := model.NewCharacter(name)
 	character.Description = description
 	character.Icon = icon
+	character.Normalise()
 
 	_, err := p.db.Db.NamedExec(`
     INSERT INTO 
-    characters (id, name, created, description, icon)
-    VALUES(:id, :name, :created, :description, :icon);`,
+    characters (id, name, name_normalised, created, description, description_normalised, icon)
+    VALUES(:id, :name, :name_normalised, :created, :description, :description_normalised, :icon);`,
 		character)
 	if err != nil {
 		return nil, errors.Join(errors.New("Cannot create character"), err)
@@ -139,15 +142,19 @@ func (p *Project) GetCharacter(id uuid.UUID) (*model.Character, error) {
 }
 
 func (p *Project) UpdateCharacter(character *model.Character, setIcon bool) error {
+	character.Normalise()
+
 	sql := `
     UPDATE characters
-      SET icon=:icon, name=:name, description=:description
+      SET icon=:icon, name=:name, description=:description,
+          name_normalised=:name_normalised, description_normalised=:description_normalised
       WHERE id=:id;
     `
 	if !setIcon {
 		sql = `
     UPDATE characters
-      SET name=:name, description=:description
+      SET name=:name, description=:description,
+          name_normalised=:name_normalised, description_normalised=:description_normalised
       WHERE id=:id;
     `
 	}
@@ -171,4 +178,52 @@ func (p *Project) DeleteCharacter(id uuid.UUID) error {
 
 func (p *Project) Close() {
 	defer p.db.Close()
+}
+
+func (p *Project) SearchCharacter(query string) ([]uuid.UUID, error) {
+	ast, err := parser.Parse(query)
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot parse query"), err)
+	}
+
+	const (
+		description = "description"
+		name        = "name"
+	)
+
+	sql, args, err := sqlsearch.AsSql(ast,
+		sqlsearch.SqlTableData{
+			FieldsToScan: []string{"id"},
+			TableName:    "characters",
+		},
+		sqlsearch.SqlColmnMap{
+			TextColumns: map[string]string{
+				"name":        name,
+				"desc":        description,
+				"description": description,
+			},
+			BasicQueryColumn: name,
+		})
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot process query"), err)
+	}
+
+	rows, err := p.db.Db.Queryx(sql, args...)
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot execute SQL query"), err)
+	}
+
+	defer rows.Close()
+	characterIds := make([]uuid.UUID, 0)
+	for rows.Next() {
+		var id uuid.UUID
+		err = rows.Scan(&id)
+		if err != nil {
+			return nil, errors.Join(errors.New("Cannot read characters"), err)
+		}
+
+		characterIds = append(characterIds, id)
+	}
+
+	return characterIds, nil
 }

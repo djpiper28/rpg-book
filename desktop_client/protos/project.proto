@@ -12,6 +12,7 @@ service ProjectSvc {
   rpc UpdateCharacter(UpdateCharacterReq) returns (Empty) {}
   rpc GetCharacter(GetCharacterReq) returns (GetCharacterResp) {}
   rpc DeleteCharacter(DeleteCharacterReq) returns (Empty) {}
+  rpc SearchCharacter(SearchCharacterReq) returns (SearchCharacterResp) {}
 }
 
 message CreateProjectReq {
@@ -71,4 +72,13 @@ message UpdateCharacterReq {
 message DeleteCharacterReq {
   ProjectHandle project = 1;
   CharacterHandle handle = 2;
+}
+
+message SearchCharacterReq {
+  ProjectHandle project = 1;
+  string query = 2;
+}
+
+message SearchCharacterResp {
+  repeated CharacterHandle details = 1;
 }

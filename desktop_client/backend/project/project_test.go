@@ -1,11 +1,13 @@
 package project_test
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
 	"github.com/djpiper28/rpg-book/common/database/sqlite3"
 	imagecompression "github.com/djpiper28/rpg-book/common/image/image_compression"
+	"github.com/djpiper28/rpg-book/common/normalisation"
 	testutils "github.com/djpiper28/rpg-book/common/test_utils"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/project"
 	"github.com/google/uuid"
@@ -65,6 +67,9 @@ func TestCreateCharacter(t *testing.T) {
 
 	require.Equal(t, name, c.Name)
 	require.Equal(t, desc, c.Description)
+	require.Equal(t, normalisation.Normalise(name), c.NameNormalised)
+	require.Equal(t, desc, c.Description)
+	require.Equal(t, normalisation.Normalise(desc), c.DescriptionNormalised)
 	require.Equal(t, icon, c.Icon)
 	require.NotEmpty(t, c.Created)
 	require.NotEmpty(t, c.Id)
@@ -117,10 +122,10 @@ func TestUpdateCharacter(t *testing.T) {
 	character.Description = description
 
 	err = project.UpdateCharacter(character, true)
-	require.NoError(t, nil)
+	require.NoError(t, err)
 
 	readCharacter, err := project.GetCharacter(character.Id)
-	require.NoError(t, nil)
+	require.NoError(t, err)
 	require.Equal(t, *character, *readCharacter)
 }
 
@@ -146,10 +151,10 @@ func TestUpdateCharacterNoIconChange(t *testing.T) {
 	character.Description = description
 
 	err = project.UpdateCharacter(character, false)
-	require.NoError(t, nil)
+	require.NoError(t, err)
 
 	readCharacter, err := project.GetCharacter(character.Id)
-	require.NoError(t, nil)
+	require.NoError(t, err)
 	character.Icon = icon
 	require.Equal(t, *character, *readCharacter)
 }
@@ -168,4 +173,64 @@ func TestDeleteCharacter(t *testing.T) {
 
 	_, err = project.GetCharacter(character.Id)
 	require.Error(t, err)
+}
+
+func TestSearchCharacterBasic(t *testing.T) {
+	project, remove := testutils.NewProject(t)
+	defer remove()
+
+	name := uuid.New().String()
+	desc := uuid.New().String()
+	character, err := project.CreateCharacter(name, desc, nil)
+	require.NoError(t, err)
+
+	res, err := project.SearchCharacter(name)
+	require.NoError(t, err)
+	require.Len(t, res, 1)
+	require.Equal(t, character.Id, res[0])
+}
+
+func TestSearchCharacterName(t *testing.T) {
+	project, remove := testutils.NewProject(t)
+	defer remove()
+
+	name := uuid.New().String()
+	desc := uuid.New().String()
+	character, err := project.CreateCharacter(name, desc, nil)
+	require.NoError(t, err)
+
+	res, err := project.SearchCharacter(fmt.Sprintf("name:%s", name))
+	require.NoError(t, err)
+	require.Len(t, res, 1)
+	require.Equal(t, character.Id, res[0])
+}
+
+func TestSearchCharacterDesc(t *testing.T) {
+	project, remove := testutils.NewProject(t)
+	defer remove()
+
+	name := uuid.New().String()
+	desc := uuid.New().String()
+	character, err := project.CreateCharacter(name, desc, nil)
+	require.NoError(t, err)
+
+	res, err := project.SearchCharacter(fmt.Sprintf("desc:%s", desc))
+	require.NoError(t, err)
+	require.Len(t, res, 1)
+	require.Equal(t, character.Id, res[0])
+}
+
+func TestSearchCharacterDescription(t *testing.T) {
+	project, remove := testutils.NewProject(t)
+	defer remove()
+
+	name := uuid.New().String()
+	desc := uuid.New().String()
+	character, err := project.CreateCharacter(name, desc, nil)
+	require.NoError(t, err)
+
+	res, err := project.SearchCharacter(fmt.Sprintf("description:%s", desc))
+	require.NoError(t, err)
+	require.Len(t, res, 1)
+	require.Equal(t, character.Id, res[0])
 }

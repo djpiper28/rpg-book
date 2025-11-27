@@ -37,6 +37,7 @@ func newTestImageFile(t *testing.T) string {
 }
 
 func TestProjectSvc(t *testing.T) {
+	t.Parallel()
 	db, closeDb := testdbutils.GetPrimaryDb()
 	defer closeDb()
 
@@ -437,5 +438,40 @@ func TestProjectSvc(t *testing.T) {
 			},
 		})
 		require.Error(t, err)
+	})
+
+	t.Run("Test search character", func(t *testing.T) {
+		filename := uuid.New().String() + sqlite3.DbExtension
+		projectName := uuid.New().String()
+		characterName := uuid.New().String()
+		characterDescription := uuid.New().String()
+		iconPath := newTestImageFile(t)
+		defer os.Remove(iconPath)
+
+		projectHandle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
+			FileName:    filename,
+			ProjectName: projectName,
+		})
+		require.NoError(t, err)
+		defer closeProject(t, filename, projectHandle)
+
+		characterHandle, err := svc.CreateCharacter(context.Background(), &pb_project.CreateCharacterReq{
+			Project: projectHandle,
+			Details: &pb_project_character.BasicCharacterDetails{
+				Name:        characterName,
+				Description: characterDescription,
+			},
+		})
+		require.NoError(t, err)
+		require.NotEmpty(t, characterHandle.Id)
+
+		searchRes, err := svc.SearchCharacter(context.Background(), &pb_project.SearchCharacterReq{
+			Project: projectHandle,
+			Query:   characterName,
+		})
+
+		require.NoError(t, err)
+		require.Len(t, searchRes.Details, 1)
+		require.Equal(t, characterHandle, searchRes.Details[0])
 	})
 }
