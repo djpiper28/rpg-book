@@ -39,7 +39,7 @@ func New(filename string) (*Db, error) {
 
 	db, err := sqlx.ConnectContext(ctx, "sqlite3", fmt.Sprintf("file:%s?cache=shared&parseTime=true", filename))
 	if err != nil {
-		return nil, errors.Join(fmt.Errorf("Cannot create database connetion for %s", filename), err)
+		return nil, errors.Join(fmt.Errorf("Cannot create database connection for %s", filename), err)
 	}
 
 	err = db.Ping()
