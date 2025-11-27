@@ -1,8 +1,11 @@
 import { Input } from "@mantine/core";
+import { HelpCircleIcon } from "lucide-react";
 import { type ReactNode } from "react";
 import { P } from "@/components/typography/P";
+import { searchHelpPathath as searchHelpPath } from "@/pages/help/search/path";
 
 interface Props<T> {
+  elementWrapper: (children: ReactNode[]) => ReactNode;
   error?: string;
   onChange: (text: string) => void;
   placeholder: string;
@@ -22,14 +25,25 @@ export function Search<T>(props: Readonly<Props<T>>): ReactNode {
           }}
           placeholder={props.placeholder}
         />
+        <button
+          className="cursor-pointer"
+          onClick={() => {
+            const w = window.open(searchHelpPath, "_blank");
+            w?.focus();
+          }}
+        >
+          <HelpCircleIcon />
+        </button>
         {props.rightElement}
       </div>
       {props.error && (
         <P className="text-red-500">Search error: {props.error}</P>
       )}
-      {props.searchRes.map((x) => {
-        return props.render(x);
-      })}
+      {props.elementWrapper(
+        props.searchRes.map((x) => {
+          return props.render(x);
+        }),
+      )}
     </div>
   );
 }
