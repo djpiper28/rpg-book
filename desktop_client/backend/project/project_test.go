@@ -122,10 +122,10 @@ func TestUpdateCharacter(t *testing.T) {
 	character.Description = description
 
 	err = project.UpdateCharacter(character, true)
-	require.NoError(t, nil)
+	require.NoError(t, err)
 
 	readCharacter, err := project.GetCharacter(character.Id)
-	require.NoError(t, nil)
+	require.NoError(t, err)
 	require.Equal(t, *character, *readCharacter)
 }
 
@@ -151,10 +151,10 @@ func TestUpdateCharacterNoIconChange(t *testing.T) {
 	character.Description = description
 
 	err = project.UpdateCharacter(character, false)
-	require.NoError(t, nil)
+	require.NoError(t, err)
 
 	readCharacter, err := project.GetCharacter(character.Id)
-	require.NoError(t, nil)
+	require.NoError(t, err)
 	character.Icon = icon
 	require.Equal(t, *character, *readCharacter)
 }
