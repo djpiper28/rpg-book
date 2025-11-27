@@ -23,7 +23,8 @@ func Migrate(db database.Database) error {
     name TEXT NOT NULL,
     created TIMESTAMP WITH TIME ZONE NOT NULL,
     icon BLOB,
-    description TEXT NOT NULL
+    description TEXT NOT NULL,
+		PRIMARY KEY(id)
   );
       `,
 		},
@@ -64,6 +65,16 @@ func Migrate(db database.Database) error {
 
 				return nil
 			},
+		},
+		{
+			Sql: `
+	CREATE TABLE notes (
+		id TEXT NOT NULL,
+		markdown TEXT NOT NULL,
+    created TIMESTAMP WITH TIME ZONE NOT NULL,
+		PRIMARY KEY(id)
+	);
+			`,
 		},
 	})
 
