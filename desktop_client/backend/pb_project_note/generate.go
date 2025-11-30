@@ -1,4 +1,4 @@
-package pb_project_character
+package pb_project_note
 
 //go:generate echo Generating project note protos...
 

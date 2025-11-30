@@ -1,5 +1,5 @@
 syntax = "proto3";
-option go_package = "github.com/djpiper28/rpg-book/desktop_client/backend/pb_project_notes";
+option go_package = "github.com/djpiper28/rpg-book/desktop_client/backend/pb_project_note";
 
 message NoteHandle {
   string id = 1;
