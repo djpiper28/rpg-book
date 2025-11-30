@@ -10,3 +10,7 @@ message Note {
   string name = 2;
   string markdown = 3;
 }
+
+message CreateNoteReq {
+  Note note = 1;
+}
