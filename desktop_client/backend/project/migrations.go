@@ -67,12 +67,40 @@ func Migrate(db database.Database) error {
 			},
 		},
 		{
+			/*
+				When the note_relations TABLE is updated its constraint should be updated to make its CHECK looks like below
+
+				CREATE TABLE note_relations (
+				    note_id TEXT NOT NULL,
+				    id_1 INTEGER,
+				    id_2 INTEGER,
+				    id_3 INTEGER,
+
+				    CHECK (
+				        (id_1 IS NOT NULL) +
+				        (id_2 IS NOT NULL) +
+				        (id_3 IS NOT NULL) <= 1
+				    )
+				);
+			*/
 			Sql: `
 	CREATE TABLE notes (
 		id TEXT NOT NULL,
+		name TEXT NOT NULL,
 		markdown TEXT NOT NULL,
     created TIMESTAMP WITH TIME ZONE NOT NULL,
 		PRIMARY KEY(id)
+	);
+
+	CREATE TABLE note_relations (
+		note_id TEXT NOT NULL,
+		character_id TEXT,
+		FOREIGN KEY (character_id) REFERENCES characters(id),
+		FOREIGN KEY (note_id) REFERENCES notes(id),
+		UNIQUE(note_id, character_id),
+		CHECK (
+      (character_id IS NOT NULL) <= 1
+    )
 	);
 			`,
 		},
