@@ -1,9 +1,9 @@
 import { Input } from "@mantine/core";
 import { HelpCircleIcon } from "lucide-react";
 import { type ReactNode } from "react";
+import { useNavigate } from "react-router";
 import { P } from "@/components/typography/P";
 import { searchHelpPath } from "@/pages/help/search/path";
-import { useNavigate } from "react-router";
 
 interface Props<T> {
   elementWrapper: (children: ReactNode[]) => ReactNode;

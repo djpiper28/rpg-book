@@ -8,7 +8,6 @@ import (
 	"github.com/google/uuid"
 )
 
-
 type Character struct {
 	Id                    uuid.UUID `db:"id"`
 	Name                  string    `db:"name"`
