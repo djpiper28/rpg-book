@@ -208,6 +208,7 @@ func (p *Project) SearchCharacter(query string) ([]uuid.UUID, error) {
 		return nil, errors.Join(errors.New("Cannot process query"), err)
 	}
 
+	log.Debug("Executing search", "sql", sql, "args", args)
 	rows, err := p.db.Db.Queryx(sql, args...)
 	if err != nil {
 		return nil, errors.Join(errors.New("Cannot execute SQL query"), err)
