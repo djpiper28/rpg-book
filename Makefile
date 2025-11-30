@@ -53,6 +53,7 @@ go-lint: go-core
 
 .PHONY: test
 test: go-test go-lint desktop-test
+	echo "Tests complete"
 
 .PHONY: go-fmt
 go-fmt:
