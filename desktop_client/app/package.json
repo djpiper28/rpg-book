@@ -81,7 +81,7 @@
     "vite-plugin-electron-renderer": "^0.14.6",
     "vitest": "^3.1.1",
     "vitest-matchmedia-mock": "^2.0.3",
-    "zustand": "^5.0.8"
+    "zustand": "^5.0.9"
   },
   "devDependancies": {
     "electron": "^37.4.0",
