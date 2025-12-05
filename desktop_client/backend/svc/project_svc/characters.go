@@ -53,6 +53,10 @@ func (p *ProjectSvc) readAndCompressImageIfNeeded(path string) ([]byte, error) {
 
 func (p *ProjectSvc) CreateCharacter(ctx context.Context, in *pb_project.CreateCharacterReq) (*pb_project_character.CharacterHandle, error) {
 	project, err := p.getProject(in.Project)
+	if err != nil {
+		log.Error("Cannot get projecct id", loggertags.TagError, err)
+		return nil, errors.Join(errors.New("Cannot get proejct"), err)
+	}
 
 	var img []byte
 	if in.IconPath != "" {

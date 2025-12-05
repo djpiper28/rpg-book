@@ -12,6 +12,7 @@ import (
 	"github.com/djpiper28/rpg-book/common/database/sqlite3"
 	"github.com/djpiper28/rpg-book/common/image"
 	imagecompression "github.com/djpiper28/rpg-book/common/image/image_compression"
+	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/model"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_common"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_system"
@@ -23,18 +24,36 @@ type SystemSvc struct {
 }
 
 func New(db *sqlite3.Db) *SystemSvc {
-	return &SystemSvc{
+	svc := &SystemSvc{
 		db: db,
 	}
+
+	settings, err := svc.getDbSettings()
+	if err != nil {
+		log.Warn("Cannot check settings on startup", loggertags.TagError)
+	} else {
+		settings.Apply()
+	}
+
+	return svc
 }
 
-func (s *SystemSvc) GetSettings(ctx context.Context, in *pb_common.Empty) (*pb_system.Settings, error) {
+func (s *SystemSvc) getDbSettings() (model.Settings, error) {
 	rows := s.db.Db.QueryRowx("SELECT * FROM settings;")
 
 	var settings model.Settings
 	err := rows.StructScan(&settings)
 	if err != nil {
-		return nil, errors.Join(errors.New("Cannot get settings"), err)
+		return model.Settings{}, errors.Join(errors.New("Cannot get settings"), err)
+	}
+
+	return settings, nil
+}
+
+func (s *SystemSvc) GetSettings(ctx context.Context, in *pb_common.Empty) (*pb_system.Settings, error) {
+	settings, err := s.getDbSettings()
+	if err != nil {
+		return nil, err
 	}
 
 	return settings.ToProto(), nil
@@ -45,6 +64,9 @@ func (s *SystemSvc) SetSettings(ctx context.Context, in *pb_system.Settings) (*p
 	if err != nil {
 		return nil, errors.Join(errors.New("Cannot set settings"), err)
 	}
+
+	settings := model.SettingsFromProto(in)
+	settings.Apply()
 
 	return &pb_common.Empty{}, nil
 }

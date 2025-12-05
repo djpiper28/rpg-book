@@ -1,9 +1,9 @@
 import { Input } from "@mantine/core";
 import { HelpCircleIcon } from "lucide-react";
 import { type ReactNode } from "react";
+import { useNavigate } from "react-router";
 import { P } from "@/components/typography/P";
 import { searchHelpPath } from "@/pages/help/search/path";
-import { useNavigate } from "react-router";
 
 interface Props<T> {
   elementWrapper: (children: ReactNode[]) => ReactNode;
@@ -22,7 +22,7 @@ export function Search<T>(props: Readonly<Props<T>>): ReactNode {
     <div className="flex flex-col gap-2">
       <div className="flex flex-row gap-2 justify-between">
         <Input
-          className="flex-grow"
+          className="grow"
           onChange={(event) => {
             props.onChange(event.target.value);
           }}
@@ -31,6 +31,7 @@ export function Search<T>(props: Readonly<Props<T>>): ReactNode {
         <button
           className="cursor-pointer"
           onClick={() => {
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
             navigate(searchHelpPath);
           }}
         >

@@ -1,6 +1,9 @@
 package model
 
-import "github.com/djpiper28/rpg-book/desktop_client/backend/pb_system"
+import (
+	"github.com/charmbracelet/log"
+	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_system"
+)
 
 type Settings struct {
 	DevMode        bool `db:"dev_mode"`
@@ -21,5 +24,14 @@ func SettingsFromProto(p *pb_system.Settings) *Settings {
 		DevMode:        p.DevMode,
 		DarkMode:       p.DarkMode,
 		CompressImages: p.CompressImages,
+	}
+}
+
+func (s *Settings) Apply() {
+	if s.DevMode {
+		log.SetLevel(log.DebugLevel)
+		log.Debug("Dev mode enabled")
+	} else {
+		log.SetLevel(log.InfoLevel)
 	}
 }

@@ -53,7 +53,7 @@ export function CharacterTab(): ReactNode {
         return;
       }
 
-      if (queryText === "") {
+      if (queryText.trim() === "") {
         setQueryResult(thisProject.project.characters);
         setQueryError("");
         return;

@@ -12,4 +12,6 @@ const (
 	TagScale    = "scale"
 	TagWidth    = "width"
 	TagHeight   = "height"
+	TagUrl      = "url"
+	TagSize     = "size" // bytes
 )
