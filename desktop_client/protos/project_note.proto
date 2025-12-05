@@ -5,12 +5,12 @@ message NoteHandle {
   string id = 1;
 }
 
-message Note {
-  NoteHandle handle = 1;
+message NoteDetails {
   string name = 2;
   string markdown = 3;
 }
 
-message CreateNoteReq {
-  Note note = 1;
+message Note {
+  NoteHandle handle = 1;
+  NoteDetails details = 2;
 }

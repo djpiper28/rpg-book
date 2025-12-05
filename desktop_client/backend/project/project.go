@@ -3,6 +3,7 @@ package project
 import (
 	"errors"
 	"os"
+	"time"
 
 	"github.com/charmbracelet/log"
 	"github.com/djpiper28/rpg-book/common/database/sqlite3"
@@ -94,6 +95,7 @@ func (p *Project) CreateCharacter(name, description string, icon []byte) (*model
 	character := model.NewCharacter(name)
 	character.Description = description
 	character.Icon = icon
+	character.Created = time.Now().String()
 	character.Normalise()
 
 	_, err := p.db.Db.NamedExec(`
@@ -227,4 +229,47 @@ func (p *Project) SearchCharacter(query string) ([]uuid.UUID, error) {
 	}
 
 	return characterIds, nil
+}
+
+func (p *Project) CreateNote(name, markdown string) (*model.Note, error) {
+	note := &model.Note{
+		Id:       uuid.New(),
+		Name:     name,
+		Markdown: markdown,
+		Created:  time.Now().String(),
+	}
+
+	note.Normalise()
+
+	_, err := p.db.Db.NamedExec(`
+    INSERT INTO notes 
+      (id, name, name_normalised, markdown, markdown_normalised, created) 
+    VALUES 
+      (:id, :name, :name_normalised, :markdown, :markdown_normalised, :created);`, note)
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot insert note"), err)
+	}
+
+	return note, nil
+}
+
+func (p *Project) GetNotes() ([]*model.Note, error) {
+	notes := make([]*model.Note, 0)
+
+	rows, err := p.db.Db.Queryx("SELECT * FROM notes;")
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot get notes"), err)
+	}
+
+	for rows.Next() {
+		var note model.Note
+		err = rows.StructScan(&note)
+		if err != nil {
+			return nil, errors.Join(errors.New("Cannot scan note into struct"), err)
+		}
+
+		notes = append(notes, &note)
+	}
+
+	return notes, nil
 }

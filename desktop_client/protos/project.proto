@@ -86,3 +86,8 @@ message SearchCharacterReq {
 message SearchCharacterResp {
   repeated CharacterHandle details = 1;
 }
+
+message CreateNoteReq {
+  ProjectHandle project = 1;
+  NoteDetails details = 2;
+}

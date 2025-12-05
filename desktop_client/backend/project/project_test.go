@@ -15,6 +15,8 @@ import (
 )
 
 func TestOpenProjectNotFound(t *testing.T) {
+	t.Parallel()
+
 	dbName := uuid.NewString() + sqlite3.DbExtension
 	defer os.Remove(dbName)
 
@@ -23,6 +25,8 @@ func TestOpenProjectNotFound(t *testing.T) {
 }
 
 func TestCreateNewProject(t *testing.T) {
+	t.Parallel()
+
 	filename := uuid.New().String() + sqlite3.DbExtension
 	defer os.Remove(filename)
 
@@ -36,6 +40,8 @@ func TestCreateNewProject(t *testing.T) {
 }
 
 func TestReOpenProject(t *testing.T) {
+	t.Parallel()
+
 	filename := uuid.New().String() + sqlite3.DbExtension
 	defer os.Remove(filename)
 
@@ -56,6 +62,8 @@ func TestReOpenProject(t *testing.T) {
 }
 
 func TestCreateCharacter(t *testing.T) {
+	t.Parallel()
+
 	project, remove := testutils.NewProject(t)
 	defer remove()
 
@@ -81,6 +89,8 @@ func TestCreateCharacter(t *testing.T) {
 }
 
 func TestCreateCharacterNilIcon(t *testing.T) {
+	t.Parallel()
+
 	project, remove := testutils.NewProject(t)
 	defer remove()
 
@@ -103,6 +113,8 @@ func TestCreateCharacterNilIcon(t *testing.T) {
 }
 
 func TestUpdateCharacter(t *testing.T) {
+	t.Parallel()
+
 	project, remove := testutils.NewProject(t)
 	defer remove()
 
@@ -130,6 +142,8 @@ func TestUpdateCharacter(t *testing.T) {
 }
 
 func TestUpdateCharacterNoIconChange(t *testing.T) {
+	t.Parallel()
+
 	project, remove := testutils.NewProject(t)
 	defer remove()
 
@@ -160,6 +174,8 @@ func TestUpdateCharacterNoIconChange(t *testing.T) {
 }
 
 func TestDeleteCharacter(t *testing.T) {
+	t.Parallel()
+
 	project, remove := testutils.NewProject(t)
 	defer remove()
 
@@ -176,6 +192,8 @@ func TestDeleteCharacter(t *testing.T) {
 }
 
 func TestSearchCharacterBasic(t *testing.T) {
+	t.Parallel()
+
 	project, remove := testutils.NewProject(t)
 	defer remove()
 
@@ -191,6 +209,8 @@ func TestSearchCharacterBasic(t *testing.T) {
 }
 
 func TestSearchCharacterName(t *testing.T) {
+	t.Parallel()
+
 	project, remove := testutils.NewProject(t)
 	defer remove()
 
@@ -206,6 +226,8 @@ func TestSearchCharacterName(t *testing.T) {
 }
 
 func TestSearchCharacterDesc(t *testing.T) {
+	t.Parallel()
+
 	project, remove := testutils.NewProject(t)
 	defer remove()
 
@@ -221,6 +243,8 @@ func TestSearchCharacterDesc(t *testing.T) {
 }
 
 func TestSearchCharacterDescription(t *testing.T) {
+	t.Parallel()
+
 	project, remove := testutils.NewProject(t)
 	defer remove()
 
@@ -233,4 +257,27 @@ func TestSearchCharacterDescription(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, res, 1)
 	require.Equal(t, character.Id, res[0])
+}
+
+func TestCreateNote(t *testing.T) {
+	t.Parallel()
+
+	project, remove := testutils.NewProject(t)
+	defer remove()
+
+	name := uuid.New().String()
+	markdown := uuid.New().String()
+	note, err := project.CreateNote(name, markdown)
+	require.NoError(t, err)
+	require.Equal(t, name, note.Name)
+	require.Equal(t, markdown, note.Markdown)
+	require.Equal(t, normalisation.Normalise(name), note.NameNormalised)
+	require.Equal(t, normalisation.Normalise(markdown), note.MarkdownNormalised)
+	require.NotEmpty(t, note.Created)
+	require.NotEmpty(t, note.Id)
+
+	res, err := project.GetNotes()
+	require.NoError(t, err)
+	require.Len(t, res, 1)
+	require.Equal(t, note, res[0])
 }

@@ -87,7 +87,9 @@ func Migrate(db database.Database) error {
 	CREATE TABLE notes (
 		id TEXT NOT NULL,
 		name TEXT NOT NULL,
+		name_normalised TEXT NOT NULL,
 		markdown TEXT NOT NULL,
+		markdown_normalised TEXT NOT NULL,
     created TIMESTAMP WITH TIME ZONE NOT NULL,
 		PRIMARY KEY(id)
 	);

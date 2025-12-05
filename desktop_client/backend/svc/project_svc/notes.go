@@ -4,9 +4,26 @@ import (
 	"context"
 	"errors"
 
+	"github.com/charmbracelet/log"
+	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
+	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_project"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_project_note"
 )
 
-func (p *ProjectSvc) CreateNote(ctx context.Context, in *pb_project_note.CreateNoteReq) (*pb_project_note.NoteHandle, error) {
-	return nil, errors.ErrUnsupported
+func (p *ProjectSvc) CreateNote(ctx context.Context, in *pb_project.CreateNoteReq) (*pb_project_note.NoteHandle, error) {
+	project, err := p.getProject(in.Project)
+	if err != nil {
+		log.Error("Cannot get projecct id", loggertags.TagError, err)
+		return nil, errors.Join(errors.New("Cannot get proejct"), err) 
+	}
+
+  note, err := project.CreateNote(in.Details.Name, in.Details.Markdown)
+	if err != nil {
+		log.Error("Cannot create note", loggertags.TagError, err)
+		return nil, errors.Join(errors.New("Cannot get proejct"), err) 
+	}
+
+  return &pb_project_note.NoteHandle{
+    Id: note.Id.String(),
+  }, nil
 }
