@@ -147,7 +147,7 @@ func (p *Project) GetCharacter(id uuid.UUID) (*model.Character, error) {
 		return nil, errors.Join(errors.New("Cannot get character"), err)
 	}
 
-  // Select the related notes
+	// Select the related notes
 	notes := make([]*model.Note, 0)
 	rows, err := tx.Queryx(`
     SELECT notes.*

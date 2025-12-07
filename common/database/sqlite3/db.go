@@ -37,7 +37,7 @@ func New(filename string) (*Db, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
-	db, err := sqlx.ConnectContext(ctx, "sqlite3", fmt.Sprintf("file:%s?cache=shared&parseTime=true", filename))
+	db, err := sqlx.ConnectContext(ctx, "sqlite3", fmt.Sprintf("file:%s?_journal_mode=WAL&parseTime=true&_auto_vacuum=2", filename))
 	if err != nil {
 		return nil, errors.Join(fmt.Errorf("Cannot create database connection for %s", filename), err)
 	}
