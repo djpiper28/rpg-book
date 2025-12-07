@@ -14,7 +14,7 @@ export interface CharacterViewProps {
   onEdit: () => void;
 }
 
-export function CharacterView(props: CharacterViewProps): ReactNode {
+export function CharacterView(props: Readonly<CharacterViewProps>): ReactNode {
   const [character, setCharacter] = useState<
     BasicCharacterDetails | undefined
   >();
