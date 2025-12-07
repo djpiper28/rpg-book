@@ -234,33 +234,31 @@ export function CharacterTab(): ReactNode {
           />
         </div>
 
-        <div className="flex-1 gap-3 overflow-y-auto flex flex-col">
-          {selectedCharcter && (
-            <>
-              <div className="flex flex-col gap-3">
-                <div className="flex flex-row gap-3 items-center justify-between">
-                  <H2>{selectedCharcter.name}</H2>
-                  <EditDelete
-                    delete={() => {
-                      deleteOpen();
-                    }}
-                    edit={() => {
-                      editOpen();
-                    }}
-                  />
-                </div>
-                {iconB64 && (
-                  <img
-                    alt="User selected"
-                    className="max-h-screen"
-                    src={`data:image/jpg;base64,${iconB64}`}
-                  />
-                )}
+        {selectedCharcter && (
+          <div className="flex-1 gap-3 overflow-y-auto flex flex-col">
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-row gap-3 items-center justify-between">
+                <H2>{selectedCharcter.name}</H2>
+                <EditDelete
+                  delete={() => {
+                    deleteOpen();
+                  }}
+                  edit={() => {
+                    editOpen();
+                  }}
+                />
               </div>
-              <MarkdownRenderer markdown={selectedCharcter.description} />
-            </>
-          )}
-        </div>
+              {iconB64 && (
+                <img
+                  alt="User selected"
+                  className="max-h-screen"
+                  src={`data:image/jpg;base64,${iconB64}`}
+                />
+              )}
+            </div>
+            <MarkdownRenderer markdown={selectedCharcter.description} />
+          </div>
+        )}
       </div>
     </>
   );
