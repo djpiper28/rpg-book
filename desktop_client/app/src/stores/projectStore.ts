@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { immer } from "zustand/middleware/immer";
 import {
   type OpenProjectResp,
   type ProjectHandle,
@@ -32,77 +33,72 @@ function asId(handle: ProjectHandle): string {
 
 export const useProjectStore = create<ProjectStore>()(
   persist(
-    (set, get) => ({
+    immer((set, get) => ({
       addCharacter: (
         handle: ProjectHandle,
         character: BasicCharacterDetails,
       ): void => {
-        const projects = get();
-        const project = projects.projects[asId(handle)]?.project;
+        set((state) => {
+          const project = state.projects[asId(handle)]?.project;
 
-        if (!project) {
-          return;
-        }
+          if (!project) {
+            return;
+          }
 
-        const oldCharacter = project.characters.findIndex(
-          (x) => x.handle?.id === character.handle?.id,
-        );
+          const oldCharacterIndex = project.characters.findIndex(
+            (x) => x.handle?.id === character.handle?.id,
+          );
 
-        if (oldCharacter) {
-          project.characters[oldCharacter] = character;
-        } else {
-          project.characters.push(character);
-        }
-
-        set(projects);
+          if (oldCharacterIndex === -1) {
+            project.characters.push(character);
+          } else {
+            project.characters[oldCharacterIndex] = character;
+          }
+        });
       },
       deleteCharacter: (
         handle: ProjectHandle,
         character: CharacterHandle,
       ): void => {
-        const projects = get();
-        const project = projects.projects[asId(handle)]?.project;
+        set((state) => {
+          const project = state.projects[asId(handle)]?.project;
 
-        if (!project) {
-          return;
-        }
+          if (!project) {
+            return;
+          }
 
-        project.characters = project.characters.filter(
-          (x) => x.handle?.id !== character.id,
-        );
-
-        set(projects);
+          project.characters = project.characters.filter(
+            (x) => x.handle?.id !== character.id,
+          );
+        });
       },
       getProject: (handle: ProjectHandle): Project | undefined => {
-        const projects = get();
-        return projects.projects[asId(handle)];
+        return get().projects[asId(handle)];
       },
       newProject: (handle: ProjectHandle, project: OpenProjectResp): void => {
-        const projects = get();
-
-        projects.projects[asId(handle)] = {
-          handle,
-          project,
-        };
-
-        set(projects);
+        set((state) => {
+          state.projects[asId(handle)] = {
+            handle,
+            project,
+          };
+        });
       },
       projects: {},
       updateProject: (
         handle: ProjectHandle,
         project: OpenProjectResp,
       ): void => {
-        const projects = get();
-        const projectRef = projects.projects[asId(handle)];
+        set((state) => {
+          const projectRef = state.projects[asId(handle)];
 
-        if (!projectRef) {
-          return;
-        }
+          if (!projectRef) {
+            return;
+          }
 
-        projectRef.project = project;
-        set(projects);
+          projectRef.project = project;
+        });
       },
-    }),
+    })),
     {
       name: "project-storage",
       storage: createJSONStorage(() => sessionStorage),

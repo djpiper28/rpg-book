@@ -16,7 +16,6 @@ export const useSettingsStore = create<SettingsStore>(
   (set): SettingsStore => ({
     setSettings: (settings: Settings): void => {
       set({ settings });
-      console.log(settings);
     },
     settings: defaultSettings,
   }),
