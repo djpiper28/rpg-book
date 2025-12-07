@@ -91,4 +91,5 @@ message SearchCharacterResp {
 message CreateNoteReq {
   ProjectHandle project = 1;
   NoteDetails details = 2;
+  repeated CharacterHandle characters = 3;
 }

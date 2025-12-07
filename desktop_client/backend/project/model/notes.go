@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/djpiper28/rpg-book/common/normalisation"
+	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_project_note"
 	"github.com/google/uuid"
 )
 
@@ -17,6 +18,18 @@ type Note struct {
 func (n *Note) Normalise() {
 	n.NameNormalised = normalisation.Normalise(n.Name)
 	n.MarkdownNormalised = normalisation.Normalise(n.Markdown)
+}
+
+func (n *Note) ToPb() *pb_project_note.Note {
+	return &pb_project_note.Note{
+		Handle: &pb_project_note.NoteHandle{
+			Id: n.Id.String(),
+		},
+		Details: &pb_project_note.NoteDetails{
+			Name:     n.Name,
+			Markdown: n.Markdown,
+		},
+	}
 }
 
 type NoteRelations struct {

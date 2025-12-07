@@ -111,6 +111,7 @@ func (p *Project) CreateCharacter(name, description string, icon []byte) (*model
 }
 
 func (p *Project) GetCharacters() ([]*model.Character, error) {
+	// TODO: do not select icon
 	rows, err := p.db.Db.Queryx(`SELECT * FROM characters;`)
 	if err != nil {
 		return nil, errors.Join(errors.New("Cannot query characters"), err)
@@ -134,10 +135,53 @@ func (p *Project) GetCharacters() ([]*model.Character, error) {
 func (p *Project) GetCharacter(id uuid.UUID) (*model.Character, error) {
 	character := model.Character{}
 
-	row := p.db.Db.QueryRowx(`SELECT * FROM characters WHERE id=?;`, id)
-	err := row.StructScan(&character)
+	tx, err := p.db.Db.Beginx()
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot begin transaction"), err)
+	}
+	defer tx.Rollback()
+
+	row := tx.QueryRowx(`SELECT * FROM characters WHERE id=?;`, id)
+	err = row.StructScan(&character)
 	if err != nil {
 		return nil, errors.Join(errors.New("Cannot get character"), err)
+	}
+
+  // Select the related notes
+	notes := make([]*model.Note, 0)
+	rows, err := tx.Queryx(`
+    SELECT notes.*
+    FROM
+    (
+      (
+        characters
+        INNER JOIN note_relations
+          ON note_relations.character_id = characters.id
+      )
+      INNER JOIN notes
+        ON notes.id = note_relations.note_id
+    )
+    WHERE characters.id = ?;
+    `, id)
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot get related notes"), err)
+	}
+
+	for rows.Next() {
+		var note model.Note
+		err = rows.StructScan(&note)
+		if err != nil {
+			return nil, errors.Join(errors.New("Cannot scan notes"), err)
+		}
+
+		notes = append(notes, &note)
+	}
+
+	character.Notes = notes
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot commit transaction"), err)
 	}
 
 	return &character, nil

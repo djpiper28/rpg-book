@@ -6,8 +6,8 @@ message NoteHandle {
 }
 
 message NoteDetails {
-  string name = 2;
-  string markdown = 3;
+  string name = 1;
+  string markdown = 2;
 }
 
 message Note {

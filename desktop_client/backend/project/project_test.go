@@ -10,6 +10,7 @@ import (
 	"github.com/djpiper28/rpg-book/common/normalisation"
 	testutils "github.com/djpiper28/rpg-book/common/test_utils"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/project"
+	"github.com/djpiper28/rpg-book/desktop_client/backend/project/model"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
@@ -132,6 +133,7 @@ func TestUpdateCharacter(t *testing.T) {
 	character.Name = name
 	character.Icon = icon
 	character.Description = description
+	character.Notes = make([]*model.Note, 0)
 
 	err = project.UpdateCharacter(character, true)
 	require.NoError(t, err)
@@ -163,6 +165,7 @@ func TestUpdateCharacterNoIconChange(t *testing.T) {
 	character.Name = name
 	character.Icon = nil
 	character.Description = description
+	character.Notes = make([]*model.Note, 0)
 
 	err = project.UpdateCharacter(character, false)
 	require.NoError(t, err)
@@ -314,4 +317,11 @@ func TestCreateNoteWithRelatedCharacters(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, res, 1)
 	require.Equal(t, note, res[0])
+
+	for _, id := range characterIds {
+		character, err := project.GetCharacter(id)
+		require.NoError(t, err)
+		require.Len(t, character.Notes, 1)
+		require.Equal(t, note, character.Notes[0])
+	}
 }

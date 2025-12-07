@@ -16,6 +16,7 @@ type Character struct {
 	Icon                  []byte    `db:"icon"`
 	Description           string    `db:"description"`
 	DescriptionNormalised string    `db:"description_normalised"`
+	Notes                 []*Note   `db:"-"`
 }
 
 func NewCharacter(name string) *Character {
@@ -34,7 +35,7 @@ func (c *Character) Normalise() {
 }
 
 // The icon is not set here, if you want an icon then you need to set it to another proto
-// this is to avoid sending the icon as much
+// this is to avoid sending the icon too much.
 func (c *Character) ToPb() *pb_project_character.BasicCharacterDetails {
 	return &pb_project_character.BasicCharacterDetails{
 		Handle: &pb_project_character.CharacterHandle{

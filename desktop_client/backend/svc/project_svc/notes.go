@@ -18,7 +18,18 @@ func (p *ProjectSvc) CreateNote(ctx context.Context, in *pb_project.CreateNoteRe
 		return nil, errors.Join(errors.New("Cannot get proejct"), err)
 	}
 
-	note, err := project.CreateNote(in.Details.Name, in.Details.Markdown, []uuid.UUID{})
+	characterIds := make([]uuid.UUID, 0)
+	for _, characterHandle := range in.Characters {
+		id, err := uuid.Parse(characterHandle.Id)
+		if err != nil {
+			log.Error("Cannot parse uuid", loggertags.TagError, err)
+			return nil, errors.Join(errors.New("Cannot parse uuid"), err)
+		}
+
+		characterIds = append(characterIds, id)
+	}
+
+	note, err := project.CreateNote(in.Details.Name, in.Details.Markdown, characterIds)
 	if err != nil {
 		log.Error("Cannot create note", loggertags.TagError, err)
 		return nil, errors.Join(errors.New("Cannot get proejct"), err)
