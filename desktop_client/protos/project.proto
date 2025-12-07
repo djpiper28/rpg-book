@@ -63,6 +63,7 @@ message GetCharacterReq {
 message GetCharacterResp {
   BasicCharacterDetails details = 1;
   bytes icon = 2;
+  repeated Note notes = 3;
 }
 
 message UpdateCharacterReq {

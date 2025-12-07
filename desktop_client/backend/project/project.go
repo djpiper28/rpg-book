@@ -231,7 +231,7 @@ func (p *Project) SearchCharacter(query string) ([]uuid.UUID, error) {
 	return characterIds, nil
 }
 
-func (p *Project) CreateNote(name, markdown string) (*model.Note, error) {
+func (p *Project) CreateNote(name, markdown string, characterIds []uuid.UUID) (*model.Note, error) {
 	note := &model.Note{
 		Id:       uuid.New(),
 		Name:     name,
@@ -241,13 +241,36 @@ func (p *Project) CreateNote(name, markdown string) (*model.Note, error) {
 
 	note.Normalise()
 
-	_, err := p.db.Db.NamedExec(`
+	tx, err := p.db.Db.Beginx()
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot start transaction"), err)
+	}
+	defer tx.Rollback()
+
+	_, err = tx.NamedExec(`
     INSERT INTO notes 
       (id, name, name_normalised, markdown, markdown_normalised, created) 
     VALUES 
       (:id, :name, :name_normalised, :markdown, :markdown_normalised, :created);`, note)
 	if err != nil {
 		return nil, errors.Join(errors.New("Cannot insert note"), err)
+	}
+
+	for _, id := range characterIds {
+		_, err = tx.Exec(`
+      INSERT INTO note_relations
+        (note_id, character_id)
+      VALUES
+        (?, ?);
+      `, note.Id, id)
+		if err != nil {
+			return nil, errors.Join(errors.New("Cannot insert note relation"), err)
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot commit transaction"), err)
 	}
 
 	return note, nil

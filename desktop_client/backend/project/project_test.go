@@ -267,7 +267,41 @@ func TestCreateNote(t *testing.T) {
 
 	name := uuid.New().String()
 	markdown := uuid.New().String()
-	note, err := project.CreateNote(name, markdown)
+	note, err := project.CreateNote(name, markdown, []uuid.UUID{})
+	require.NoError(t, err)
+	require.Equal(t, name, note.Name)
+	require.Equal(t, markdown, note.Markdown)
+	require.Equal(t, normalisation.Normalise(name), note.NameNormalised)
+	require.Equal(t, normalisation.Normalise(markdown), note.MarkdownNormalised)
+	require.NotEmpty(t, note.Created)
+	require.NotEmpty(t, note.Id)
+
+	res, err := project.GetNotes()
+	require.NoError(t, err)
+	require.Len(t, res, 1)
+	require.Equal(t, note, res[0])
+}
+
+func TestCreateNoteWithRelatedCharacters(t *testing.T) {
+	t.Parallel()
+
+	project, remove := testutils.NewProject(t)
+	defer remove()
+
+	const relatedIds = 10
+	characterIds := make([]uuid.UUID, 0)
+
+	for i := range relatedIds {
+		character, err := project.CreateCharacter(uuid.New().String(), fmt.Sprintf("This is a test %d", i), nil)
+		require.NoError(t, err)
+		require.NotNil(t, character)
+
+		characterIds = append(characterIds, character.Id)
+	}
+
+	name := uuid.New().String()
+	markdown := uuid.New().String()
+	note, err := project.CreateNote(name, markdown, characterIds)
 	require.NoError(t, err)
 	require.Equal(t, name, note.Name)
 	require.Equal(t, markdown, note.Markdown)
