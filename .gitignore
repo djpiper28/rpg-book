@@ -2,6 +2,6 @@
 *.log
 *.rpg
 *.sqlite
-*.-journal
-*.-shm
-*.-wal
+*-journal
+*-shm
+*-wal
