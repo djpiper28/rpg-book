@@ -12,6 +12,7 @@ import (
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_common"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_project"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_project_character"
+	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_project_note"
 	projectsvc "github.com/djpiper28/rpg-book/desktop_client/backend/svc/project_svc"
 	testdbutils "github.com/djpiper28/rpg-book/desktop_client/test_db_utils"
 	"github.com/google/uuid"
@@ -376,6 +377,8 @@ func TestProjectSvc(t *testing.T) {
 		require.Equal(t, updatedCharacterName, returnedCharacter.Details.Name)
 		require.Equal(t, updatedCharacterDescription, returnedCharacter.Details.Description)
 		require.Empty(t, returnedCharacter.Icon)
+		require.NotNil(t, returnedCharacter.Notes)
+		require.Len(t, returnedCharacter.Notes, 0)
 	})
 
 	t.Run("Test delete character", func(t *testing.T) {
@@ -473,5 +476,67 @@ func TestProjectSvc(t *testing.T) {
 		require.NoError(t, err)
 		require.Len(t, searchRes.Details, 1)
 		require.Equal(t, characterHandle, searchRes.Details[0])
+	})
+
+	t.Run("Test create character note", func(t *testing.T) {
+		filename := uuid.New().String() + sqlite3.DbExtension
+		projectName := uuid.New().String()
+		characterName := uuid.New().String()
+		characterDescription := uuid.New().String()
+		iconPath := newTestImageFile(t)
+		defer os.Remove(iconPath)
+
+		projectHandle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
+			FileName:    filename,
+			ProjectName: projectName,
+		})
+		require.NoError(t, err)
+		defer closeProject(t, filename, projectHandle)
+
+		characterHandle, err := svc.CreateCharacter(context.Background(), &pb_project.CreateCharacterReq{
+			Project: projectHandle,
+			Details: &pb_project_character.BasicCharacterDetails{
+				Name:        characterName,
+				Description: characterDescription,
+			},
+		})
+		require.NoError(t, err)
+		require.NotEmpty(t, characterHandle.Id)
+
+		name := uuid.New().String()
+		markdown := uuid.New().String()
+		note, err := svc.CreateNote(context.Background(), &pb_project.CreateNoteReq{
+			Project: projectHandle,
+			Details: &pb_project_note.NoteDetails{
+				Name:     name,
+				Markdown: markdown,
+			},
+			Characters: []*pb_project_character.CharacterHandle{
+				{
+					Id: characterHandle.Id,
+				},
+			},
+		})
+
+		require.NoError(t, err)
+		require.NotNil(t, note)
+
+		character, err := svc.GetCharacter(context.Background(), &pb_project.GetCharacterReq{
+			Project:   projectHandle,
+			Character: characterHandle,
+		})
+
+		require.NoError(t, err)
+		require.Equal(t, characterHandle.Id, character.Details.Handle.Id)
+		require.Len(t, character.Notes, 1)
+		require.Equal(t, &pb_project_note.Note{
+			Handle: &pb_project_note.NoteHandle{
+				Id: note.Id,
+			},
+			Details: &pb_project_note.NoteDetails{
+				Name:     name,
+				Markdown: markdown,
+			},
+		}, character.Notes[0])
 	})
 }

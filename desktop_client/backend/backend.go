@@ -193,6 +193,8 @@ func (s *Server) start() error {
 		Addr:           fmt.Sprintf("127.0.0.1:%d", s.Port),
 		TLSConfig:      creds,
 		Handler: recoveryMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			log.Debug("Handling request", loggertags.TagUrl, r.URL.String(), loggertags.TagSize, r.ContentLength)
+
 			if wrappedGrpc.IsGrpcWebRequest(r) {
 				wrappedGrpc.ServeHTTP(w, r)
 				return

@@ -10,11 +10,14 @@ import (
 	"github.com/djpiper28/rpg-book/common/normalisation"
 	testutils "github.com/djpiper28/rpg-book/common/test_utils"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/project"
+	"github.com/djpiper28/rpg-book/desktop_client/backend/project/model"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
 
 func TestOpenProjectNotFound(t *testing.T) {
+	t.Parallel()
+
 	dbName := uuid.NewString() + sqlite3.DbExtension
 	defer os.Remove(dbName)
 
@@ -23,6 +26,8 @@ func TestOpenProjectNotFound(t *testing.T) {
 }
 
 func TestCreateNewProject(t *testing.T) {
+	t.Parallel()
+
 	filename := uuid.New().String() + sqlite3.DbExtension
 	defer os.Remove(filename)
 
@@ -36,6 +41,8 @@ func TestCreateNewProject(t *testing.T) {
 }
 
 func TestReOpenProject(t *testing.T) {
+	t.Parallel()
+
 	filename := uuid.New().String() + sqlite3.DbExtension
 	defer os.Remove(filename)
 
@@ -56,6 +63,8 @@ func TestReOpenProject(t *testing.T) {
 }
 
 func TestCreateCharacter(t *testing.T) {
+	t.Parallel()
+
 	project, remove := testutils.NewProject(t)
 	defer remove()
 
@@ -81,6 +90,8 @@ func TestCreateCharacter(t *testing.T) {
 }
 
 func TestCreateCharacterNilIcon(t *testing.T) {
+	t.Parallel()
+
 	project, remove := testutils.NewProject(t)
 	defer remove()
 
@@ -103,6 +114,8 @@ func TestCreateCharacterNilIcon(t *testing.T) {
 }
 
 func TestUpdateCharacter(t *testing.T) {
+	t.Parallel()
+
 	project, remove := testutils.NewProject(t)
 	defer remove()
 
@@ -120,6 +133,7 @@ func TestUpdateCharacter(t *testing.T) {
 	character.Name = name
 	character.Icon = icon
 	character.Description = description
+	character.Notes = make([]*model.Note, 0)
 
 	err = project.UpdateCharacter(character, true)
 	require.NoError(t, err)
@@ -130,6 +144,8 @@ func TestUpdateCharacter(t *testing.T) {
 }
 
 func TestUpdateCharacterNoIconChange(t *testing.T) {
+	t.Parallel()
+
 	project, remove := testutils.NewProject(t)
 	defer remove()
 
@@ -149,6 +165,7 @@ func TestUpdateCharacterNoIconChange(t *testing.T) {
 	character.Name = name
 	character.Icon = nil
 	character.Description = description
+	character.Notes = make([]*model.Note, 0)
 
 	err = project.UpdateCharacter(character, false)
 	require.NoError(t, err)
@@ -160,6 +177,8 @@ func TestUpdateCharacterNoIconChange(t *testing.T) {
 }
 
 func TestDeleteCharacter(t *testing.T) {
+	t.Parallel()
+
 	project, remove := testutils.NewProject(t)
 	defer remove()
 
@@ -176,6 +195,8 @@ func TestDeleteCharacter(t *testing.T) {
 }
 
 func TestSearchCharacterBasic(t *testing.T) {
+	t.Parallel()
+
 	project, remove := testutils.NewProject(t)
 	defer remove()
 
@@ -191,6 +212,8 @@ func TestSearchCharacterBasic(t *testing.T) {
 }
 
 func TestSearchCharacterName(t *testing.T) {
+	t.Parallel()
+
 	project, remove := testutils.NewProject(t)
 	defer remove()
 
@@ -206,6 +229,8 @@ func TestSearchCharacterName(t *testing.T) {
 }
 
 func TestSearchCharacterDesc(t *testing.T) {
+	t.Parallel()
+
 	project, remove := testutils.NewProject(t)
 	defer remove()
 
@@ -221,6 +246,8 @@ func TestSearchCharacterDesc(t *testing.T) {
 }
 
 func TestSearchCharacterDescription(t *testing.T) {
+	t.Parallel()
+
 	project, remove := testutils.NewProject(t)
 	defer remove()
 
@@ -233,4 +260,68 @@ func TestSearchCharacterDescription(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, res, 1)
 	require.Equal(t, character.Id, res[0])
+}
+
+func TestCreateNote(t *testing.T) {
+	t.Parallel()
+
+	project, remove := testutils.NewProject(t)
+	defer remove()
+
+	name := uuid.New().String()
+	markdown := uuid.New().String()
+	note, err := project.CreateNote(name, markdown, []uuid.UUID{})
+	require.NoError(t, err)
+	require.Equal(t, name, note.Name)
+	require.Equal(t, markdown, note.Markdown)
+	require.Equal(t, normalisation.Normalise(name), note.NameNormalised)
+	require.Equal(t, normalisation.Normalise(markdown), note.MarkdownNormalised)
+	require.NotEmpty(t, note.Created)
+	require.NotEmpty(t, note.Id)
+
+	res, err := project.GetNotes()
+	require.NoError(t, err)
+	require.Len(t, res, 1)
+	require.Equal(t, note, res[0])
+}
+
+func TestCreateNoteWithRelatedCharacters(t *testing.T) {
+	t.Parallel()
+
+	project, remove := testutils.NewProject(t)
+	defer remove()
+
+	const relatedIds = 10
+	characterIds := make([]uuid.UUID, 0)
+
+	for i := range relatedIds {
+		character, err := project.CreateCharacter(uuid.New().String(), fmt.Sprintf("This is a test %d", i), nil)
+		require.NoError(t, err)
+		require.NotNil(t, character)
+
+		characterIds = append(characterIds, character.Id)
+	}
+
+	name := uuid.New().String()
+	markdown := uuid.New().String()
+	note, err := project.CreateNote(name, markdown, characterIds)
+	require.NoError(t, err)
+	require.Equal(t, name, note.Name)
+	require.Equal(t, markdown, note.Markdown)
+	require.Equal(t, normalisation.Normalise(name), note.NameNormalised)
+	require.Equal(t, normalisation.Normalise(markdown), note.MarkdownNormalised)
+	require.NotEmpty(t, note.Created)
+	require.NotEmpty(t, note.Id)
+
+	res, err := project.GetNotes()
+	require.NoError(t, err)
+	require.Len(t, res, 1)
+	require.Equal(t, note, res[0])
+
+	for _, id := range characterIds {
+		character, err := project.GetCharacter(id)
+		require.NoError(t, err)
+		require.Len(t, character.Notes, 1)
+		require.Equal(t, note, character.Notes[0])
+	}
 }

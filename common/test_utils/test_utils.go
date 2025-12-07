@@ -8,7 +8,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/charmbracelet/log"
 	"github.com/djpiper28/rpg-book/common/database/sqlite3"
+	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/project"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
@@ -46,6 +48,9 @@ func NewProject(t *testing.T) (*project.Project, func()) {
 	require.Equal(t, project.Filename, filename)
 
 	return project, func() {
-		os.Remove(filename)
+		err := os.Remove(filename)
+		if err != nil {
+			log.Warn("Cannot remove test project database", loggertags.TagError, err)
+		}
 	}
 }

@@ -41,42 +41,31 @@ export default function CreateCharacterModal(
       />
       <Button
         onClick={() => {
-          getProjectClient()
-            .createCharacter({
-              details: character,
-              iconPath,
-              project: projectHandle,
-            })
-            .then((resp) => {
-              getProjectClient()
-                .getCharacter({
-                  character: resp.response,
-                  project: projectHandle,
-                })
-                .then((charDetails) => {
-                  if (!charDetails.response.details) {
-                    return;
-                  }
+          // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+          const f = async () => {
+            try {
+              const resp = await getProjectClient().createCharacter({
+                details: character,
+                iconPath,
+                project: projectHandle,
+              });
 
-                  projectStore.addCharacter(
-                    projectHandle,
-                    charDetails.response.details,
-                  );
+              const charDetails = await getProjectClient().getCharacter({
+                character: resp.response,
+                project: projectHandle,
+              });
 
-                  props.closeDialog();
-                })
-                .catch((error: unknown) => {
-                  getLogger().error("Cannot get character after creating", {
-                    error: String(error),
-                  });
+              if (!charDetails.response.details) {
+                return;
+              }
 
-                  setError({
-                    body: String(error),
-                    title: "Cannot get character after creating",
-                  });
-                });
-            })
-            .catch((error: unknown) => {
+              projectStore.addCharacter(
+                projectHandle,
+                charDetails.response.details,
+              );
+
+              props.closeDialog();
+            } catch (error: unknown) {
               getLogger().error("Cannot create character", {
                 error: String(error),
               });
@@ -85,7 +74,11 @@ export default function CreateCharacterModal(
                 body: String(error),
                 title: "Cannot create character",
               });
-            });
+            }
+          };
+
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          f();
         }}
       >
         Create Character

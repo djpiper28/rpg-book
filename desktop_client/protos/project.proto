@@ -2,17 +2,21 @@ syntax = "proto3";
 option go_package = "github.com/djpiper28/rpg-book/desktop_client/backend/pb_project";
 import 'common.proto';
 import 'project_character.proto';
+import 'project_note.proto';
 
 service ProjectSvc {
   rpc CreateProject(CreateProjectReq) returns (ProjectHandle) {}
   rpc OpenProject(OpenProjectReq) returns (OpenProjectResp) {}
   rpc RecentProjects(Empty) returns (RecentProjectsResp) {}
   rpc CloseProject(ProjectHandle) returns (Empty) {}
+
   rpc CreateCharacter(CreateCharacterReq) returns (CharacterHandle) {}
   rpc UpdateCharacter(UpdateCharacterReq) returns (Empty) {}
   rpc GetCharacter(GetCharacterReq) returns (GetCharacterResp) {}
   rpc DeleteCharacter(DeleteCharacterReq) returns (Empty) {}
   rpc SearchCharacter(SearchCharacterReq) returns (SearchCharacterResp) {}
+
+  rpc CreateNote(CreateNoteReq) returns (NoteHandle) {}
 }
 
 message CreateProjectReq {
@@ -59,6 +63,7 @@ message GetCharacterReq {
 message GetCharacterResp {
   BasicCharacterDetails details = 1;
   bytes icon = 2;
+  repeated Note notes = 3;
 }
 
 message UpdateCharacterReq {
@@ -81,4 +86,10 @@ message SearchCharacterReq {
 
 message SearchCharacterResp {
   repeated CharacterHandle details = 1;
+}
+
+message CreateNoteReq {
+  ProjectHandle project = 1;
+  NoteDetails details = 2;
+  repeated CharacterHandle characters = 3;
 }

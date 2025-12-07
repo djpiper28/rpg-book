@@ -120,9 +120,15 @@ func Parse(inputStr string) (*Node, error) {
 		stack:    make([]*Node, 0),
 	}
 
-	p.Init()
+	err := p.Init()
+	if err != nil {
+		log.Error("Failed to init parser",
+			loggertags.TagError, err,
+			"input", inputStr)
+		return nil, err
+	}
 
-	err := p.Parse()
+	err = p.Parse()
 	if err != nil {
 		log.Error("Failed to parse input",
 			loggertags.TagError, err,

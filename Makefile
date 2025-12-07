@@ -47,12 +47,17 @@ desktop: desktop-app desktop-backend
 desktop-test: desktop-codegen 
 	cd $(DESKTOP_APP) && pnpm test
 
+.PHONY: desktop_lint
+desktop_lint: desktop-codegen 
+	cd $(DESKTOP_APP) && pnpm lint
+
 .PHONY: go-lint
 go-lint: go-core
 	go vet ./...
 
 .PHONY: test
-test: go-test go-lint desktop-test
+test: go-test go-lint desktop_lint desktop-test
+	echo "Tests complete"
 
 .PHONY: go-fmt
 go-fmt:

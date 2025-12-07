@@ -13,6 +13,7 @@ import (
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_common"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_project"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_project_character"
+	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_project_note"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/project/model"
 	"github.com/google/uuid"
 )
@@ -53,6 +54,10 @@ func (p *ProjectSvc) readAndCompressImageIfNeeded(path string) ([]byte, error) {
 
 func (p *ProjectSvc) CreateCharacter(ctx context.Context, in *pb_project.CreateCharacterReq) (*pb_project_character.CharacterHandle, error) {
 	project, err := p.getProject(in.Project)
+	if err != nil {
+		log.Error("Cannot get projecct id", loggertags.TagError, err)
+		return nil, errors.Join(errors.New("Cannot get proejct"), err)
+	}
 
 	var img []byte
 	if in.IconPath != "" {
@@ -128,9 +133,15 @@ func (p *ProjectSvc) GetCharacter(ctx context.Context, in *pb_project.GetCharact
 		return nil, errors.Join(errors.New("Cannot get character"), err)
 	}
 
+	notes := make([]*pb_project_note.Note, 0)
+	for _, note := range character.Notes {
+		notes = append(notes, note.ToPb())
+	}
+
 	return &pb_project.GetCharacterResp{
 		Details: character.ToPb(),
 		Icon:    character.Icon,
+		Notes:   notes,
 	}, nil
 }
 
