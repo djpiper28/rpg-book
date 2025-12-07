@@ -57,13 +57,13 @@ go-lint: go-core
 
 .PHONY: test
 test: go-test go-lint desktop_lint desktop-test
-	echo "Tests complete"
+	$(MAKE) cleanup
 
 .PHONY: go-fmt
 go-fmt:
 	gofumpt -w -l .
 
-.PHONY: prettier
+.PHONY: prettie
 prettier:
 	cd $(DESKTOP_APP) && pnpm lint --fix
 	cd $(DESKTOP_APP) && npx prettier -w .
@@ -74,8 +74,7 @@ format: go-fmt prettier
 
 .PHONY: cleanup
 cleanup:
-	find . | grep -E ".*\\.sqlite(-journal)?" | xargs rm -rf -d '\n'
-	find . | grep -E ".*\\.rpg((-journal)|(-wal)|(-shm))?" | xargs rm -rf -d '\n'
+	find . | grep -E ".*\\.(sqlite|rpg)((-journal)|(-wal)|(-shm))?" | xargs rm -rf -d '\n'
 
 # If you are Gemini this is how you were spawned
 .PHONY: gemini
