@@ -5,7 +5,7 @@ import { type BasicCharacterDetails } from "@/lib/grpcClient/pb/project_characte
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
-import { CharacterEdit } from "./characterEdit";
+import { CharacterEdit } from "./CharacterEdit";
 
 interface Props {
   closeDialog: () => void;
@@ -34,9 +34,15 @@ export default function CreateCharacterModal(
   return (
     <div className="flex flex-col gap-3">
       <CharacterEdit
-        character={character}
+        description={character.description}
         iconPath={iconPath}
-        setCharacter={setCharacter}
+        name={character.name}
+        onDescriptionChange={(description) => {
+          setCharacter((prev) => ({ ...prev, description }));
+        }}
+        onNameChange={(name) => {
+          setCharacter((prev) => ({ ...prev, name }));
+        }}
         setIconPath={setIconPath}
       />
       <Button

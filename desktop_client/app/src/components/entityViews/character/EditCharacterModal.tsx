@@ -9,7 +9,7 @@ import { uint8ArrayToBase64 } from "@/lib/utils/base64";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
-import { CharacterEdit } from "./characterEdit";
+import { CharacterEdit } from "./CharacterEdit";
 
 interface Props {
   characterHandle: CharacterHandle;
@@ -66,10 +66,16 @@ export default function EditCharacterModal(props: Readonly<Props>): ReactNode {
   return (
     <div className="flex flex-col gap-3">
       <CharacterEdit
-        character={characterDetails}
+        description={characterDetails.description}
         iconPath={iconPath}
         imageDataB64={icon}
-        setCharacter={setCharacterDetails}
+        name={characterDetails.name}
+        onDescriptionChange={(description) => {
+          setCharacterDetails((prev) => ({ ...prev, description }));
+        }}
+        onNameChange={(name) => {
+          setCharacterDetails((prev) => ({ ...prev, name }));
+        }}
         setIconPath={(path) => {
           setIconPath(path);
           setDirtyIcon(true);

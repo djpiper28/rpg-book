@@ -1,28 +1,21 @@
 import { Button, Table } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { type ReactNode, useEffect, useState } from "react";
-import { EditDelete } from "@/components/buttons/editDelete";
+import { CharacterView } from "@/components/entityViews/character/CharacterView";
+import CreateCharacterModal from "@/components/entityViews/character/CreateCharacterModal";
+import EditCharacterModal from "@/components/entityViews/character/EditCharacterModal";
 import { ConfirmModal } from "@/components/modal/confirmModal";
 import { Modal } from "@/components/modal/modal";
-import MarkdownRenderer from "@/components/renderers/markdown";
 import { Search } from "@/components/search/search";
-import { H2 } from "@/components/typography/H2";
 import { P } from "@/components/typography/P";
 import { getLogger, getProjectClient } from "@/lib/grpcClient/client";
 import { type BasicCharacterDetails } from "@/lib/grpcClient/pb/project_character";
-import { uint8ArrayToBase64 } from "@/lib/utils/base64";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
-import CreateCharacterModal from "./createCharacterModal";
-import EditCharacterModal from "./editCharacterModal";
 
 export function CharacterTab(): ReactNode {
   const [selectedCharacterId, setSelectedCharacterId] = useState("");
-
-  const [selectedCharcter, setSelectedCharacter] = useState<
-    BasicCharacterDetails | undefined
-  >();
 
   const [createOpened, { close: createClose, open: createOpen }] =
     useDisclosure(false);
@@ -37,10 +30,13 @@ export function CharacterTab(): ReactNode {
   const projectStore = useProjectStore((x) => x);
   const thisProject = projectHandle && projectStore.getProject(projectHandle);
   const errorStore = useGlobalErrorStore((x) => x);
-  const [iconB64, setIconB64] = useState("");
   const [queryText, setQueryText] = useState("");
   const [queryResult, setQueryResult] = useState<BasicCharacterDetails[]>([]);
   const [queryError, setQueryError] = useState("");
+
+  const selectedCharacter = thisProject?.project.characters.find(
+    (c) => c.handle?.id === selectedCharacterId,
+  );
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -91,40 +87,6 @@ export function CharacterTab(): ReactNode {
     sync();
   }, [projectHandle, queryText, thisProject, thisProject?.project.characters]);
 
-  useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-    const sync = async () => {
-      if (!selectedCharacterId) {
-        return;
-      }
-
-      if (!projectHandle) {
-        return;
-      }
-
-      try {
-        const resp = await getProjectClient().getCharacter({
-          character: {
-            id: selectedCharacterId,
-          },
-          project: projectHandle,
-        });
-
-        setSelectedCharacter(resp.response.details);
-        setIconB64(uint8ArrayToBase64(resp.response.icon));
-      } catch (error: unknown) {
-        getLogger().error("Cannot get character", {
-          character: selectedCharacterId,
-          error: JSON.stringify(error),
-          project: JSON.stringify(projectHandle),
-        });
-      }
-    };
-
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    sync();
-  }, [projectHandle, selectedCharacterId, editOpened]);
-
   if (!projectHandle) {
     return "No project selected";
   }
@@ -151,12 +113,12 @@ export function CharacterTab(): ReactNode {
       <ConfirmModal
         close={deleteClose}
         onConfirm={() => {
-          if (!selectedCharcter?.handle) {
+          if (!selectedCharacter?.handle) {
             deleteClose();
             return;
           }
 
-          const characterHandle = selectedCharcter.handle;
+          const characterHandle = selectedCharacter.handle;
 
           getProjectClient()
             .deleteCharacter({
@@ -165,8 +127,7 @@ export function CharacterTab(): ReactNode {
             })
             .then(() => {
               projectStore.deleteCharacter(projectHandle, characterHandle);
-
-              setSelectedCharacter(undefined);
+              setSelectedCharacterId("");
             })
             .catch((error: unknown) => {
               errorStore.setError({
@@ -176,7 +137,7 @@ export function CharacterTab(): ReactNode {
             });
         }}
         opened={deleteOpened}
-        title={`Delete Character "${selectedCharcter?.name ?? "no name"}"`}
+        title={`Delete Character "${selectedCharacter?.name ?? "no name"}"`}
       />
 
       <div className="flex flex-row gap-2 pt-2 justify-between">
@@ -234,33 +195,14 @@ export function CharacterTab(): ReactNode {
           />
         </div>
 
-        <div className="flex-1 gap-3 overflow-y-auto flex flex-col">
-          {selectedCharcter && (
-            <>
-              <div className="flex flex-col gap-3">
-                <div className="flex flex-row gap-3 items-center justify-between">
-                  <H2>{selectedCharcter.name}</H2>
-                  <EditDelete
-                    delete={() => {
-                      deleteOpen();
-                    }}
-                    edit={() => {
-                      editOpen();
-                    }}
-                  />
-                </div>
-                {iconB64 && (
-                  <img
-                    alt="User selected"
-                    className="max-h-screen"
-                    src={`data:image/jpg;base64,${iconB64}`}
-                  />
-                )}
-              </div>
-              <MarkdownRenderer markdown={selectedCharcter.description} />
-            </>
-          )}
-        </div>
+        {selectedCharacterId && (
+          <CharacterView
+            characterId={selectedCharacterId}
+            isEditModalOpen={editOpened}
+            onDelete={deleteOpen}
+            onEdit={editOpen}
+          />
+        )}
       </div>
     </>
   );

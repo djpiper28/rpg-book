@@ -5,7 +5,8 @@ import { H2 } from "@/components/typography/H2";
 import { mustVoid } from "@/lib/utils/errorHandlers";
 import { useTabStore } from "@/stores/tabStore";
 import { indexPath } from "../path";
-import { CharacterTab } from "./tabs/characterTab";
+import { CharacterTab } from "./tabs/characters/characterTab";
+import { NoteTab } from "./tabs/notes/noteTab";
 
 export function Component(): ReactNode {
   const navigate = useNavigate();
@@ -24,8 +25,8 @@ export function Component(): ReactNode {
         <Tabs.List>
           <H2>{currentTab.name}</H2>
           <Tabs.Tab value="characters">Characters</Tabs.Tab>
-          {/*
           <Tabs.Tab value="notes">Notes</Tabs.Tab>
+          {/*
           <Tabs.Tab value="items">Items</Tabs.Tab>
           <Tabs.Tab value="factions">Factions</Tabs.Tab>
           <Tabs.Tab value="maps">Maps &amp; Places</Tabs.Tab>
@@ -35,6 +36,10 @@ export function Component(): ReactNode {
 
         <Tabs.Panel value="characters">
           <CharacterTab />
+        </Tabs.Panel>
+
+        <Tabs.Panel value="notes">
+          <NoteTab />
         </Tabs.Panel>
       </Tabs>
     </>
