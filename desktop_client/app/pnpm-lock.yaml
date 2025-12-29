@@ -72,8 +72,8 @@ importers:
         specifier: ^2.11.1
         version: 2.11.1
       '@protobuf-ts/runtime-rpc':
-        specifier: ^2.10.0
-        version: 2.10.0
+        specifier: ^2.11.1
+        version: 2.11.1
       '@repodog/eslint-config':
         specifier: ^9.0.19
         version: 9.0.19(@typescript-eslint/parser@8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(@typescript-eslint/utils@8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(prettier@3.7.4)(typescript@5.9.3)
@@ -1047,9 +1047,6 @@ packages:
   '@protobuf-ts/protoc@2.11.1':
     resolution: {integrity: sha512-mUZJaV0daGO6HUX90o/atzQ6A7bbN2RSuHtdwo8SSF2Qoe3zHwa4IHyCN1evftTeHfLmdz+45qo47sL+5P8nyg==}
     hasBin: true
-
-  '@protobuf-ts/runtime-rpc@2.10.0':
-    resolution: {integrity: sha512-8CS/XPv3+pMK4v8UKhtCdvbS4h9l7aqlteKdRt0/UbIKZ8n0qHj6hX8cBhz2ngvohxCOS0N08zPr9aCLBNhW3Q==}
 
   '@protobuf-ts/runtime-rpc@2.11.1':
     resolution: {integrity: sha512-4CqqUmNA+/uMz00+d3CYKgElXO9VrEbucjnBFEjqI4GuDrEQ32MaI3q+9qPBvIGOlL4PmHXrzM32vBPWRhQKWQ==}
@@ -6203,7 +6200,7 @@ snapshots:
   '@protobuf-ts/grpcweb-transport@2.10.0':
     dependencies:
       '@protobuf-ts/runtime': 2.11.1
-      '@protobuf-ts/runtime-rpc': 2.10.0
+      '@protobuf-ts/runtime-rpc': 2.11.1
 
   '@protobuf-ts/plugin@2.11.1':
     dependencies:
@@ -6217,10 +6214,6 @@ snapshots:
       - supports-color
 
   '@protobuf-ts/protoc@2.11.1': {}
-
-  '@protobuf-ts/runtime-rpc@2.10.0':
-    dependencies:
-      '@protobuf-ts/runtime': 2.11.1
 
   '@protobuf-ts/runtime-rpc@2.11.1':
     dependencies:
