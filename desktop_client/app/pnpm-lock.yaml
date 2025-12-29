@@ -63,8 +63,8 @@ importers:
         specifier: ^7.17.4
         version: 7.17.7(@mantine/core@7.17.7(@mantine/hooks@7.17.7(react@19.2.0))(@types/react@19.2.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(@mantine/hooks@7.17.7(react@19.2.0))(@tiptap/extension-link@2.12.0(@tiptap/core@2.12.0(@tiptap/pm@2.12.0))(@tiptap/pm@2.12.0))(@tiptap/react@2.12.0(@tiptap/core@2.12.0(@tiptap/pm@2.12.0))(@tiptap/pm@2.12.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@protobuf-ts/grpcweb-transport':
-        specifier: ^2.9.6
-        version: 2.10.0
+        specifier: ^2.11.1
+        version: 2.11.1
       '@protobuf-ts/plugin':
         specifier: ^2.11.1
         version: 2.11.1
@@ -1037,8 +1037,8 @@ packages:
   '@popperjs/core@2.11.8':
     resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
 
-  '@protobuf-ts/grpcweb-transport@2.10.0':
-    resolution: {integrity: sha512-VUyD+8kn4XEfWoEiKjAsWX5XWkt8Gfdp/uquS17yt9hdfMBVx3o5tlXX5ylwfWhcIjbRvkf7WHEEdS2wMuq86Q==}
+  '@protobuf-ts/grpcweb-transport@2.11.1':
+    resolution: {integrity: sha512-1W4utDdvOB+RHMFQ0soL4JdnxjXV+ddeGIUg08DvZrA8Ms6k5NN6GBFU2oHZdTOcJVpPrDJ02RJlqtaoCMNBtw==}
 
   '@protobuf-ts/plugin@2.11.1':
     resolution: {integrity: sha512-HyuprDcw0bEEJqkOWe1rnXUP0gwYLij8YhPuZyZk6cJbIgc/Q0IFgoHQxOXNIXAcXM4Sbehh6kjVnCzasElw1A==}
@@ -6216,7 +6216,7 @@ snapshots:
 
   '@popperjs/core@2.11.8': {}
 
-  '@protobuf-ts/grpcweb-transport@2.10.0':
+  '@protobuf-ts/grpcweb-transport@2.11.1':
     dependencies:
       '@protobuf-ts/runtime': 2.11.1
       '@protobuf-ts/runtime-rpc': 2.11.1
