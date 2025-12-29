@@ -37,7 +37,7 @@
     "@protobuf-ts/grpcweb-transport": "^2.9.6",
     "@protobuf-ts/plugin": "^2.11.1",
     "@protobuf-ts/runtime": "^2.11.1",
-    "@protobuf-ts/runtime-rpc": "^2.10.0",
+    "@protobuf-ts/runtime-rpc": "^2.11.1",
     "@repodog/eslint-config": "^9.0.19",
     "@repodog/eslint-config-react": "^9.0.5",
     "@storybook/addon-onboarding": "^9.1.4",
