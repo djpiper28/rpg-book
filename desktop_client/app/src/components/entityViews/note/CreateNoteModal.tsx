@@ -3,6 +3,7 @@ import { type ReactNode, useState } from "react";
 import { getLogger, getProjectClient } from "@/lib/grpcClient/client";
 import { type NoteDetails } from "@/lib/grpcClient/pb/project_note";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
+import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
 import { NoteEdit } from "./NoteEdit";
 
@@ -15,7 +16,7 @@ export default function CreateCharacterModal(
 ): ReactNode {
   const { setError } = useGlobalErrorStore((x) => x);
   const projectHandle = useTabStore((x) => x.selectedTab);
-  // const projectStore = useProjectStore((x) => x);
+  const projectStore = useProjectStore((x) => x);
 
   const [note, setNote] = useState<NoteDetails>({
     markdown: "",
@@ -43,27 +44,22 @@ export default function CreateCharacterModal(
           // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
           const f = async () => {
             try {
-              // const resp = await getProjectClient().createNote({
-              await getProjectClient().createNote({
+              const resp = await getProjectClient().createNote({
                 characters: [],
                 details: note,
                 project: projectHandle,
               });
 
-              // TODO: add notes to the project store
-              // const noteDetails = await getProjectClient().getNote({
-              //   note: resp.response,
-              //   project: projectHandle,
-              // });
-              //
-              // if (!noteDetails.response.details) {
-              //   return;
-              // }
-              //
-              // projectStore.addNote(
-              //   projectHandle,
-              //   noteDetails.response.details,
-              // );
+              const noteDetails = await getProjectClient().getNote({
+                note: resp.response,
+                project: projectHandle,
+              });
+
+              if (!noteDetails.response.details) {
+                return;
+              }
+
+              projectStore.addNote(projectHandle, noteDetails.response.details);
 
               props.closeDialog();
             } catch (error: unknown) {

@@ -17,6 +17,7 @@ service ProjectSvc {
   rpc SearchCharacter(SearchCharacterReq) returns (SearchCharacterResp) {}
 
   rpc CreateNote(CreateNoteReq) returns (NoteHandle) {}
+  rpc GetNote(GetNoteReq) returns (GetNoteResp) {}
 }
 
 message CreateProjectReq {
@@ -36,6 +37,7 @@ message ProjectHandle {
 message OpenProjectResp {
   ProjectHandle handle = 1;
   repeated BasicCharacterDetails characters = 2;
+  repeated Note notes = 3;
 }
 
 message RecentProject {
@@ -92,4 +94,14 @@ message CreateNoteReq {
   ProjectHandle project = 1;
   NoteDetails details = 2;
   repeated CharacterHandle characters = 3;
+}
+
+message GetNoteReq {
+  ProjectHandle project = 1;
+  NoteHandle note = 2;
+}
+
+message GetNoteResp {
+  Note details = 1;
+  repeated BasicCharacterDetails characters = 2;
 }

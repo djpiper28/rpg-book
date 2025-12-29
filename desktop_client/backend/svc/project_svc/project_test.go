@@ -539,4 +539,37 @@ func TestProjectSvc(t *testing.T) {
 			},
 		}, character.Notes[0])
 	})
+
+	t.Run("Test note in project open", func(t *testing.T) {
+		filename := uuid.New().String() + sqlite3.DbExtension
+		projectName := uuid.New().String()
+		name := uuid.New().String()
+		markdown := uuid.New().String()
+
+		projectHandle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
+			FileName:    filename,
+			ProjectName: projectName,
+		})
+		require.NoError(t, err)
+
+		note, err := svc.CreateNote(context.Background(), &pb_project.CreateNoteReq{
+			Project: projectHandle,
+			Details: &pb_project_note.NoteDetails{
+				Name:     name,
+				Markdown: markdown,
+			},
+		})
+
+		require.NoError(t, err)
+		require.NotEmpty(t, note.Id)
+
+		_, err = svc.CloseProject(context.Background(), projectHandle)
+		require.NoError(t, err)
+
+		project, err := svc.OpenProject(context.Background(), &pb_project.OpenProjectReq{
+			FileName: filename,
+		})
+		defer closeProject(t, filename, project.Handle)
+		require.Len(t, project.Notes, 1)
+	})
 }

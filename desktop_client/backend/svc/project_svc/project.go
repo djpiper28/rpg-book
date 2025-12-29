@@ -15,6 +15,7 @@ import (
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_common"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_project"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_project_character"
+	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_project_note"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/project"
 	"github.com/google/uuid"
 )
@@ -157,11 +158,22 @@ func (p *ProjectSvc) OpenProject(ctx context.Context, in *pb_project.OpenProject
 		characters = append(characters, character.ToPb())
 	}
 
+	notes := make([]*pb_project_note.Note, 0)
+	rawNotes, err := proj.GetNotes()
+	if err != nil {
+		log.Error("Cannot open project", loggertags.TagError, err)
+	}
+
+	for _, note := range rawNotes {
+		notes = append(notes, note.ToPb())
+	}
+
 	return &pb_project.OpenProjectResp{
 		Handle: &pb_project.ProjectHandle{
 			Id: id.String(),
 		},
 		Characters: characters,
+		Notes:      notes,
 	}, nil
 }
 
