@@ -90,7 +90,7 @@
   },
   "main": "dist-electron/main.js",
   "devDependencies": {
-    "@storybook/addon-docs": "^9.1.4",
+    "@storybook/addon-docs": "^9.1.17",
     "@storybook/addon-vitest": "9.1.4",
     "@testing-library/jest-dom": "^6.9.1"
   }
