@@ -67,5 +67,5 @@ func (p *ProjectSvc) GetNote(ctx context.Context, in *pb_project.GetNoteReq) (*p
 		result.Characters = append(result.Characters, character.ToPb())
 	}
 
-  return result, nil
+	return result, nil
 }

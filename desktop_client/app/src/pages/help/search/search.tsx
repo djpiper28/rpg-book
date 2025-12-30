@@ -3,8 +3,8 @@ import { type ReactNode } from "react";
 import { H1 } from "@/components/typography/H1";
 import { H2 } from "@/components/typography/H2";
 import { H3 } from "@/components/typography/H3";
-import { P } from "@/components/typography/P";
 import { Link } from "@/components/typography/Link";
+import { P } from "@/components/typography/P";
 
 export function Component(): ReactNode {
   return (

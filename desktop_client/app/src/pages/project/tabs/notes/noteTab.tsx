@@ -1,10 +1,10 @@
+import { Button, Table } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { type ReactNode, useState } from "react";
 import { NoteView } from "@/components/entityViews/note/NoteView";
 import { Search } from "@/components/search/search";
 import { P } from "@/components/typography/P";
-import { Note } from "@/lib/grpcClient/pb/project_note";
-import { Button, Table } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import { useState, type ReactNode } from "react";
+import { type Note } from "@/lib/grpcClient/pb/project_note";
 
 export function NoteTab(): ReactNode {
   const [queryError, setQueryError] = useState("");

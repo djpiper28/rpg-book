@@ -2,11 +2,11 @@ import { Button } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { TriangleAlert } from "lucide-react";
 import { type ReactNode } from "react";
+import { useNavigate } from "react-router";
 import { electronShell } from "@/lib/electron";
 import { getLogger } from "@/lib/grpcClient/client";
 import { Modal } from "../modal/modal";
 import { P } from "./P";
-import { useNavigate } from "react-router";
 
 interface Props {
   children: ReactNode;
