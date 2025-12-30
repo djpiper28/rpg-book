@@ -36,3 +36,9 @@ type NoteRelations struct {
 	NoteId      uuid.UUID `db:"note_id"`
 	CharacterId uuid.UUID `db:"character_id"`
 }
+
+// This contains the note, and everything that it is related to
+type CompleteNote struct {
+	Note       *Note
+	Characters []*Character
+}

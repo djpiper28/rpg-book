@@ -325,3 +325,29 @@ func TestCreateNoteWithRelatedCharacters(t *testing.T) {
 		require.Equal(t, note, character.Notes[0])
 	}
 }
+
+func TestGetNote(t *testing.T) {
+	t.Parallel()
+
+	project, remove := testutils.NewProject(t)
+	defer remove()
+
+	character, err := project.CreateCharacter("Crazy Dave", "pan on head", nil)
+	require.NoError(t, err)
+	require.NotEmpty(t, character.Id)
+
+	name := uuid.New().String()
+	markdown := uuid.New().String()
+	expectedNote, err := project.CreateNote(name, markdown, []uuid.UUID{character.Id})
+	require.NoError(t, err)
+
+	require.NotEmpty(t, expectedNote.Id)
+	require.Equal(t, name, expectedNote.Name)
+	require.Equal(t, markdown, expectedNote.Markdown)
+
+	completeNote, err := project.GetNote(expectedNote.Id)
+	require.NoError(t, err)
+	require.Equal(t, expectedNote, completeNote.Note)
+	require.Len(t, completeNote.Characters, 1)
+	require.Equal(t, character, completeNote.Characters[0])
+}

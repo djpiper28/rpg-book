@@ -1,6 +1,8 @@
 package project
 
 import (
+	"context"
+	"database/sql"
 	"errors"
 	"os"
 	"time"
@@ -339,4 +341,51 @@ func (p *Project) GetNotes() ([]*model.Note, error) {
 	}
 
 	return notes, nil
+}
+
+func (p *Project) GetNote(noteId uuid.UUID) (*model.CompleteNote, error) {
+	tx, err := p.db.Db.BeginTxx(context.Background(), &sql.TxOptions{ReadOnly: true})
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot start transaction"), err)
+	}
+	defer tx.Rollback()
+
+	row := tx.QueryRowx("SELECT * FROM notes WHERE id=?;", noteId)
+
+	var note model.Note
+	err = row.StructScan(&note)
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot scan note into struct"), err)
+	}
+
+	rows, err := tx.Queryx(`
+    SELECT characters.*
+    FROM characters 
+    INNER JOIN note_relations 
+      ON characters.id=note_relations.character_id
+    WHERE note_id=?;`, noteId)
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot get related characters"), err)
+	}
+
+	characters := make([]*model.Character, 0)
+	for rows.Next() {
+		var character model.Character
+		err = rows.StructScan(&character)
+		if err != nil {
+			return nil, errors.Join(errors.New("Cannot scan character into struct"), err)
+		}
+
+		characters = append(characters, &character)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot commit transaction"), err)
+	}
+
+	return &model.CompleteNote{
+		Note:       &note,
+		Characters: characters,
+	}, nil
 }
