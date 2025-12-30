@@ -123,6 +123,33 @@ export function Component(): ReactNode {
           </Table.Th>
         </Table.Tr>
       </Table>
+
+      <H3>Notes</H3>
+      <Table variant="vertical">
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>Field</Table.Th>
+            <Table.Th>Description</Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tr>
+          <Table.Th>name</Table.Th>
+          <Table.Th>The name of the note i.e: Map of Scary Dungeon</Table.Th>
+        </Table.Tr>
+        <Table.Tr>
+          <Table.Th>contents, desc, or description</Table.Th>
+          <Table.Th>
+            The text contents of description of the note i.e: 2 spuds
+          </Table.Th>
+        </Table.Tr>
+        <Table.Tr>
+          <Table.Th>character.*</Table.Th>
+          <Table.Th>
+            Allows you to search by the fields of related characters i.e:
+            character.name=&quot;Dave&qauot;
+          </Table.Th>
+        </Table.Tr>
+      </Table>
     </>
   );
 }
