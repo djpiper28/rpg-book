@@ -6,6 +6,7 @@ import { electronShell } from "@/lib/electron";
 import { getLogger } from "@/lib/grpcClient/client";
 import { Modal } from "../modal/modal";
 import { P } from "./P";
+import { useNavigate } from "react-router";
 
 interface Props {
   children: ReactNode;
@@ -18,19 +19,21 @@ interface Props {
 }
 
 export function Link(props: Readonly<Props>): ReactNode {
+  const navigate = useNavigate();
   const [opened, { close, open }] = useDisclosure(false);
-  const style = "text-blue-500 hover:text-blue-600 underline";
+  const style = "text-blue-500 hover:text-blue-600 underline cursor-grab";
 
   if (!props.openInBrowser) {
     return (
-      <a
+      <button
         className={style}
-        href={props.href}
-        rel={props.newWindow ? "noreferrer" : ""}
-        target={props.newWindow ? "_blank" : ""}
+        onClick={() => {
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          navigate(props.href);
+        }}
       >
         {props.children}
-      </a>
+      </button>
     );
   }
 

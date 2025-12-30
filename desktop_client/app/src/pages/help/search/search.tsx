@@ -4,6 +4,7 @@ import { H1 } from "@/components/typography/H1";
 import { H2 } from "@/components/typography/H2";
 import { H3 } from "@/components/typography/H3";
 import { P } from "@/components/typography/P";
+import { Link } from "@/components/typography/Link";
 
 export function Component(): ReactNode {
   return (
@@ -103,7 +104,7 @@ export function Component(): ReactNode {
         There are a series of different scopes for searching, think of these as
         each of the different search bars in the RPG Book.
       </P>
-      <H3>Characters</H3>
+      <H3 id="#characters">Characters</H3>
       <Table variant="vertical">
         <Table.Thead>
           <Table.Tr>
@@ -146,7 +147,8 @@ export function Component(): ReactNode {
           <Table.Th>character.*</Table.Th>
           <Table.Th>
             Allows you to search by the fields of related characters i.e:
-            character.name=&quot;Dave&qauot;
+            character.name=&quot;Dave&qauot;. See{" "}
+            <Link href="#characters">characters</Link>.
           </Table.Th>
         </Table.Tr>
       </Table>
