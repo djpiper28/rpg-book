@@ -5,7 +5,6 @@ import (
 	"image"
 	"image/color"
 	"os"
-	"testing"
 	"time"
 
 	"github.com/charmbracelet/log"
@@ -37,7 +36,7 @@ func NewTestImage(w, h int) image.Image {
 	return img
 }
 
-func NewProject(t *testing.T) (*project.Project, func()) {
+func NewProject(t require.TestingT) (*project.Project, func()) {
 	filename := uuid.New().String() + sqlite3.DbExtension
 
 	projectName := uuid.New().String()

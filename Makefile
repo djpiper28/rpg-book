@@ -36,6 +36,10 @@ go-generate: desktop-deps
 .PHONY: go-core
 go-core: go-generate
 
+.PHONY: go-fuzz
+go-fuzz: go-core
+	go test -fuzz=FuzzSearchCharacter -fuzztime=10s ./desktop_client/backend/project/search_fuzz_test.go
+
 .PHONY: go-test
 go-test: go-core
 	go test ./...
@@ -56,7 +60,7 @@ go-lint: go-core
 	go vet ./...
 
 .PHONY: test
-test: go-test go-lint desktop_lint desktop-test
+test: go-test go-fuzz go-lint desktop_lint desktop-test
 	$(MAKE) cleanup
 
 .PHONY: go-fmt
@@ -75,6 +79,7 @@ format: go-fmt prettier
 .PHONY: cleanup
 cleanup:
 	find . | grep -E ".*\\.(sqlite|rpg)((-journal)|(-wal)|(-shm))?" | xargs rm -rf -d '\n'
+	find . | grep -E "testdata/.*/[a-z0-9]+" | xargs rm -rf -d '\n'
 
 # If you are Gemini this is how you were spawned
 .PHONY: gemini
