@@ -4,7 +4,7 @@ import { getLogger, getProjectClient } from "@/lib/grpcClient/client";
 import {
   type NoteDetails,
   type NoteHandle,
-} from "@/lib/grpcClient/pb/project_character";
+} from "@/lib/grpcClient/pb/project_note";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
@@ -39,11 +39,11 @@ export function EditNoteModal(props: Readonly<Props>): ReactNode {
         project: projectHandle,
       })
       .then((resp) => {
-        if (!resp.response.details) {
+        if (!resp.response.details?.details) {
           return;
         }
 
-        setNoteDetails(resp.response.details);
+        setNoteDetails(resp.response.details.details);
       })
       .catch((error: unknown) => {
         setError({
@@ -59,7 +59,7 @@ export function EditNoteModal(props: Readonly<Props>): ReactNode {
   return (
     <div className="flex flex-col gap-3">
       <NoteEdit
-        description={noteDetails.description}
+        markdown={noteDetails.markdown}
         name={noteDetails.name}
         onMarkdownChange={(markdown) => {
           setNoteDetails((prev) => ({ ...prev, markdown }));

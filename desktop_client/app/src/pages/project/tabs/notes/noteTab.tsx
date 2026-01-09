@@ -1,6 +1,6 @@
 import { Button, Table } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { CreateNoteModal } from "@/components/entityViews/note/CreateNoteModal";
 import { EditNoteModal } from "@/components/entityViews/note/EditNoteModal";
 import { NoteView } from "@/components/entityViews/note/NoteView";
@@ -8,14 +8,12 @@ import { ConfirmModal } from "@/components/modal/confirmModal";
 import { Modal } from "@/components/modal/modal";
 import { Search } from "@/components/search/search";
 import { P } from "@/components/typography/P";
+import { getLogger, getProjectClient } from "@/lib/grpcClient/client";
 import { type Note } from "@/lib/grpcClient/pb/project_note";
+import { useProjectStore } from "@/stores/projectStore";
+import { useTabStore } from "@/stores/tabStore";
 
 export function NoteTab(): ReactNode {
-  const [queryError, setQueryError] = useState("");
-  const [queryText, setQueryText] = useState("");
-  const [selectedNoteId, setSelectedNoteId] = useState<string | undefined>();
-  const [queryResult, setQueryResult] = useState<Note[]>([]);
-
   const [createOpened, { close: createClose, open: createOpen }] =
     useDisclosure(false);
 
@@ -24,6 +22,75 @@ export function NoteTab(): ReactNode {
 
   const [deleteOpened, { close: deleteClose, open: deleteOpen }] =
     useDisclosure(false);
+
+  const projectHandle = useTabStore((x) => x.selectedTab);
+  const projectStore = useProjectStore((x) => x);
+  const thisProject = projectHandle && projectStore.getProject(projectHandle);
+  const [queryError, setQueryError] = useState("");
+  const [queryText, setQueryText] = useState("");
+  const [selectedNoteId, setSelectedNoteId] = useState<string | undefined>();
+  const [queryResult, setQueryResult] = useState<Note[]>([]);
+
+  // const selectedNote = thisProject?.project.notes.find(
+  //   (n) => n.handle?.id === selectedNoteId,
+  // );
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+    const sync = async () => {
+      if (!projectHandle) {
+        return;
+      }
+
+      if (!thisProject) {
+        return;
+      }
+
+      if (queryText.trim() === "") {
+        setQueryResult(thisProject.project.notes);
+        setQueryError("");
+        return;
+      }
+
+      try {
+        const resp = await getProjectClient().searchNote({
+          project: projectHandle,
+          query: queryText,
+        });
+
+        setQueryResult(
+          thisProject.project.notes.filter((allNotes) => {
+            const inSearchRes = resp.response.details.find(
+              (n) => n.id === allNotes.handle?.id,
+            );
+
+            return !!inSearchRes;
+          }),
+        );
+
+        setQueryError("");
+      } catch (error: unknown) {
+        getLogger().error("Cannot search notes", {
+          error: JSON.stringify(error),
+          project: JSON.stringify(projectHandle),
+          query: queryText,
+        });
+
+        setQueryError(JSON.stringify(error));
+      }
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    sync();
+  }, [projectHandle, queryText, thisProject, thisProject?.project.notes]);
+
+  if (!projectHandle) {
+    return "No project selected";
+  }
+
+  if (!thisProject) {
+    return "Project not found";
+  }
 
   return (
     <>

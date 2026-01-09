@@ -171,6 +171,7 @@ func TestSearchNoteMarkdown(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, []uuid.UUID{expectedNote.Id}, ids)
 }
+
 func TestSearchNoteQualified(t *testing.T) {
 	t.Parallel()
 

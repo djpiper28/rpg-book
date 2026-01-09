@@ -61,13 +61,13 @@ export function CreateNoteModal(props: Readonly<Props>): ReactNode {
 
               props.closeDialog();
             } catch (error: unknown) {
-              getLogger().error("Cannot create character", {
+              getLogger().error("Cannot create note", {
                 error: String(error),
               });
 
               setError({
                 body: String(error),
-                title: "Cannot create character",
+                title: "Cannot create note",
               });
             }
           };

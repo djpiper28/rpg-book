@@ -211,6 +211,7 @@ func TestSearchCharacterDescription(t *testing.T) {
 	require.Len(t, res, 1)
 	require.Equal(t, character.Id, res[0])
 }
+
 func TestSearchCharacterQualified(t *testing.T) {
 	t.Parallel()
 

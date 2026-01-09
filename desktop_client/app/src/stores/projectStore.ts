@@ -16,19 +16,27 @@ export interface Project {
   project: OpenProjectResp;
 }
 
-interface ProjectStore {
+interface CharacterMethods {
   addCharacter: (
     handle: ProjectHandle,
     character: BasicCharacterDetails,
   ) => void;
-  addNote: (handle: ProjectHandle, note: Note) => void;
   deleteCharacter: (handle: ProjectHandle, character: CharacterHandle) => void;
+}
+
+interface NoteMethods {
+  addNote: (handle: ProjectHandle, note: Note) => void;
   deleteNote: (handle: ProjectHandle, note: NoteHandle) => void;
+}
+
+interface ProjectMethods {
   getProject: (handle: ProjectHandle) => Project | undefined;
   newProject: (handle: ProjectHandle, project: OpenProjectResp) => void;
   projects: Record<string, Project | undefined>;
   updateProject: (handle: ProjectHandle, project: OpenProjectResp) => void;
 }
+
+type ProjectStore = ProjectMethods & CharacterMethods & NoteMethods;
 
 function asId(handle: ProjectHandle): string {
   return handle.id;

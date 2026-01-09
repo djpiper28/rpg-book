@@ -140,6 +140,7 @@ func noteColumns() map[string]string {
 		"contents":    noteMarkdown,
 	}
 }
+
 func qualifiedNoteColumns() map[string]string {
 	unmodifiedColumns := noteColumns()
 	modifiedColumns := make(map[string]string)
@@ -160,7 +161,7 @@ func (p *Project) SearchNote(query string) ([]uuid.UUID, error) {
 		sqlsearch.SqlTableData{
 			FieldsToScan: []string{"notes.id"},
 			TableName:    "notes",
-      JoinClauses: `
+			JoinClauses: `
   LEFT JOIN note_relations ON note_relations.note_id = notes.id
   LEFT JOIN characters ON characters.id = note_relations.character_id
       `,

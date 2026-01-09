@@ -177,7 +177,7 @@ func (p *Project) SearchCharacter(query string) ([]uuid.UUID, error) {
 		sqlsearch.SqlTableData{
 			FieldsToScan: []string{"characters.id"},
 			TableName:    "characters",
-      JoinClauses: `
+			JoinClauses: `
   LEFT JOIN note_relations ON note_relations.character_id = characters.id
   LEFT JOIN notes ON notes.id = note_relations.note_id
       `,
