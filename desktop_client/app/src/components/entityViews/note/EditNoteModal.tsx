@@ -78,7 +78,7 @@ export function EditNoteModal(props: Readonly<Props>): ReactNode {
           //       project: projectHandle,
           //     });
           //
-          //     projectStore.addCharacter(projectHandle, characterDetails);
+          //     projectStore.addNote(projectHandle, characterDetails);
           //
           //     props.closeDialog();
           //   } catch (error: unknown) {

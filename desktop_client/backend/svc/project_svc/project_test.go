@@ -604,4 +604,53 @@ func TestProjectSvc(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, resp.Details, []*pb_project_note.NoteHandle{note})
 	})
+
+	t.Run("Test update notes", func(t *testing.T) {
+		filename := uuid.New().String() + sqlite3.DbExtension
+		projectName := uuid.New().String()
+		name := uuid.New().String()
+		markdown := uuid.New().String()
+
+		projectHandle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
+			FileName:    filename,
+			ProjectName: projectName,
+		})
+		require.NoError(t, err)
+		defer closeProject(t, filename, projectHandle)
+
+		noteHandle, err := svc.CreateNote(t.Context(), &pb_project.CreateNoteReq{
+			Project: projectHandle,
+			Details: &pb_project_note.NoteDetails{
+				Name:     name,
+				Markdown: markdown,
+			},
+		})
+
+		require.NoError(t, err)
+		require.NotEmpty(t, noteHandle.Id)
+
+		updatedDetails := &pb_project_note.NoteDetails{
+			Name:     name + "-new",
+			Markdown: markdown + "-new",
+		}
+
+		_, err = svc.UpdateNote(t.Context(), &pb_project.UpdateNoteReq{
+			Handle:     noteHandle,
+			Project:    projectHandle,
+			Characters: []*pb_project_character.CharacterHandle{},
+			Details:    updatedDetails,
+		})
+
+		require.NoError(t, err)
+
+		note, err := svc.GetNote(t.Context(), &pb_project.GetNoteReq{
+			Project: projectHandle,
+			Note:    noteHandle,
+		})
+
+		require.NoError(t, err)
+		require.Len(t, note.Characters, 0)
+		require.Equal(t, note.Details.Details.Name, updatedDetails.Name)
+		require.Equal(t, note.Details.Details.Markdown, updatedDetails.Markdown)
+	})
 }

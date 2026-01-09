@@ -235,3 +235,92 @@ func TestSearchNoteCharacterDescription(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, []uuid.UUID{expectedNote.Id}, ids)
 }
+
+func TestUpdateNote(t *testing.T) {
+	t.Parallel()
+
+	project, remove := testutils.NewProject(t)
+	defer remove()
+
+	character, err := project.CreateCharacter("Crazy Dave", "pan on head", nil)
+	require.NoError(t, err)
+	require.NotEmpty(t, character.Id)
+
+	name := uuid.New().String()
+	markdown := uuid.New().String()
+	note, err := project.CreateNote(name, markdown, []uuid.UUID{character.Id})
+	require.NoError(t, err)
+
+	newName := name + "-edited"
+	newMarkdown := name + "-edited"
+	note.Name = newName
+	note.Markdown = newMarkdown
+
+	err = project.UpdateNote(note, []uuid.UUID{character.Id})
+	require.NoError(t, err)
+
+	editedNote, err := project.GetNote(note.Id)
+	require.NoError(t, err)
+	require.Equal(t, note, editedNote.Note)
+	require.Len(t, editedNote.Characters, 1)
+	require.Equal(t, character.Id, editedNote.Characters[0].Id)
+}
+
+func TestUpdateNoteNewCharacterRelation(t *testing.T) {
+	t.Parallel()
+
+	project, remove := testutils.NewProject(t)
+	defer remove()
+
+	character, err := project.CreateCharacter("Crazy Dave", "pan on head", nil)
+	require.NoError(t, err)
+	require.NotEmpty(t, character.Id)
+
+	name := uuid.New().String()
+	markdown := uuid.New().String()
+	note, err := project.CreateNote(name, markdown, []uuid.UUID{})
+	require.NoError(t, err)
+
+	newName := name + "-edited"
+	newMarkdown := name + "-edited"
+	note.Name = newName
+	note.Markdown = newMarkdown
+
+	err = project.UpdateNote(note, []uuid.UUID{character.Id})
+	require.NoError(t, err)
+
+	editedNote, err := project.GetNote(note.Id)
+	require.NoError(t, err)
+	require.Equal(t, note, editedNote.Note)
+	require.Len(t, editedNote.Characters, 1)
+	require.Equal(t, character.Id, editedNote.Characters[0].Id)
+}
+
+func TestUpdateNoteDeleteCharacterRelation(t *testing.T) {
+	t.Parallel()
+
+	project, remove := testutils.NewProject(t)
+	defer remove()
+
+	character, err := project.CreateCharacter("Crazy Dave", "pan on head", nil)
+	require.NoError(t, err)
+	require.NotEmpty(t, character.Id)
+
+	name := uuid.New().String()
+	markdown := uuid.New().String()
+	note, err := project.CreateNote(name, markdown, []uuid.UUID{character.Id})
+	require.NoError(t, err)
+
+	newName := name + "-edited"
+	newMarkdown := name + "-edited"
+	note.Name = newName
+	note.Markdown = newMarkdown
+
+	err = project.UpdateNote(note, []uuid.UUID{})
+	require.NoError(t, err)
+
+	editedNote, err := project.GetNote(note.Id)
+	require.NoError(t, err)
+	require.Equal(t, note, editedNote.Note)
+	require.Len(t, editedNote.Characters, 0)
+}

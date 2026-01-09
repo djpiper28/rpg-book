@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
+	"slices"
 	"time"
 
 	"github.com/charmbracelet/log"
@@ -11,6 +13,7 @@ import (
 	sqlsearch "github.com/djpiper28/rpg-book/common/search/sql_search"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/project/model"
 	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx"
 )
 
 func (p *Project) CreateNote(name, markdown string, characterIds []uuid.UUID) (*model.Note, error) {
@@ -203,4 +206,91 @@ func (p *Project) SearchNote(query string) ([]uuid.UUID, error) {
 	}
 
 	return noteIds, nil
+}
+
+func (p *Project) UpdateNote(note *model.Note, updatedCharacterIds []uuid.UUID) error {
+	note.Normalise()
+
+	tx, err := p.db.Db.BeginTxx(context.Background(), nil)
+	if err != nil {
+		return errors.Join(errors.New("Cannot start transaction"), err)
+	}
+
+	defer tx.Rollback()
+
+	_, err = tx.NamedExec(`
+    UPDATE notes 
+    SET name=:name,
+      name_normalised=:name_normalised,
+      markdown=:markdown,
+      markdown_normalised=:markdown_normalised
+    WHERE
+      id=:id;
+    `, note)
+	if err != nil {
+		return errors.Join(errors.New("Cannot update note"), err)
+	}
+
+	// Get related characters
+	existingCharacterIds := make([]uuid.UUID, 0)
+	rows, err := tx.Queryx("SELECT character_id FROM note_relations WHERE note_id=?;", note.Id)
+	if err != nil {
+		return errors.Join(errors.New("Cannot get characters related to note"), err)
+	}
+
+	for rows.Next() {
+		var id uuid.UUID
+		err = rows.Scan(&id)
+		if err != nil {
+			return errors.Join(errors.New("Cannot scan character ID"), err)
+		}
+		existingCharacterIds = append(existingCharacterIds, id)
+	}
+
+	// Compare linked characters
+	toCreate := make([]model.NoteRelations, 0)
+	for _, characterId := range updatedCharacterIds {
+		found := slices.Contains(existingCharacterIds, characterId)
+		if !found {
+			toCreate = append(toCreate, model.NoteRelations{
+				NoteId:      note.Id,
+				CharacterId: characterId,
+			})
+		}
+	}
+
+	toDelete := make([]uuid.UUID, 0)
+	for _, characterId := range existingCharacterIds {
+		found := slices.Contains(updatedCharacterIds, characterId)
+		if !found {
+			toDelete = append(toDelete, characterId)
+		}
+	}
+
+	if len(toDelete) > 0 {
+		// Bulk delete the characters
+		deleteCmd, args, err := sqlx.In("DELETE FROM note_relations WHERE note_id=? AND character_id IN (?);", note.Id, toDelete)
+		if err != nil {
+			return fmt.Errorf("failed to construct IN query: %w", err)
+		}
+
+		_, err = tx.Exec(deleteCmd, args...)
+		if err != nil {
+			return errors.Join(errors.New("cannot delete note relations that are not required"), err)
+		}
+	}
+
+	if len(toCreate) > 0 {
+		_, err = tx.NamedExec("INSERT INTO note_relations(note_id, character_id) VALUES (:note_id, :character_id);", toCreate)
+		if err != nil {
+			return errors.Join(errors.New("Cannot insert note relations"))
+		}
+	}
+
+	// Finalise the transaction
+	err = tx.Commit()
+	if err != nil {
+		return errors.Join(errors.New("Cannot commit transaction"), err)
+	}
+	return nil
 }
