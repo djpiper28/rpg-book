@@ -1,0 +1,18 @@
+name: test 
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches: ["*"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/workflows/shared/setup
+      - name: Test
+        shell: bash
+        run: make fuzz -j
