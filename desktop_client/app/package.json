@@ -93,5 +93,10 @@
     "@storybook/addon-docs": "^9.1.17",
     "@storybook/addon-vitest": "9.1.4",
     "@testing-library/jest-dom": "^6.9.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "parse5": "7.1.2"
+    }
   }
 }

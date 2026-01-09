@@ -46,6 +46,7 @@ make -j # Builds the backend and frontend
 
 make test -j # Runs the codegen, and tests
 make format -j # Runs all formatter scripts
+make fuzz -j # Runs the fuzzers sequentially, this takes a while
 
 make dev -j # Starts a hot-reloading dev version of the app
 make release -j # Starts a release build of the app

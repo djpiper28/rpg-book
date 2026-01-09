@@ -16,7 +16,7 @@ type SqlTableData struct {
 type SqlColmnMap struct {
 	TextColumns         map[string]string
 	NumberColumns       map[string]string
-	BasicQueryColumn    string
+	BasicQueryColumn    string                   // A column as defined in either column map
 	BasicQueryOperation parser.GeneratorOperator // Defaults to includes
 }
 

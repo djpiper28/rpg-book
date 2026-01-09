@@ -160,7 +160,7 @@ export function CharacterTab(): ReactNode {
             onChange={(txt: string) => {
               setQueryText(txt);
             }}
-            placeholder="search:here or click help"
+            placeholder="search here or click help"
             render={(character: BasicCharacterDetails) => {
               const id = character.handle?.id ?? "";
               const selected = selectedCharacterId == id;

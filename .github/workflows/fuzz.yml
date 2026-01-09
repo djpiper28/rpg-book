@@ -1,4 +1,4 @@
-name: build 
+name: test 
 
 permissions:
   contents: read
@@ -11,11 +11,11 @@ on:
     branches: ["*"]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/workflows/shared/setup
-      - name: Build 
+      - name: Test
         shell: bash
-        run: make desktop -j
+        run: make fuzz -j
