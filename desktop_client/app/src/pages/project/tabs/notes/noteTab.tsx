@@ -1,7 +1,11 @@
 import { Button, Table } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { type ReactNode, useState } from "react";
+import { CreateNoteModal } from "@/components/entityViews/note/CreateNoteModal";
+import { EditNoteModal } from "@/components/entityViews/note/EditNoteModal";
 import { NoteView } from "@/components/entityViews/note/NoteView";
+import { ConfirmModal } from "@/components/modal/confirmModal";
+import { Modal } from "@/components/modal/modal";
 import { Search } from "@/components/search/search";
 import { P } from "@/components/typography/P";
 import { type Note } from "@/lib/grpcClient/pb/project_note";
@@ -23,6 +27,49 @@ export function NoteTab(): ReactNode {
 
   return (
     <>
+      <Modal close={createClose} opened={createOpened} title="Create Note">
+        {createOpened && <CreateNoteModal closeDialog={createClose} />}
+      </Modal>
+
+      <Modal close={editClose} opened={editOpened} title="Edit Note">
+        {editOpened && (
+          <EditNoteModal
+            closeDialog={editClose}
+            noteHandle={{ id: selectedNoteId }}
+          />
+        )}
+      </Modal>
+
+      <ConfirmModal
+        close={deleteClose}
+        onConfirm={() => {
+          // if (!selectedNote?.handle) {
+          //   deleteClose();
+          //   return;
+          // }
+          //
+          // const noteHandle = selectedNote.handle;
+          //
+          // getProjectClient()
+          //   .deleteNote({
+          //     handle: noteHandle,
+          //     project: thisProject.handle,
+          //   })
+          //   .then(() => {
+          //     projectStore.deleteNote(projectHandle, noteHandle);
+          //     setSelectedNoteId("");
+          //   })
+          //   .catch((error: unknown) => {
+          //     errorStore.setError({
+          //       body: JSON.stringify(error),
+          //       title: "Cannot delete note",
+          //     });
+          //   });
+        }}
+        opened={deleteOpened}
+        title={`Delete Note TODO: name`}
+      />
+
       <div className="flex flex-row gap-2 pt-2 justify-between">
         <div className="flex flex-col gap-2 flex-1">
           <Search<Note>

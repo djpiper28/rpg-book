@@ -11,9 +11,7 @@ interface Props {
   closeDialog: () => void;
 }
 
-export default function CreateCharacterModal(
-  props: Readonly<Props>,
-): ReactNode {
+export function CreateNoteModal(props: Readonly<Props>): ReactNode {
   const { setError } = useGlobalErrorStore((x) => x);
   const projectHandle = useTabStore((x) => x.selectedTab);
   const projectStore = useProjectStore((x) => x);
@@ -78,7 +76,7 @@ export default function CreateCharacterModal(
           f();
         }}
       >
-        Create Character
+        Create Note
       </Button>
     </div>
   );
