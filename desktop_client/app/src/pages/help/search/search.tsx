@@ -138,7 +138,7 @@ export function Component(): ReactNode {
           <Table.Th>The name of the note i.e: Map of Scary Dungeon</Table.Th>
         </Table.Tr>
         <Table.Tr>
-          <Table.Th>contents, desc, or description</Table.Th>
+          <Table.Th>markdown, contents, desc, or description</Table.Th>
           <Table.Th>
             The text contents of description of the note i.e: 2 spuds
           </Table.Th>

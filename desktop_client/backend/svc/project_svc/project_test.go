@@ -468,7 +468,7 @@ func TestProjectSvc(t *testing.T) {
 		require.NoError(t, err)
 		require.NotEmpty(t, characterHandle.Id)
 
-		searchRes, err := svc.SearchCharacter(context.Background(), &pb_project.SearchCharacterReq{
+		searchRes, err := svc.SearchCharacter(context.Background(), &pb_project.QueryReq{
 			Project: projectHandle,
 			Query:   characterName,
 		})
@@ -571,5 +571,37 @@ func TestProjectSvc(t *testing.T) {
 		})
 		defer closeProject(t, filename, project.Handle)
 		require.Len(t, project.Notes, 1)
+	})
+
+	t.Run("Test note search", func(t *testing.T) {
+		filename := uuid.New().String() + sqlite3.DbExtension
+		projectName := uuid.New().String()
+		name := uuid.New().String()
+		markdown := uuid.New().String()
+
+		projectHandle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
+			FileName:    filename,
+			ProjectName: projectName,
+		})
+		require.NoError(t, err)
+		defer closeProject(t, filename, projectHandle)
+
+		note, err := svc.CreateNote(t.Context(), &pb_project.CreateNoteReq{
+			Project: projectHandle,
+			Details: &pb_project_note.NoteDetails{
+				Name:     name,
+				Markdown: markdown,
+			},
+		})
+
+		require.NoError(t, err)
+		require.NotEmpty(t, note.Id)
+
+		resp, err := svc.SearchNote(t.Context(), &pb_project.QueryReq{
+			Project: projectHandle,
+			Query:   name,
+		})
+		require.NoError(t, err)
+		require.Equal(t, resp.Details, []*pb_project_note.NoteHandle{note})
 	})
 }

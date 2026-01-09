@@ -36,9 +36,12 @@ go-generate: desktop-deps
 .PHONY: go-core
 go-core: go-generate
 
-.PHONY: go-fuzz
-go-fuzz: go-core
-	go test -fuzz=FuzzSearchCharacter -fuzztime=10s ./desktop_client/backend/project/search_fuzz_test.go
+FUZZARGS=-fuzztime=10s
+.PHONY: fuzz
+fuzz: go-core
+	go test -fuzz=FuzzSearchCharacter $(FUZZARGS) ./desktop_client/backend/project/search_fuzz_test.go
+	go test -fuzz=FuzzSearchNote $(FUZZARGS) ./desktop_client/backend/project/search_fuzz_test.go
+	$(MAKE) cleanup
 
 .PHONY: go-test
 go-test: go-core
@@ -60,7 +63,7 @@ go-lint: go-core
 	go vet ./...
 
 .PHONY: test
-test: go-test go-fuzz go-lint desktop_lint desktop-test
+test: go-test go-lint desktop_lint desktop-test
 	$(MAKE) cleanup
 
 .PHONY: go-fmt

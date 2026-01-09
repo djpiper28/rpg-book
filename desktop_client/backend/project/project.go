@@ -1,19 +1,14 @@
 package project
 
 import (
-	"context"
-	"database/sql"
 	"errors"
+	"fmt"
 	"os"
-	"time"
 
 	"github.com/charmbracelet/log"
 	"github.com/djpiper28/rpg-book/common/database/sqlite3"
 	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
-	"github.com/djpiper28/rpg-book/common/search/parser"
-	sqlsearch "github.com/djpiper28/rpg-book/common/search/sql_search"
 	"github.com/djpiper28/rpg-book/desktop_client/backend/project/model"
-	"github.com/google/uuid"
 )
 
 type Project struct {
@@ -93,299 +88,23 @@ func Create(filename string, projectName string) (*Project, error) {
 	}, nil
 }
 
-func (p *Project) CreateCharacter(name, description string, icon []byte) (*model.Character, error) {
-	character := model.NewCharacter(name)
-	character.Description = description
-	character.Icon = icon
-	character.Created = time.Now().String()
-	character.Normalise()
-
-	_, err := p.db.Db.NamedExec(`
-    INSERT INTO 
-    characters (id, name, name_normalised, created, description, description_normalised, icon)
-    VALUES(:id, :name, :name_normalised, :created, :description, :description_normalised, :icon);`,
-		character)
-	if err != nil {
-		return nil, errors.Join(errors.New("Cannot create character"), err)
-	}
-
-	return character, nil
-}
-
-func (p *Project) GetCharacters() ([]*model.Character, error) {
-	// TODO: do not select icon
-	rows, err := p.db.Db.Queryx(`SELECT * FROM characters;`)
-	if err != nil {
-		return nil, errors.Join(errors.New("Cannot query characters"), err)
-	}
-
-	characters := make([]*model.Character, 0)
-
-	for rows.Next() {
-		var character model.Character
-		err := rows.StructScan(&character)
-		if err != nil {
-			return nil, errors.Join(errors.New("Cannot scan characters"), err)
-		}
-
-		characters = append(characters, &character)
-	}
-
-	return characters, nil
-}
-
-func (p *Project) GetCharacter(id uuid.UUID) (*model.Character, error) {
-	character := model.Character{}
-
-	tx, err := p.db.Db.Beginx()
-	if err != nil {
-		return nil, errors.Join(errors.New("Cannot begin transaction"), err)
-	}
-	defer tx.Rollback()
-
-	row := tx.QueryRowx(`SELECT * FROM characters WHERE id=?;`, id)
-	err = row.StructScan(&character)
-	if err != nil {
-		return nil, errors.Join(errors.New("Cannot get character"), err)
-	}
-
-	// Select the related notes
-	notes := make([]*model.Note, 0)
-	rows, err := tx.Queryx(`
-    SELECT notes.*
-    FROM
-    (
-      (
-        characters
-        INNER JOIN note_relations
-          ON note_relations.character_id = characters.id
-      )
-      INNER JOIN notes
-        ON notes.id = note_relations.note_id
-    )
-    WHERE characters.id = ?;
-    `, id)
-	if err != nil {
-		return nil, errors.Join(errors.New("Cannot get related notes"), err)
-	}
-
-	for rows.Next() {
-		var note model.Note
-		err = rows.StructScan(&note)
-		if err != nil {
-			return nil, errors.Join(errors.New("Cannot scan notes"), err)
-		}
-
-		notes = append(notes, &note)
-	}
-
-	character.Notes = notes
-
-	err = tx.Commit()
-	if err != nil {
-		return nil, errors.Join(errors.New("Cannot commit transaction"), err)
-	}
-
-	return &character, nil
-}
-
-func (p *Project) UpdateCharacter(character *model.Character, setIcon bool) error {
-	character.Normalise()
-
-	sql := `
-    UPDATE characters
-      SET icon=:icon, name=:name, description=:description,
-          name_normalised=:name_normalised, description_normalised=:description_normalised
-      WHERE id=:id;
-    `
-	if !setIcon {
-		sql = `
-    UPDATE characters
-      SET name=:name, description=:description,
-          name_normalised=:name_normalised, description_normalised=:description_normalised
-      WHERE id=:id;
-    `
-	}
-
-	_, err := p.db.Db.NamedExec(sql, character)
-	if err != nil {
-		return errors.Join(errors.New("Cannot update character"), err)
-	}
-
-	return nil
-}
-
-func (p *Project) DeleteCharacter(id uuid.UUID) error {
-	_, err := p.db.Db.Exec("DELETE FROM characters WHERE id=?;", id)
-	if err != nil {
-		return errors.Join(errors.New("Cannot delete character"), err)
-	}
-
-	return nil
-}
-
 func (p *Project) Close() {
 	defer p.db.Close()
 }
 
-func (p *Project) SearchCharacter(query string) ([]uuid.UUID, error) {
-	ast, err := parser.Parse(query)
-	if err != nil {
-		return nil, errors.Join(errors.New("Cannot parse query"), err)
-	}
+func mergeColumns(columnMaps ...map[string]string) map[string]string {
+	output := make(map[string]string)
 
-	const (
-		description = "description"
-		name        = "name"
-	)
+	for _, columnMap := range columnMaps {
+		for key, value := range columnMap {
+			_, found := output[key]
+			if found {
+				panic(fmt.Sprintf("Illegal merge operation - duplicate key %s", key))
+			}
 
-	sql, args, err := sqlsearch.AsSql(ast,
-		sqlsearch.SqlTableData{
-			FieldsToScan: []string{"id"},
-			TableName:    "characters",
-		},
-		sqlsearch.SqlColmnMap{
-			TextColumns: map[string]string{
-				"name":        name,
-				"desc":        description,
-				"description": description,
-			},
-			BasicQueryColumn: name,
-		})
-	if err != nil {
-		return nil, errors.Join(errors.New("Cannot process query"), err)
-	}
-
-	log.Debug("Executing search", "sql", sql, "args", args)
-	rows, err := p.db.Db.Queryx(sql, args...)
-	if err != nil {
-		return nil, errors.Join(errors.New("Cannot execute SQL query"), err)
-	}
-
-	defer rows.Close()
-	characterIds := make([]uuid.UUID, 0)
-	for rows.Next() {
-		var id uuid.UUID
-		err = rows.Scan(&id)
-		if err != nil {
-			return nil, errors.Join(errors.New("Cannot read characters"), err)
-		}
-
-		characterIds = append(characterIds, id)
-	}
-
-	return characterIds, nil
-}
-
-func (p *Project) CreateNote(name, markdown string, characterIds []uuid.UUID) (*model.Note, error) {
-	note := &model.Note{
-		Id:       uuid.New(),
-		Name:     name,
-		Markdown: markdown,
-		Created:  time.Now().String(),
-	}
-
-	note.Normalise()
-
-	tx, err := p.db.Db.Beginx()
-	if err != nil {
-		return nil, errors.Join(errors.New("Cannot start transaction"), err)
-	}
-	defer tx.Rollback()
-
-	_, err = tx.NamedExec(`
-    INSERT INTO notes 
-      (id, name, name_normalised, markdown, markdown_normalised, created) 
-    VALUES 
-      (:id, :name, :name_normalised, :markdown, :markdown_normalised, :created);`, note)
-	if err != nil {
-		return nil, errors.Join(errors.New("Cannot insert note"), err)
-	}
-
-	for _, id := range characterIds {
-		_, err = tx.Exec(`
-      INSERT INTO note_relations
-        (note_id, character_id)
-      VALUES
-        (?, ?);
-      `, note.Id, id)
-		if err != nil {
-			return nil, errors.Join(errors.New("Cannot insert note relation"), err)
+			output[key] = value
 		}
 	}
 
-	err = tx.Commit()
-	if err != nil {
-		return nil, errors.Join(errors.New("Cannot commit transaction"), err)
-	}
-
-	return note, nil
-}
-
-func (p *Project) GetNotes() ([]*model.Note, error) {
-	notes := make([]*model.Note, 0)
-
-	rows, err := p.db.Db.Queryx("SELECT * FROM notes;")
-	if err != nil {
-		return nil, errors.Join(errors.New("Cannot get notes"), err)
-	}
-
-	for rows.Next() {
-		var note model.Note
-		err = rows.StructScan(&note)
-		if err != nil {
-			return nil, errors.Join(errors.New("Cannot scan note into struct"), err)
-		}
-
-		notes = append(notes, &note)
-	}
-
-	return notes, nil
-}
-
-func (p *Project) GetNote(noteId uuid.UUID) (*model.CompleteNote, error) {
-	tx, err := p.db.Db.BeginTxx(context.Background(), &sql.TxOptions{ReadOnly: true})
-	if err != nil {
-		return nil, errors.Join(errors.New("Cannot start transaction"), err)
-	}
-	defer tx.Rollback()
-
-	row := tx.QueryRowx("SELECT * FROM notes WHERE id=?;", noteId)
-
-	var note model.Note
-	err = row.StructScan(&note)
-	if err != nil {
-		return nil, errors.Join(errors.New("Cannot scan note into struct"), err)
-	}
-
-	rows, err := tx.Queryx(`
-    SELECT characters.*
-    FROM characters 
-    INNER JOIN note_relations 
-      ON characters.id=note_relations.character_id
-    WHERE note_id=?;`, noteId)
-	if err != nil {
-		return nil, errors.Join(errors.New("Cannot get related characters"), err)
-	}
-
-	characters := make([]*model.Character, 0)
-	for rows.Next() {
-		var character model.Character
-		err = rows.StructScan(&character)
-		if err != nil {
-			return nil, errors.Join(errors.New("Cannot scan character into struct"), err)
-		}
-
-		characters = append(characters, &character)
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return nil, errors.Join(errors.New("Cannot commit transaction"), err)
-	}
-
-	return &model.CompleteNote{
-		Note:       &note,
-		Characters: characters,
-	}, nil
+	return output
 }

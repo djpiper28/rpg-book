@@ -69,3 +69,29 @@ func (p *ProjectSvc) GetNote(ctx context.Context, in *pb_project.GetNoteReq) (*p
 
 	return result, nil
 }
+
+func (p *ProjectSvc) SearchNote(ctx context.Context, in *pb_project.QueryReq) (*pb_project.SearchNoteResp, error) {
+	project, err := p.getProject(in.Project)
+	if err != nil {
+		log.Error("Cannot search note", loggertags.TagError, err)
+		return nil, errors.New("Cannot find project")
+	}
+
+	noteIds, err := project.SearchNote(in.Query)
+	if err != nil {
+		log.Error("Cannot search note", loggertags.TagError, err)
+		return nil, errors.Join(errors.New("Cannot perform search"), err)
+	}
+
+	resp := &pb_project.SearchNoteResp{
+		Details: make([]*pb_project_note.NoteHandle, len(noteIds)),
+	}
+
+	for i, noteId := range noteIds {
+		resp.Details[i] = &pb_project_note.NoteHandle{
+			Id: noteId.String(),
+		}
+	}
+
+	return resp, nil
+}
