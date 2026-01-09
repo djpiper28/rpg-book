@@ -12,7 +12,14 @@ interface Props {
 export function NoteEdit(props: Readonly<Props>): ReactNode {
   return (
     <div className="flex flex-col gap-3">
-      <TextInput label="Name" placeholder="Note #23" value={props.name} />
+      <TextInput
+        label="Name"
+        onChange={(event) => {
+          props.onNameChange(event.target.value);
+        }}
+        placeholder="Note #23"
+        value={props.name}
+      />
       <MarkdownEditor
         label="Note"
         setValue={props.onMarkdownChange}
