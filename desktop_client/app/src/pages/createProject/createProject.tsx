@@ -107,6 +107,7 @@ export function Component(): ReactNode {
               projects.newProject(resp.response, {
                 characters: [],
                 handle: resp.response,
+                notes: [],
               });
 
               tabs.addTab({ id: resp.response.id }, projectName);

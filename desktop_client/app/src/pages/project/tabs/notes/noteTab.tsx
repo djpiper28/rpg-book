@@ -31,9 +31,9 @@ export function NoteTab(): ReactNode {
   const [selectedNoteId, setSelectedNoteId] = useState<string | undefined>();
   const [queryResult, setQueryResult] = useState<Note[]>([]);
 
-  // const selectedNote = thisProject?.project.notes.find(
-  //   (n) => n.handle?.id === selectedNoteId,
-  // );
+  const selectedNote = thisProject?.project.notes.find(
+    (n) => n.handle?.id === selectedNoteId,
+  );
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -102,7 +102,7 @@ export function NoteTab(): ReactNode {
         {editOpened && (
           <EditNoteModal
             closeDialog={editClose}
-            noteHandle={{ id: selectedNoteId }}
+            noteHandle={{ id: selectedNoteId ?? "" }}
           />
         )}
       </Modal>
@@ -134,7 +134,7 @@ export function NoteTab(): ReactNode {
           //   });
         }}
         opened={deleteOpened}
-        title={`Delete Note TODO: name`}
+        title={`Delete Note ${selectedNote?.details?.name ?? ""}`}
       />
 
       <div className="flex flex-row gap-2 pt-2 justify-between">

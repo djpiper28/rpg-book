@@ -19,7 +19,7 @@ service ProjectSvc {
   rpc CreateNote(CreateNoteReq) returns (NoteHandle) {}
   rpc GetNote(GetNoteReq) returns (GetNoteResp) {}
   rpc SearchNote(QueryReq) returns (SearchNoteResp) {}
-  rpc UpdateNOte(UpdateNoteReq) returns (Empty) {}
+  rpc UpdateNote(UpdateNoteReq) returns (Empty) {}
 }
 
 message CreateProjectReq {

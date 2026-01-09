@@ -17,9 +17,6 @@ interface Props {
 
 export function EditNoteModal(props: Readonly<Props>): ReactNode {
   const [noteDetails, setNoteDetails] = useState<NoteDetails>({
-    handle: {
-      id: "",
-    },
     markdown: "",
     name: "",
   });
@@ -70,30 +67,34 @@ export function EditNoteModal(props: Readonly<Props>): ReactNode {
       />
       <Button
         onClick={() => {
-          // const f = async (): Promise<void> => {
-          //   try {
-          //     await getProjectClient().updateNote({
-          //       details: characterDetails,
-          //       handle: props.noteHandle,
-          //       project: projectHandle,
-          //     });
-          //
-          //     projectStore.addNote(projectHandle, characterDetails);
-          //
-          //     props.closeDialog();
-          //   } catch (error: unknown) {
-          //     getLogger().error("Cannot edit note", {
-          //       error: String(error),
-          //     });
-          //
-          //     setError({
-          //       body: String(error),
-          //     });
-          //   }
-          // };
-          //
-          // // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          // f();
+          const f = async (): Promise<void> => {
+            try {
+              await getProjectClient().updateNote({
+                characters: [],
+                details: noteDetails,
+                handle: props.noteHandle,
+                project: projectHandle,
+              });
+
+              projectStore.addNote(projectHandle, {
+                details: noteDetails,
+                handle: { id: props.noteHandle.id },
+              });
+
+              props.closeDialog();
+            } catch (error: unknown) {
+              getLogger().error("Cannot edit note", {
+                error: String(error),
+              });
+
+              setError({
+                body: String(error),
+              });
+            }
+          };
+
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          f();
         }}
       >
         Save
