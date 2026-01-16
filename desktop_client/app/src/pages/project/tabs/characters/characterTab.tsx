@@ -152,7 +152,7 @@ export function CharacterTab(): ReactNode {
                       <Table.Th>Factions</Table.Th>
                     </Table.Tr>
                   </Table.Thead>
-                  {children}
+                  <Table.Tbody>{children}</Table.Tbody>
                 </Table>
               );
             }}

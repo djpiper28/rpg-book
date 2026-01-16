@@ -151,7 +151,7 @@ export function NoteTab(): ReactNode {
                       <Table.Th>Related Entities</Table.Th>
                     </Table.Tr>
                   </Table.Thead>
-                  {children}
+                  <Table.Tbody>{children}</Table.Tbody>
                 </Table>
               );
             }}
