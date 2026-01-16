@@ -3,6 +3,8 @@ package projectsvc
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"net/url"
 	"os"
@@ -139,10 +141,17 @@ func (p *ProjectSvc) GetCharacter(ctx context.Context, in *pb_project.GetCharact
 		notes = append(notes, note.ToPb())
 	}
 
-	joinedUrl, err := url.JoinPath(p.baseUrl, "image", "character", in.Project.Id, in.Character.Id)
-	if err != nil {
-		log.Error("Cannot create icon url", loggertags.TagError, err)
-		return nil, errors.Join(errors.New("Cannot create icon url"), err)
+	joinedUrl := ""
+	if len(character.Icon) > 0 {
+		var err error
+		joinedUrl, err = url.JoinPath(p.baseUrl, "image", "character", in.Project.Id, in.Character.Id)
+		if err != nil {
+			log.Error("Cannot create icon url", loggertags.TagError, err)
+			return nil, errors.Join(errors.New("Cannot create icon url"), err)
+		}
+
+		hash := sha256.Sum256(character.Icon)
+		joinedUrl += "?v=" + hex.EncodeToString(hash[:8])
 	}
 
 	return &pb_project.GetCharacterResp{

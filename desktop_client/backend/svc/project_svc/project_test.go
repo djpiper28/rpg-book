@@ -374,7 +374,7 @@ func TestProjectSvc(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, updatedCharacterName, returnedCharacter.Details.Name)
 		require.Equal(t, updatedCharacterDescription, returnedCharacter.Details.Description)
-		require.NotEmpty(t, returnedCharacter.IconUrl)
+		require.Empty(t, returnedCharacter.IconUrl)
 		require.NotNil(t, returnedCharacter.Notes)
 		require.Len(t, returnedCharacter.Notes, 0)
 	})
