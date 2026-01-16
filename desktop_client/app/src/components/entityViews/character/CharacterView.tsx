@@ -3,8 +3,7 @@ import { EditDelete } from "@/components/buttons/editDelete";
 import MarkdownRenderer from "@/components/renderers/markdown";
 import { H2 } from "@/components/typography/H2";
 import { getLogger, getProjectClient } from "@/lib/grpcClient/client";
-import { type BasicCharacterDetails } from "@/lib/grpcClient/pb/project_character";
-import { uint8ArrayToBase64 } from "@/lib/utils/base64";
+import { type CharacterDetails } from "@/lib/grpcClient/pb/project_character";
 import { useTabStore } from "@/stores/tabStore";
 
 export interface CharacterViewProps {
@@ -15,11 +14,8 @@ export interface CharacterViewProps {
 }
 
 export function CharacterView(props: Readonly<CharacterViewProps>): ReactNode {
-  const [character, setCharacter] = useState<
-    BasicCharacterDetails | undefined
-  >();
-
-  const [iconB64, setIconB64] = useState("");
+  const [character, setCharacter] = useState<CharacterDetails | undefined>();
+  const [iconUrl, setIconUrl] = useState("");
   const projectHandle = useTabStore((x) => x.selectedTab);
 
   useEffect(() => {
@@ -42,7 +38,7 @@ export function CharacterView(props: Readonly<CharacterViewProps>): ReactNode {
         });
 
         setCharacter(resp.response.details);
-        setIconB64(uint8ArrayToBase64(resp.response.icon));
+        setIconUrl(resp.response.iconUrl);
       } catch (error: unknown) {
         getLogger().error("Cannot get character", {
           character: props.characterId,
@@ -67,12 +63,8 @@ export function CharacterView(props: Readonly<CharacterViewProps>): ReactNode {
           <H2>{character.name}</H2>
           <EditDelete delete={props.onDelete} edit={props.onEdit} />
         </div>
-        {iconB64 && (
-          <img
-            alt="User selected"
-            className="max-h-screen"
-            src={`data:image/jpg;base64,${iconB64}`}
-          />
+        {iconUrl && (
+          <img alt="User selected" className="max-h-screen" src={iconUrl} />
         )}
       </div>
       <MarkdownRenderer markdown={character.description} />

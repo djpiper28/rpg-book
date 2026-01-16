@@ -62,7 +62,7 @@ func (p *ProjectSvc) GetNote(ctx context.Context, in *pb_project.GetNoteReq) (*p
 
 	result := &pb_project.GetNoteResp{
 		Details:    completeNote.Note.ToPb(),
-		Characters: make([]*pb_project_character.BasicCharacterDetails, 0),
+		Characters: make([]*pb_project_character.CharacterDetails, 0),
 	}
 
 	for _, character := range completeNote.Characters {

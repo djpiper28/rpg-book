@@ -42,7 +42,7 @@ func TestProjectSvc(t *testing.T) {
 	db, closeDb := testdbutils.GetPrimaryDb()
 	defer closeDb()
 
-	svc := projectsvc.New(db)
+	svc := projectsvc.New(db, "http://test-url")
 	defer svc.Close()
 
 	closeProjectWithoutDelete := func(t *testing.T, handle *pb_project.ProjectHandle) {
@@ -215,7 +215,7 @@ func TestProjectSvc(t *testing.T) {
 
 		character, err := svc.CreateCharacter(context.Background(), &pb_project.CreateCharacterReq{
 			Project: projectHandle,
-			Details: &pb_project_character.BasicCharacterDetails{
+			Details: &pb_project_character.CharacterDetails{
 				Name:        characterName,
 				Description: characterDescription,
 			},
@@ -252,7 +252,7 @@ func TestProjectSvc(t *testing.T) {
 
 		character, err := svc.CreateCharacter(context.Background(), &pb_project.CreateCharacterReq{
 			Project: projectHandle,
-			Details: &pb_project_character.BasicCharacterDetails{
+			Details: &pb_project_character.CharacterDetails{
 				Name:        characterName,
 				Description: characterDescription,
 			},
@@ -269,8 +269,7 @@ func TestProjectSvc(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, characterName, returnedCharacter.Details.Name)
 		require.Equal(t, characterDescription, returnedCharacter.Details.Description)
-		require.NotNil(t, returnedCharacter.Icon)
-		require.True(t, len(returnedCharacter.Icon) > 0)
+		require.NotEmpty(t, returnedCharacter.IconUrl)
 	})
 
 	t.Run("Test update character with icon set", func(t *testing.T) {
@@ -290,7 +289,7 @@ func TestProjectSvc(t *testing.T) {
 
 		characterHandle, err := svc.CreateCharacter(context.Background(), &pb_project.CreateCharacterReq{
 			Project: projectHandle,
-			Details: &pb_project_character.BasicCharacterDetails{
+			Details: &pb_project_character.CharacterDetails{
 				Name:        characterName,
 				Description: characterDescription,
 			},
@@ -307,7 +306,7 @@ func TestProjectSvc(t *testing.T) {
 		_, err = svc.UpdateCharacter(context.Background(), &pb_project.UpdateCharacterReq{
 			Handle:  characterHandle,
 			Project: projectHandle,
-			Details: &pb_project_character.BasicCharacterDetails{
+			Details: &pb_project_character.CharacterDetails{
 				Name:        updatedCharacterName,
 				Description: updatedCharacterDescription,
 			},
@@ -323,8 +322,7 @@ func TestProjectSvc(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, updatedCharacterName, returnedCharacter.Details.Name)
 		require.Equal(t, updatedCharacterDescription, returnedCharacter.Details.Description)
-		require.NotNil(t, returnedCharacter.Icon)
-		require.True(t, len(returnedCharacter.Icon) > 0)
+		require.NotEmpty(t, returnedCharacter.IconUrl)
 	})
 
 	t.Run("Test update character without icon set", func(t *testing.T) {
@@ -344,7 +342,7 @@ func TestProjectSvc(t *testing.T) {
 
 		characterHandle, err := svc.CreateCharacter(context.Background(), &pb_project.CreateCharacterReq{
 			Project: projectHandle,
-			Details: &pb_project_character.BasicCharacterDetails{
+			Details: &pb_project_character.CharacterDetails{
 				Name:        characterName,
 				Description: characterDescription,
 			},
@@ -360,7 +358,7 @@ func TestProjectSvc(t *testing.T) {
 		_, err = svc.UpdateCharacter(context.Background(), &pb_project.UpdateCharacterReq{
 			Handle:  characterHandle,
 			Project: projectHandle,
-			Details: &pb_project_character.BasicCharacterDetails{
+			Details: &pb_project_character.CharacterDetails{
 				Name:        updatedCharacterName,
 				Description: updatedCharacterDescription,
 			},
@@ -376,7 +374,7 @@ func TestProjectSvc(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, updatedCharacterName, returnedCharacter.Details.Name)
 		require.Equal(t, updatedCharacterDescription, returnedCharacter.Details.Description)
-		require.Empty(t, returnedCharacter.Icon)
+		require.Empty(t, returnedCharacter.IconUrl)
 		require.NotNil(t, returnedCharacter.Notes)
 		require.Len(t, returnedCharacter.Notes, 0)
 	})
@@ -398,7 +396,7 @@ func TestProjectSvc(t *testing.T) {
 
 		characterHandle, err := svc.CreateCharacter(context.Background(), &pb_project.CreateCharacterReq{
 			Project: projectHandle,
-			Details: &pb_project_character.BasicCharacterDetails{
+			Details: &pb_project_character.CharacterDetails{
 				Name:        characterName,
 				Description: characterDescription,
 			},
@@ -460,7 +458,7 @@ func TestProjectSvc(t *testing.T) {
 
 		characterHandle, err := svc.CreateCharacter(context.Background(), &pb_project.CreateCharacterReq{
 			Project: projectHandle,
-			Details: &pb_project_character.BasicCharacterDetails{
+			Details: &pb_project_character.CharacterDetails{
 				Name:        characterName,
 				Description: characterDescription,
 			},
@@ -495,7 +493,7 @@ func TestProjectSvc(t *testing.T) {
 
 		characterHandle, err := svc.CreateCharacter(context.Background(), &pb_project.CreateCharacterReq{
 			Project: projectHandle,
-			Details: &pb_project_character.BasicCharacterDetails{
+			Details: &pb_project_character.CharacterDetails{
 				Name:        characterName,
 				Description: characterDescription,
 			},
@@ -669,7 +667,7 @@ func TestProjectSvc(t *testing.T) {
 
 		characterHandle, err := svc.CreateCharacter(context.Background(), &pb_project.CreateCharacterReq{
 			Project: projectHandle,
-			Details: &pb_project_character.BasicCharacterDetails{
+			Details: &pb_project_character.CharacterDetails{
 				Name:        "Test Character",
 				Description: "Test Description",
 			},

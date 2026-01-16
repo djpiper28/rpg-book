@@ -25,12 +25,14 @@ type ProjectSvc struct {
 	primaryDb *sqlite3.Db
 	projects  map[uuid.UUID]*project.Project
 	lock      sync.Mutex
+	baseUrl   string
 }
 
-func New(db *sqlite3.Db) *ProjectSvc {
+func New(db *sqlite3.Db, baseUrl string) *ProjectSvc {
 	return &ProjectSvc{
 		primaryDb: db,
 		projects:  make(map[uuid.UUID]*project.Project),
+		baseUrl:   baseUrl,
 	}
 }
 
@@ -147,7 +149,7 @@ func (p *ProjectSvc) OpenProject(ctx context.Context, in *pb_project.OpenProject
 		return nil, err
 	}
 
-	characters := make([]*pb_project_character.BasicCharacterDetails, 0)
+	characters := make([]*pb_project_character.CharacterDetails, 0)
 	rawCharacters, err := proj.GetCharacters()
 	if err != nil {
 		log.Error("Cannot open project", loggertags.TagError, err)

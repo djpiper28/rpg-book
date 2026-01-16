@@ -23,6 +23,7 @@ import (
 	"github.com/djpiper28/rpg-book/desktop_client/backend/pb_system"
 	projectsvc "github.com/djpiper28/rpg-book/desktop_client/backend/svc/project_svc"
 	systemsvc "github.com/djpiper28/rpg-book/desktop_client/backend/svc/system_svc"
+	"github.com/google/uuid"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"google.golang.org/grpc"
 )
@@ -183,10 +184,26 @@ func (s *Server) start() error {
 	)
 	s.server.RegisterService(&pb_system.SystemSvc_ServiceDesc, systemsvc.New(s.primaryDb))
 
-	s.projectSvc = projectsvc.New(s.primaryDb)
+	s.projectSvc = projectsvc.New(s.primaryDb, fmt.Sprintf("https://127.0.0.1:%d", s.Port))
 	s.server.RegisterService(&pb_project.ProjectSvc_ServiceDesc, s.projectSvc)
 
 	wrappedGrpc := grpcweb.WrapServer(s.server)
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /image/character/{projectID}/{characterID}", func(w http.ResponseWriter, r *http.Request) {
+		projectID, err1 := uuid.Parse(r.PathValue("projectID"))
+		characterID, err2 := uuid.Parse(r.PathValue("characterID"))
+		if err1 == nil && err2 == nil {
+			img, err := s.projectSvc.GetCharacterImage(projectID, characterID)
+			if err == nil {
+				w.Header().Set("Content-Type", http.DetectContentType(img))
+				w.Write(img)
+				return
+			}
+			log.Warn("Cannot get character image", loggertags.TagError, err)
+		}
+		http.Error(w, "Not Found", http.StatusNotFound)
+	})
 
 	httpServer := &http.Server{
 		MaxHeaderBytes: maxHeaderSize,
@@ -200,8 +217,7 @@ func (s *Server) start() error {
 				return
 			}
 
-			// Fall back to other servers.
-			http.DefaultServeMux.ServeHTTP(w, r)
+			mux.ServeHTTP(w, r)
 		})),
 	}
 	go func() {

@@ -1,7 +1,7 @@
 import { Button } from "@mantine/core";
 import { type ReactNode, useState } from "react";
 import { getLogger, getProjectClient } from "@/lib/grpcClient/client";
-import { type BasicCharacterDetails } from "@/lib/grpcClient/pb/project_character";
+import { type CharacterDetails } from "@/lib/grpcClient/pb/project_character";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
@@ -19,7 +19,7 @@ export default function CreateCharacterModal(
   const projectStore = useProjectStore((x) => x);
   const [iconPath, setIconPath] = useState("");
 
-  const [character, setCharacter] = useState<BasicCharacterDetails>({
+  const [character, setCharacter] = useState<CharacterDetails>({
     description: "",
     handle: {
       id: "",

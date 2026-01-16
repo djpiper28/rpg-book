@@ -39,7 +39,7 @@ message ProjectHandle {
 
 message OpenProjectResp {
   ProjectHandle handle = 1;
-  repeated BasicCharacterDetails characters = 2;
+  repeated CharacterDetails characters = 2;
   repeated Note notes = 3;
 }
 
@@ -56,7 +56,7 @@ message RecentProjectsResp {
 
 message CreateCharacterReq {
   ProjectHandle project = 1;
-  BasicCharacterDetails details = 4;
+  CharacterDetails details = 4;
   string icon_path = 5;
 }
 
@@ -66,15 +66,15 @@ message GetCharacterReq {
 }
 
 message GetCharacterResp {
-  BasicCharacterDetails details = 1;
-  bytes icon = 2;
+  CharacterDetails details = 1;
+  string iconUrl = 2;
   repeated Note notes = 3;
 }
 
 message UpdateCharacterReq {
   CharacterHandle handle = 1;
   ProjectHandle project = 2;
-  BasicCharacterDetails details = 3;
+  CharacterDetails details = 3;
   bool set_icon = 4;
   string icon_path = 5;
 }
@@ -106,7 +106,7 @@ message GetNoteReq {
 
 message GetNoteResp {
   Note details = 1;
-  repeated BasicCharacterDetails characters = 2;
+  repeated CharacterDetails characters = 2;
 }
 
 message SearchNoteResp {
