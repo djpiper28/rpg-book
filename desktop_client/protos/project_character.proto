@@ -5,7 +5,7 @@ message CharacterHandle {
   string id = 1;
 }
 
-message BasicCharacterDetails {
+message CharacterDetails {
   CharacterHandle handle = 1;
   string name = 2;
   string description = 4;

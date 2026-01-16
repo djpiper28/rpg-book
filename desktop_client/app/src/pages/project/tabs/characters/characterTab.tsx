@@ -9,7 +9,7 @@ import { Modal } from "@/components/modal/modal";
 import { Search } from "@/components/search/search";
 import { P } from "@/components/typography/P";
 import { getLogger, getProjectClient } from "@/lib/grpcClient/client";
-import { type BasicCharacterDetails } from "@/lib/grpcClient/pb/project_character";
+import { type CharacterDetails } from "@/lib/grpcClient/pb/project_character";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
@@ -31,7 +31,7 @@ export function CharacterTab(): ReactNode {
   const thisProject = projectHandle && projectStore.getProject(projectHandle);
   const errorStore = useGlobalErrorStore((x) => x);
   const [queryText, setQueryText] = useState("");
-  const [queryResult, setQueryResult] = useState<BasicCharacterDetails[]>([]);
+  const [queryResult, setQueryResult] = useState<CharacterDetails[]>([]);
   const [queryError, setQueryError] = useState("");
 
   const selectedCharacter = thisProject?.project.characters.find(
@@ -142,7 +142,7 @@ export function CharacterTab(): ReactNode {
 
       <div className="flex flex-row gap-2 pt-2 justify-between">
         <div className="flex flex-col gap-2 flex-1">
-          <Search<BasicCharacterDetails>
+          <Search<CharacterDetails>
             elementWrapper={(children: ReactNode[]): ReactNode => {
               return (
                 <Table variant="vertical">
@@ -161,7 +161,7 @@ export function CharacterTab(): ReactNode {
               setQueryText(txt);
             }}
             placeholder="search here or click help"
-            render={(character: BasicCharacterDetails) => {
+            render={(character: CharacterDetails) => {
               const id = character.handle?.id ?? "";
               const selected = selectedCharacterId == id;
 

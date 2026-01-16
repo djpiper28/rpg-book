@@ -6,12 +6,26 @@ import { getLogger } from "@/lib/grpcClient/client";
 
 interface Props {
   description: string;
-  imageDataB64?: string;
   imagePath?: string;
+  imageUrl?: string;
   setImagePath: (src: string) => void;
 }
 
 export function IconSelector(props: Readonly<Props>): ReactNode {
+  const getSrc = (path: string): string => {
+    if (path.startsWith("http") || path.startsWith("file://")) {
+      return path;
+    }
+
+    return `file://${path}`;
+  };
+
+  const imageSrc = props.imagePath
+    ? getSrc(props.imagePath)
+    : props.imageUrl
+      ? getSrc(props.imageUrl)
+      : undefined;
+
   return (
     <div className="border-dotted border-2 border-gray-600 min-w-20 max-w-1/2 max-h-1/2 min-h-20 p-1">
       <button
@@ -53,18 +67,12 @@ export function IconSelector(props: Readonly<Props>): ReactNode {
             });
         }}
       >
-        <Pencil className="absolute" />
-        {props.imagePath ? (
+        <Pencil />
+        {imageSrc ? (
           <img
             alt="User selected"
             className="static max-w-1/2 max-h-1/2"
-            src={`file://${props.imagePath}`}
-          />
-        ) : props.imageDataB64 ? (
-          <img
-            alt="User selected"
-            className="static max-w-1/2 max-h-1/2"
-            src={`data:image/jpg;base64,${props.imageDataB64}`}
+            src={imageSrc}
           />
         ) : (
           <P>No icon selected</P>

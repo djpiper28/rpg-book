@@ -6,7 +6,7 @@ import { MarkdownEditor } from "@/components/input/markdownEditor";
 interface Props {
   description: string;
   iconPath: string;
-  imageDataB64?: string;
+  imageUrl?: string;
   name: string;
   onDescriptionChange: (description: string) => void;
   onNameChange: (name: string) => void;
@@ -28,8 +28,8 @@ export function CharacterEdit(props: Readonly<Props>): ReactNode {
         />
         <IconSelector
           description="Select an icon for your character"
-          imageDataB64={props.imageDataB64}
           imagePath={props.iconPath}
+          imageUrl={props.imageUrl}
           setImagePath={props.setIconPath}
         />
       </div>

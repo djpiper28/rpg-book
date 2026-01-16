@@ -36,8 +36,8 @@ func (c *Character) Normalise() {
 
 // The icon is not set here, if you want an icon then you need to set it to another proto
 // this is to avoid sending the icon too much.
-func (c *Character) ToPb() *pb_project_character.BasicCharacterDetails {
-	return &pb_project_character.BasicCharacterDetails{
+func (c *Character) ToPb() *pb_project_character.CharacterDetails {
+	return &pb_project_character.CharacterDetails{
 		Handle: &pb_project_character.CharacterHandle{
 			Id: c.Id.String(),
 		},
