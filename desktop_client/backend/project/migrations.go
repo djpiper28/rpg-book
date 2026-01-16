@@ -98,7 +98,7 @@ func Migrate(db database.Database) error {
 		note_id TEXT NOT NULL,
 		character_id TEXT,
 		FOREIGN KEY (character_id) REFERENCES characters(id),
-		FOREIGN KEY (note_id) REFERENCES notes(id),
+		FOREIGN KEY (note_id) REFERENCES notes(id) ON DELETE CASCADE,
 		UNIQUE(note_id, character_id),
 		CHECK (
       (character_id IS NOT NULL) <= 1

@@ -468,7 +468,7 @@ func TestProjectSvc(t *testing.T) {
 		require.NoError(t, err)
 		require.NotEmpty(t, characterHandle.Id)
 
-		searchRes, err := svc.SearchCharacter(context.Background(), &pb_project.SearchCharacterReq{
+		searchRes, err := svc.SearchCharacter(context.Background(), &pb_project.QueryReq{
 			Project: projectHandle,
 			Query:   characterName,
 		})
@@ -538,5 +538,211 @@ func TestProjectSvc(t *testing.T) {
 				Markdown: markdown,
 			},
 		}, character.Notes[0])
+	})
+
+	t.Run("Test note in project open", func(t *testing.T) {
+		filename := uuid.New().String() + sqlite3.DbExtension
+		projectName := uuid.New().String()
+		name := uuid.New().String()
+		markdown := uuid.New().String()
+
+		projectHandle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
+			FileName:    filename,
+			ProjectName: projectName,
+		})
+		require.NoError(t, err)
+
+		note, err := svc.CreateNote(context.Background(), &pb_project.CreateNoteReq{
+			Project: projectHandle,
+			Details: &pb_project_note.NoteDetails{
+				Name:     name,
+				Markdown: markdown,
+			},
+		})
+
+		require.NoError(t, err)
+		require.NotEmpty(t, note.Id)
+
+		_, err = svc.CloseProject(context.Background(), projectHandle)
+		require.NoError(t, err)
+
+		project, err := svc.OpenProject(context.Background(), &pb_project.OpenProjectReq{
+			FileName: filename,
+		})
+		defer closeProject(t, filename, project.Handle)
+		require.Len(t, project.Notes, 1)
+	})
+
+	t.Run("Test note search", func(t *testing.T) {
+		filename := uuid.New().String() + sqlite3.DbExtension
+		projectName := uuid.New().String()
+		name := uuid.New().String()
+		markdown := uuid.New().String()
+
+		projectHandle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
+			FileName:    filename,
+			ProjectName: projectName,
+		})
+		require.NoError(t, err)
+		defer closeProject(t, filename, projectHandle)
+
+		note, err := svc.CreateNote(t.Context(), &pb_project.CreateNoteReq{
+			Project: projectHandle,
+			Details: &pb_project_note.NoteDetails{
+				Name:     name,
+				Markdown: markdown,
+			},
+		})
+
+		require.NoError(t, err)
+		require.NotEmpty(t, note.Id)
+
+		resp, err := svc.SearchNote(t.Context(), &pb_project.QueryReq{
+			Project: projectHandle,
+			Query:   name,
+		})
+		require.NoError(t, err)
+		require.Equal(t, resp.Details, []*pb_project_note.NoteHandle{note})
+	})
+
+	t.Run("Test update notes", func(t *testing.T) {
+		filename := uuid.New().String() + sqlite3.DbExtension
+		projectName := uuid.New().String()
+		name := uuid.New().String()
+		markdown := uuid.New().String()
+
+		projectHandle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
+			FileName:    filename,
+			ProjectName: projectName,
+		})
+		require.NoError(t, err)
+		defer closeProject(t, filename, projectHandle)
+
+		noteHandle, err := svc.CreateNote(t.Context(), &pb_project.CreateNoteReq{
+			Project: projectHandle,
+			Details: &pb_project_note.NoteDetails{
+				Name:     name,
+				Markdown: markdown,
+			},
+		})
+
+		require.NoError(t, err)
+		require.NotEmpty(t, noteHandle.Id)
+
+		updatedDetails := &pb_project_note.NoteDetails{
+			Name:     name + "-new",
+			Markdown: markdown + "-new",
+		}
+
+		_, err = svc.UpdateNote(t.Context(), &pb_project.UpdateNoteReq{
+			Handle:     noteHandle,
+			Project:    projectHandle,
+			Characters: []*pb_project_character.CharacterHandle{},
+			Details:    updatedDetails,
+		})
+
+		require.NoError(t, err)
+
+		note, err := svc.GetNote(t.Context(), &pb_project.GetNoteReq{
+			Project: projectHandle,
+			Note:    noteHandle,
+		})
+
+		require.NoError(t, err)
+		require.Len(t, note.Characters, 0)
+		require.Equal(t, note.Details.Details.Name, updatedDetails.Name)
+		require.Equal(t, note.Details.Details.Markdown, updatedDetails.Markdown)
+	})
+
+	t.Run("Test update notes with characters", func(t *testing.T) {
+		filename := uuid.New().String() + sqlite3.DbExtension
+		projectName := uuid.New().String()
+		name := uuid.New().String()
+		markdown := uuid.New().String()
+
+		projectHandle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
+			FileName:    filename,
+			ProjectName: projectName,
+		})
+		require.NoError(t, err)
+		defer closeProject(t, filename, projectHandle)
+
+		characterHandle, err := svc.CreateCharacter(context.Background(), &pb_project.CreateCharacterReq{
+			Project: projectHandle,
+			Details: &pb_project_character.BasicCharacterDetails{
+				Name:        "Test Character",
+				Description: "Test Description",
+			},
+		})
+		require.NoError(t, err)
+
+		noteHandle, err := svc.CreateNote(t.Context(), &pb_project.CreateNoteReq{
+			Project: projectHandle,
+			Details: &pb_project_note.NoteDetails{
+				Name:     name,
+				Markdown: markdown,
+			},
+		})
+
+		require.NoError(t, err)
+		require.NotEmpty(t, noteHandle.Id)
+
+		_, err = svc.UpdateNote(t.Context(), &pb_project.UpdateNoteReq{
+			Handle:     noteHandle,
+			Project:    projectHandle,
+			Characters: []*pb_project_character.CharacterHandle{characterHandle},
+			Details: &pb_project_note.NoteDetails{
+				Name:     name,
+				Markdown: markdown,
+			},
+		})
+
+		require.NoError(t, err)
+
+		note, err := svc.GetNote(t.Context(), &pb_project.GetNoteReq{
+			Project: projectHandle,
+			Note:    noteHandle,
+		})
+
+		require.NoError(t, err)
+		require.Len(t, note.Characters, 1)
+		require.Equal(t, characterHandle.Id, note.Characters[0].Handle.Id)
+	})
+
+	t.Run("Test delete notes", func(t *testing.T) {
+		filename := uuid.New().String() + sqlite3.DbExtension
+		projectName := uuid.New().String()
+		name := uuid.New().String()
+		markdown := uuid.New().String()
+
+		projectHandle, err := svc.CreateProject(context.Background(), &pb_project.CreateProjectReq{
+			FileName:    filename,
+			ProjectName: projectName,
+		})
+		require.NoError(t, err)
+		defer closeProject(t, filename, projectHandle)
+
+		noteHandle, err := svc.CreateNote(t.Context(), &pb_project.CreateNoteReq{
+			Project: projectHandle,
+			Details: &pb_project_note.NoteDetails{
+				Name:     name,
+				Markdown: markdown,
+			},
+		})
+
+		require.NoError(t, err)
+		require.NotEmpty(t, noteHandle.Id)
+
+		_, err = svc.DeleteNote(t.Context(), &pb_project.DeleteNoteReq{
+			Project: projectHandle,
+			Handle:  noteHandle,
+		})
+		require.NoError(t, err)
+
+		_, err = svc.GetNote(t.Context(), &pb_project.GetNoteReq{
+			Project: projectHandle,
+			Note:    noteHandle,
+		})
+		require.Error(t, err)
 	})
 }

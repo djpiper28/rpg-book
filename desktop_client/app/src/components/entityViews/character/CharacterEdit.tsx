@@ -34,7 +34,7 @@ export function CharacterEdit(props: Readonly<Props>): ReactNode {
         />
       </div>
       <MarkdownEditor
-        label="Description and notes"
+        label="Description"
         setValue={props.onDescriptionChange}
         value={props.description}
       />

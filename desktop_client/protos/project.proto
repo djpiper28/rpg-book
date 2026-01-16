@@ -14,9 +14,13 @@ service ProjectSvc {
   rpc UpdateCharacter(UpdateCharacterReq) returns (Empty) {}
   rpc GetCharacter(GetCharacterReq) returns (GetCharacterResp) {}
   rpc DeleteCharacter(DeleteCharacterReq) returns (Empty) {}
-  rpc SearchCharacter(SearchCharacterReq) returns (SearchCharacterResp) {}
+  rpc SearchCharacter(QueryReq) returns (SearchCharacterResp) {}
 
   rpc CreateNote(CreateNoteReq) returns (NoteHandle) {}
+  rpc GetNote(GetNoteReq) returns (GetNoteResp) {}
+  rpc SearchNote(QueryReq) returns (SearchNoteResp) {}
+  rpc UpdateNote(UpdateNoteReq) returns (Empty) {}
+  rpc DeleteNote(DeleteNoteReq) returns (Empty) {}
 }
 
 message CreateProjectReq {
@@ -36,6 +40,7 @@ message ProjectHandle {
 message OpenProjectResp {
   ProjectHandle handle = 1;
   repeated BasicCharacterDetails characters = 2;
+  repeated Note notes = 3;
 }
 
 message RecentProject {
@@ -79,7 +84,7 @@ message DeleteCharacterReq {
   CharacterHandle handle = 2;
 }
 
-message SearchCharacterReq {
+message QueryReq {
   ProjectHandle project = 1;
   string query = 2;
 }
@@ -92,4 +97,30 @@ message CreateNoteReq {
   ProjectHandle project = 1;
   NoteDetails details = 2;
   repeated CharacterHandle characters = 3;
+}
+
+message GetNoteReq {
+  ProjectHandle project = 1;
+  NoteHandle note = 2;
+}
+
+message GetNoteResp {
+  Note details = 1;
+  repeated BasicCharacterDetails characters = 2;
+}
+
+message SearchNoteResp {
+  repeated NoteHandle details = 1;
+}
+
+message UpdateNoteReq {
+  NoteHandle handle = 1;
+  ProjectHandle project = 2;
+  NoteDetails details = 3;
+  repeated CharacterHandle characters = 4;
+}
+
+message DeleteNoteReq {
+  ProjectHandle project = 1;
+  NoteHandle handle = 2;
 }

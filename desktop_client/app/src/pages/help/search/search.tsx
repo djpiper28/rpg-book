@@ -3,6 +3,7 @@ import { type ReactNode } from "react";
 import { H1 } from "@/components/typography/H1";
 import { H2 } from "@/components/typography/H2";
 import { H3 } from "@/components/typography/H3";
+import { Link } from "@/components/typography/Link";
 import { P } from "@/components/typography/P";
 
 export function Component(): ReactNode {
@@ -103,7 +104,7 @@ export function Component(): ReactNode {
         There are a series of different scopes for searching, think of these as
         each of the different search bars in the RPG Book.
       </P>
-      <H3>Characters</H3>
+      <H3 id="#characters">Characters</H3>
       <Table variant="vertical">
         <Table.Thead>
           <Table.Tr>
@@ -120,6 +121,34 @@ export function Component(): ReactNode {
           <Table.Th>
             The description of the character i.e: Likes to eat mushy peas on a
             Wednesday with his wife.
+          </Table.Th>
+        </Table.Tr>
+      </Table>
+
+      <H3>Notes</H3>
+      <Table variant="vertical">
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>Field</Table.Th>
+            <Table.Th>Description</Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tr>
+          <Table.Th>name</Table.Th>
+          <Table.Th>The name of the note i.e: Map of Scary Dungeon</Table.Th>
+        </Table.Tr>
+        <Table.Tr>
+          <Table.Th>markdown, contents, desc, or description</Table.Th>
+          <Table.Th>
+            The text contents of description of the note i.e: 2 spuds
+          </Table.Th>
+        </Table.Tr>
+        <Table.Tr>
+          <Table.Th>character.*</Table.Th>
+          <Table.Th>
+            Allows you to search by the fields of related characters i.e:
+            character.name=&quot;Dave&qauot;. See{" "}
+            <Link href="#characters">characters</Link>.
           </Table.Th>
         </Table.Tr>
       </Table>

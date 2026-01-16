@@ -167,7 +167,7 @@ func (p *ProjectSvc) DeleteCharacter(ctx context.Context, in *pb_project.DeleteC
 	return &pb_common.Empty{}, nil
 }
 
-func (p *ProjectSvc) SearchCharacter(ctx context.Context, in *pb_project.SearchCharacterReq) (*pb_project.SearchCharacterResp, error) {
+func (p *ProjectSvc) SearchCharacter(ctx context.Context, in *pb_project.QueryReq) (*pb_project.SearchCharacterResp, error) {
 	project, err := p.getProject(in.Project)
 	if err != nil {
 		log.Error("Cannot search character", loggertags.TagError, err)
