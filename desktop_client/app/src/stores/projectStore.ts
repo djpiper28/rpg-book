@@ -6,7 +6,7 @@ import {
   type ProjectHandle,
 } from "@/lib/grpcClient/pb/project";
 import {
-  type BasicCharacterDetails,
+  type CharacterDetails,
   type CharacterHandle,
 } from "@/lib/grpcClient/pb/project_character";
 import { type Note, type NoteHandle } from "@/lib/grpcClient/pb/project_note";
@@ -17,10 +17,7 @@ export interface Project {
 }
 
 interface CharacterMethods {
-  addCharacter: (
-    handle: ProjectHandle,
-    character: BasicCharacterDetails,
-  ) => void;
+  addCharacter: (handle: ProjectHandle, character: CharacterDetails) => void;
   deleteCharacter: (handle: ProjectHandle, character: CharacterHandle) => void;
 }
 
@@ -47,7 +44,7 @@ export const useProjectStore = create<ProjectStore>()(
     immer((set, get) => ({
       addCharacter: (
         handle: ProjectHandle,
-        character: BasicCharacterDetails,
+        character: CharacterDetails,
       ): void => {
         set((state) => {
           const project = state.projects[asId(handle)]?.project;

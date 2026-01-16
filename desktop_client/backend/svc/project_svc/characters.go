@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"net/url"
 	"os"
 
 	"github.com/charmbracelet/log"
@@ -138,11 +139,31 @@ func (p *ProjectSvc) GetCharacter(ctx context.Context, in *pb_project.GetCharact
 		notes = append(notes, note.ToPb())
 	}
 
+	joinedUrl, err := url.JoinPath(p.baseUrl, "image", "character", in.Project.Id, in.Character.Id)
+	if err != nil {
+		log.Error("Cannot create icon url", loggertags.TagError, err)
+		return nil, errors.Join(errors.New("Cannot create icon url"), err)
+	}
+
 	return &pb_project.GetCharacterResp{
 		Details: character.ToPb(),
-		Icon:    character.Icon,
+		IconUrl: joinedUrl,
 		Notes:   notes,
 	}, nil
+}
+
+func (p *ProjectSvc) GetCharacterImage(projectID, characterID uuid.UUID) ([]byte, error) {
+	project, err := p.getProject(&pb_project.ProjectHandle{Id: projectID.String()})
+	if err != nil {
+		return nil, err
+	}
+
+	character, err := project.GetCharacter(characterID)
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot get character"), err)
+	}
+
+	return character.Icon, nil
 }
 
 func (p *ProjectSvc) DeleteCharacter(ctx context.Context, in *pb_project.DeleteCharacterReq) (*pb_common.Empty, error) {

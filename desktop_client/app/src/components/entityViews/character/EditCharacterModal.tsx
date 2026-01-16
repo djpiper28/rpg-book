@@ -2,10 +2,9 @@ import { Button } from "@mantine/core";
 import { type ReactNode, useEffect, useState } from "react";
 import { getLogger, getProjectClient } from "@/lib/grpcClient/client";
 import {
-  type BasicCharacterDetails,
+  type CharacterDetails,
   type CharacterHandle,
 } from "@/lib/grpcClient/pb/project_character";
-import { uint8ArrayToBase64 } from "@/lib/utils/base64";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
@@ -17,14 +16,13 @@ interface Props {
 }
 
 export default function EditCharacterModal(props: Readonly<Props>): ReactNode {
-  const [characterDetails, setCharacterDetails] =
-    useState<BasicCharacterDetails>({
-      description: "",
-      handle: {
-        id: "",
-      },
-      name: "",
-    });
+  const [characterDetails, setCharacterDetails] = useState<CharacterDetails>({
+    description: "",
+    handle: {
+      id: "",
+    },
+    name: "",
+  });
 
   const projectStore = useProjectStore((x) => x);
   const [icon, setIcon] = useState("");
@@ -49,7 +47,7 @@ export default function EditCharacterModal(props: Readonly<Props>): ReactNode {
         }
 
         setCharacterDetails(resp.response.details);
-        setIcon(uint8ArrayToBase64(resp.response.icon));
+        setIcon(resp.response.iconUrl);
         setDirtyIcon(false);
       })
       .catch((error: unknown) => {
