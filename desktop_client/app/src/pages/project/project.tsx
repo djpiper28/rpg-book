@@ -1,12 +1,20 @@
-import { Tabs } from "@mantine/core";
-import { type ReactNode } from "react";
+import { Center, Loader, Tabs } from "@mantine/core";
+import { type ReactNode, Suspense, lazy } from "react";
 import { useNavigate } from "react-router";
 import { H2 } from "@/components/typography/H2";
 import { mustVoid } from "@/lib/utils/errorHandlers";
 import { useTabStore } from "@/stores/tabStore";
 import { indexPath } from "../path";
-import { CharacterTab } from "./tabs/characters/characterTab";
-import { NoteTab } from "./tabs/notes/noteTab";
+
+const CharacterTab = lazy(() =>
+  import("./tabs/characters/characterTab").then((m) => ({
+    default: m.CharacterTab,
+  })),
+);
+
+const NoteTab = lazy(() =>
+  import("./tabs/notes/noteTab").then((m) => ({ default: m.NoteTab })),
+);
 
 export function Component(): ReactNode {
   const navigate = useNavigate();
@@ -21,7 +29,7 @@ export function Component(): ReactNode {
 
   return (
     <>
-      <Tabs defaultValue="characters">
+      <Tabs defaultValue="characters" keepMounted={false}>
         <Tabs.List>
           <H2>{currentTab.name}</H2>
           <Tabs.Tab value="characters">Characters</Tabs.Tab>
@@ -35,11 +43,27 @@ export function Component(): ReactNode {
         </Tabs.List>
 
         <Tabs.Panel value="characters">
-          <CharacterTab />
+          <Suspense
+            fallback={
+              <Center p="md">
+                <Loader />
+              </Center>
+            }
+          >
+            <CharacterTab />
+          </Suspense>
         </Tabs.Panel>
 
         <Tabs.Panel value="notes">
-          <NoteTab />
+          <Suspense
+            fallback={
+              <Center p="md">
+                <Loader />
+              </Center>
+            }
+          >
+            <NoteTab />
+          </Suspense>
         </Tabs.Panel>
       </Tabs>
     </>
