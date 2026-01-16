@@ -1,6 +1,7 @@
 package project
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
 	"errors"
@@ -211,6 +212,11 @@ func (p *Project) SearchNote(query string) ([]uuid.UUID, error) {
 func (p *Project) UpdateNote(note *model.Note, updatedCharacterIds []uuid.UUID) error {
 	note.Normalise()
 
+	slices.SortFunc(updatedCharacterIds, func(a, b uuid.UUID) int {
+		return bytes.Compare(a[:], b[:])
+	})
+	updatedCharacterIds = slices.Compact(updatedCharacterIds)
+
 	tx, err := p.db.Db.BeginTxx(context.Background(), nil)
 	if err != nil {
 		return errors.Join(errors.New("Cannot start transaction"), err)
@@ -292,5 +298,26 @@ func (p *Project) UpdateNote(note *model.Note, updatedCharacterIds []uuid.UUID) 
 	if err != nil {
 		return errors.Join(errors.New("Cannot commit transaction"), err)
 	}
+	return nil
+}
+
+func (p *Project) DeleteNote(noteId uuid.UUID) error {
+	tx, err := p.db.Db.Beginx()
+	if err != nil {
+		return errors.Join(errors.New("Cannot start transaction"), err)
+	}
+	defer tx.Rollback()
+
+	// ON DELETE CASCADE handles the relations
+	_, err = tx.Exec("DELETE FROM notes WHERE id=?;", noteId)
+	if err != nil {
+		return errors.Join(errors.New("Cannot delete note"), err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return errors.Join(errors.New("Cannot commit transaction"), err)
+	}
+
 	return nil
 }

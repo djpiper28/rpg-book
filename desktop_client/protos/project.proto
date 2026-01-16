@@ -20,6 +20,7 @@ service ProjectSvc {
   rpc GetNote(GetNoteReq) returns (GetNoteResp) {}
   rpc SearchNote(QueryReq) returns (SearchNoteResp) {}
   rpc UpdateNote(UpdateNoteReq) returns (Empty) {}
+  rpc DeleteNote(DeleteNoteReq) returns (Empty) {}
 }
 
 message CreateProjectReq {
@@ -117,4 +118,9 @@ message UpdateNoteReq {
   ProjectHandle project = 2;
   NoteDetails details = 3;
   repeated CharacterHandle characters = 4;
+}
+
+message DeleteNoteReq {
+  ProjectHandle project = 1;
+  NoteHandle handle = 2;
 }

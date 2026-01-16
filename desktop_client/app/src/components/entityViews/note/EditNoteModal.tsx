@@ -1,6 +1,7 @@
 import { Button } from "@mantine/core";
 import { type ReactNode, useEffect, useState } from "react";
 import { getLogger, getProjectClient } from "@/lib/grpcClient/client";
+import { type CharacterHandle } from "@/lib/grpcClient/pb/project_character";
 import {
   type NoteDetails,
   type NoteHandle,
@@ -20,6 +21,10 @@ export function EditNoteModal(props: Readonly<Props>): ReactNode {
     markdown: "",
     name: "",
   });
+
+  const [characterHandles, setCharacterHandles] = useState<CharacterHandle[]>(
+    [],
+  );
 
   const projectStore = useProjectStore((x) => x);
   const { setError } = useGlobalErrorStore((x) => x);
@@ -41,6 +46,10 @@ export function EditNoteModal(props: Readonly<Props>): ReactNode {
         }
 
         setNoteDetails(resp.response.details.details);
+
+        setCharacterHandles(
+          resp.response.characters.map((c) => ({ id: c.handle?.id ?? "" })),
+        );
       })
       .catch((error: unknown) => {
         setError({
@@ -70,7 +79,7 @@ export function EditNoteModal(props: Readonly<Props>): ReactNode {
           const f = async (): Promise<void> => {
             try {
               await getProjectClient().updateNote({
-                characters: [],
+                characters: characterHandles,
                 details: noteDetails,
                 handle: props.noteHandle,
                 project: projectHandle,

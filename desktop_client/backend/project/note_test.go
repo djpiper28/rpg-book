@@ -324,3 +324,31 @@ func TestUpdateNoteDeleteCharacterRelation(t *testing.T) {
 	require.Equal(t, note, editedNote.Note)
 	require.Len(t, editedNote.Characters, 0)
 }
+
+func TestDeleteNote(t *testing.T) {
+	t.Parallel()
+
+	project, remove := testutils.NewProject(t)
+	defer remove()
+
+	character, err := project.CreateCharacter("Crazy Dave", "pan on head", nil)
+	require.NoError(t, err)
+	require.NotEmpty(t, character.Id)
+
+	name := uuid.New().String()
+	markdown := uuid.New().String()
+	note, err := project.CreateNote(name, markdown, []uuid.UUID{character.Id})
+	require.NoError(t, err)
+
+	err = project.DeleteNote(note.Id)
+	require.NoError(t, err)
+
+	// Check note is gone
+	_, err = project.GetNote(note.Id)
+	require.Error(t, err)
+
+	// Check relations are gone (via character)
+	characterLoaded, err := project.GetCharacter(character.Id)
+	require.NoError(t, err)
+	require.Len(t, characterLoaded.Notes, 0)
+}

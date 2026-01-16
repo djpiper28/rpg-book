@@ -1,3 +1,4 @@
+import { Button } from "@mantine/core";
 import { type ReactNode, useEffect, useState } from "react";
 import MarkdownRenderer from "@/components/renderers/markdown";
 import { H2 } from "@/components/typography/H2";
@@ -55,7 +56,15 @@ export function NoteView(props: Readonly<Props>): ReactNode {
 
   return (
     <div className="flex-1 gap-3 overflow-y-auto flex flex-col">
-      <H2>{note.details?.name}</H2>
+      <div className="flex flex-row justify-between items-center">
+        <H2>{note.details?.name}</H2>
+        <div className="flex flex-row gap-2">
+          <Button onClick={props.onEdit}>Edit</Button>
+          <Button color="red" onClick={props.onDelete}>
+            Delete
+          </Button>
+        </div>
+      </div>
       <MarkdownRenderer markdown={note.details?.markdown ?? ""} />
     </div>
   );

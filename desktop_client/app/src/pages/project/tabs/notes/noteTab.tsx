@@ -10,6 +10,7 @@ import { Search } from "@/components/search/search";
 import { P } from "@/components/typography/P";
 import { getLogger, getProjectClient } from "@/lib/grpcClient/client";
 import { type Note } from "@/lib/grpcClient/pb/project_note";
+import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
 
@@ -25,6 +26,7 @@ export function NoteTab(): ReactNode {
 
   const projectHandle = useTabStore((x) => x.selectedTab);
   const projectStore = useProjectStore((x) => x);
+  const errorStore = useGlobalErrorStore((x) => x);
   const thisProject = projectHandle && projectStore.getProject(projectHandle);
   const [queryError, setQueryError] = useState("");
   const [queryText, setQueryText] = useState("");
@@ -110,28 +112,28 @@ export function NoteTab(): ReactNode {
       <ConfirmModal
         close={deleteClose}
         onConfirm={() => {
-          // if (!selectedNote?.handle) {
-          //   deleteClose();
-          //   return;
-          // }
-          //
-          // const noteHandle = selectedNote.handle;
-          //
-          // getProjectClient()
-          //   .deleteNote({
-          //     handle: noteHandle,
-          //     project: thisProject.handle,
-          //   })
-          //   .then(() => {
-          //     projectStore.deleteNote(projectHandle, noteHandle);
-          //     setSelectedNoteId("");
-          //   })
-          //   .catch((error: unknown) => {
-          //     errorStore.setError({
-          //       body: JSON.stringify(error),
-          //       title: "Cannot delete note",
-          //     });
-          //   });
+          if (!selectedNote?.handle) {
+            deleteClose();
+            return;
+          }
+
+          const noteHandle = selectedNote.handle;
+
+          getProjectClient()
+            .deleteNote({
+              handle: noteHandle,
+              project: thisProject.handle,
+            })
+            .then(() => {
+              projectStore.deleteNote(projectHandle, noteHandle);
+              setSelectedNoteId("");
+              deleteClose();
+            })
+            .catch((error: unknown) => {
+              errorStore.setError({
+                body: JSON.stringify(error),
+              });
+            });
         }}
         opened={deleteOpened}
         title={`Delete Note ${selectedNote?.details?.name ?? ""}`}

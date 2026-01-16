@@ -134,3 +134,24 @@ func (p *ProjectSvc) UpdateNote(ctx context.Context, in *pb_project.UpdateNoteRe
 
 	return nil, nil
 }
+
+func (p *ProjectSvc) DeleteNote(ctx context.Context, in *pb_project.DeleteNoteReq) (*pb_common.Empty, error) {
+	project, err := p.getProject(in.Project)
+	if err != nil {
+		log.Error("Cannot get project from id", loggertags.TagError, err)
+		return nil, errors.Join(errors.New("Cannot get project"), err)
+	}
+
+	noteId, err := uuid.Parse(in.Handle.Id)
+	if err != nil {
+		return nil, errors.Join(errors.New("Cannot parse note ID"), err)
+	}
+
+	err = project.DeleteNote(noteId)
+	if err != nil {
+		log.Error("Cannot delete note", loggertags.TagError, err)
+		return nil, errors.Join(errors.New("Cannot delete note"), err)
+	}
+
+	return nil, nil
+}
