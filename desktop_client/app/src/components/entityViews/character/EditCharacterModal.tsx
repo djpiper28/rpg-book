@@ -66,7 +66,7 @@ export default function EditCharacterModal(props: Readonly<Props>): ReactNode {
       <CharacterEdit
         description={characterDetails.description}
         iconPath={iconPath}
-        imageDataB64={icon}
+        imageUrl={icon}
         name={characterDetails.name}
         onDescriptionChange={(description) => {
           setCharacterDetails((prev) => ({ ...prev, description }));
