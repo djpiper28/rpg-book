@@ -57,7 +57,7 @@
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.20",
-    "eslint-plugin-storybook": "^9.1.4",
+    "eslint-plugin-storybook": "^9.1.17",
     "immer": "^11.0.1",
     "jest-matchmedia-mock": "^1.1.0",
     "jsdom": "^27.0.0",
