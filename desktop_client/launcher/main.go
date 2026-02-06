@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -8,6 +9,7 @@ import (
 
 	"github.com/charmbracelet/log"
 	loggertags "github.com/djpiper28/rpg-book/common/logger_tags"
+	"github.com/djpiper28/rpg-book/common/platform"
 	"github.com/djpiper28/rpg-book/desktop_client/backend"
 	"github.com/jessevdk/go-flags"
 )
@@ -23,10 +25,58 @@ const (
 	EnvVarPort        = EnvVarPrefix + "PORT"
 )
 
+const pathLoggerTag = "path"
+
+func createAppDir(path string) error {
+	err := os.MkdirAll(path, 0o755)
+	if err != nil {
+		return errors.Join(errors.New("Cannot create app data folder"), err)
+	}
+
+	log.Info("Created data directory", pathLoggerTag, path)
+	return nil
+}
+
+func changeWorkingDirectory() error {
+	path := platform.GetAppPath("RPG Book")
+	log.Debug("Trying to open data directory", pathLoggerTag, path)
+
+	stat, err := os.Stat(path)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			err = createAppDir(path)
+			if err != nil {
+				return err
+			}
+
+			// If the app directory was created successfully then we can probably set it as our working directory
+		} else {
+			return err
+		}
+	} else if !stat.IsDir() {
+		return errors.New("app data folder is not a directory")
+	}
+
+	err = os.Chdir(path)
+	if err != nil {
+		return errors.Join(errors.New("Cannot open data directory"), err)
+	}
+
+	return nil
+}
+
 func main() {
 	fmt.Println("Starting RPG Book")
 	log.Default().SetReportCaller(true)
 	log.Default().SetReportTimestamp(true)
+
+	err := changeWorkingDirectory()
+	if err != nil {
+		log.Warn("Cannot set the app to run its data directory", loggertags.TagError, err)
+	} else {
+		path, err := os.Getwd()
+		log.Info("Current working directory", pathLoggerTag, path, loggertags.TagError, err)
+	}
 
 	var opts options
 	launcherCmd, err := flags.Parse(&opts)
