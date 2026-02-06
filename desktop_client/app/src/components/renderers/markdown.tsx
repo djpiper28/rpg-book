@@ -26,7 +26,9 @@ interface Props {
 
 export default function MarkdownRenderer(props: Readonly<Props>): ReactNode {
   return (
-    <div className={`border border-gray-500 rounded-lg p-2 min-w-50 min-h-10 overflow-y-auto w-full h-full ${props.className ?? ""}`}>
+    <div
+      className={`border border-gray-500 rounded-lg p-2 min-w-50 min-h-10 w-full h-full ${props.className ?? ""}`}
+    >
       <Markdown
         components={{
           a: SafeLink,

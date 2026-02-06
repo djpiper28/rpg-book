@@ -1,4 +1,4 @@
-import { Button, Table } from "@mantine/core";
+import { Button, ScrollArea, Table } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { type ReactNode, useEffect, useState } from "react";
 import { CreateNoteModal } from "@/components/entityViews/note/CreateNoteModal";
@@ -142,57 +142,59 @@ export function NoteTab(): ReactNode {
 
       <div className="flex flex-row gap-2 pt-2 justify-between">
         <div className="flex flex-col gap-2 flex-1 h-full">
-          <Search<Note>
-            elementWrapper={(children: ReactNode): ReactNode => {
-              return (
-                <Table variant="vertical" className="w-full">
-                  <Table.Thead className="sticky top-0 bg-gray-800 z-10">
-                    <Table.Tr>
-                      <Table.Th>Name</Table.Th>
-                      <Table.Th>Related Entities</Table.Th>
-                    </Table.Tr>
-                  </Table.Thead>
-                  <Table.Tbody>{children}</Table.Tbody>
-                </Table>
-              );
-            }}
-            error={queryError}
-            onChange={(txt: string) => {
-              setQueryText(txt);
-            }}
-            placeholder="search here or click help"
-            render={(note: Note) => {
-              const id = note.handle?.id ?? "";
-              const selected = selectedNoteHandle?.id === id;
+          <ScrollArea h="100%" type="always">
+            <Search<Note>
+              elementWrapper={(children: ReactNode): ReactNode => {
+                return (
+                  <Table className="w-full" variant="vertical">
+                    <Table.Thead className="sticky top-0 bg-gray-800 z-10">
+                      <Table.Tr>
+                        <Table.Th>Name</Table.Th>
+                        <Table.Th>Related Entities</Table.Th>
+                      </Table.Tr>
+                    </Table.Thead>
+                    <Table.Tbody>{children}</Table.Tbody>
+                  </Table>
+                );
+              }}
+              error={queryError}
+              onChange={(txt: string) => {
+                setQueryText(txt);
+              }}
+              placeholder="search here or click help"
+              render={(note: Note) => {
+                const id = note.handle?.id ?? "";
+                const selected = selectedNoteHandle?.id === id;
 
-              return (
-                <Table.Tr
-                  className={selected ? "bg-gray-500" : ""}
-                  key={id}
+                return (
+                  <Table.Tr
+                    className={selected ? "bg-gray-500" : ""}
+                    key={id}
+                    onClick={() => {
+                      setSelectedNote(projectHandle.id, note.handle);
+                    }}
+                  >
+                    <Table.Th>
+                      <div className="flex flex-row gap-2">
+                        <P className="text-wrap">{note.details?.name ?? ""}</P>
+                      </div>
+                    </Table.Th>
+                    <Table.Th>TODO: Change me</Table.Th>
+                  </Table.Tr>
+                );
+              }}
+              rightElement={
+                <Button
                   onClick={() => {
-                    setSelectedNote(projectHandle.id, note.handle);
+                    createOpen();
                   }}
                 >
-                  <Table.Th>
-                    <div className="flex flex-row gap-2">
-                      <P className="text-wrap">{note.details?.name ?? ""}</P>
-                    </div>
-                  </Table.Th>
-                  <Table.Th>TODO: Change me</Table.Th>
-                </Table.Tr>
-              );
-            }}
-            rightElement={
-              <Button
-                onClick={() => {
-                  createOpen();
-                }}
-              >
-                Add Note
-              </Button>
-            }
-            searchRes={queryResult}
-          />
+                  Add Note
+                </Button>
+              }
+              searchRes={queryResult}
+            />
+          </ScrollArea>
         </div>
 
         {selectedNoteHandle && (

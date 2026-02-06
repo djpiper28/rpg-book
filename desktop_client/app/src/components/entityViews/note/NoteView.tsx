@@ -49,7 +49,7 @@ export function NoteView(props: Readonly<Props>): ReactNode {
   }
 
   return (
-    <div className="flex-1 gap-3 flex flex-col">
+    <div className="flex-1 gap-3 overflow-y-auto flex flex-col">
       <div className="flex flex-row justify-between items-center">
         <H2>{note.details?.name}</H2>
         <div className="flex flex-row gap-2">
@@ -59,7 +59,10 @@ export function NoteView(props: Readonly<Props>): ReactNode {
           </Button>
         </div>
       </div>
-      <MarkdownRenderer markdown={note.details?.markdown ?? ""} className="flex-grow min-h-0" />
+      <MarkdownRenderer
+        className="flex-grow min-h-0"
+        markdown={note.details?.markdown ?? ""}
+      />
     </div>
   );
 }
