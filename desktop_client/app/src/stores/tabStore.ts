@@ -9,6 +9,8 @@ interface Tab {
   name: string;
   selectedCharacter?: CharacterHandle;
   selectedNote?: NoteHandle;
+  // Currently selected tab
+  value: string;
 }
 
 interface TabStore {
@@ -20,6 +22,7 @@ interface TabStore {
   };
   selectedTab?: ProjectHandle;
   setSelectedTab: (handle: ProjectHandle) => void;
+  setValue: (tabId: string, value: string) => void;
   tabs: Record<string, Tab>;
 }
 
@@ -67,6 +70,14 @@ export const useTabStore = create<TabStore>()(
       setSelectedTab: (handle: ProjectHandle): void => {
         set({
           selectedTab: handle,
+        });
+      },
+      setValue: (tabId: string, value: string): void => {
+        const newTabs = structuredClone(get().tabs);
+        newTabs[tabId].value = value;
+
+        set({
+          tabs: newTabs,
         });
       },
       tabs: {},

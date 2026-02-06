@@ -16,6 +16,8 @@ const NoteTab = lazy(() =>
   import("./tabs/notes/noteTab").then((m) => ({ default: m.NoteTab })),
 );
 
+const defaultValue = "characters";
+
 export function Component(): ReactNode {
   const navigate = useNavigate();
   const tabs = useTabStore();
@@ -29,10 +31,19 @@ export function Component(): ReactNode {
 
   return (
     <>
-      <Tabs defaultValue="characters" keepMounted={false}>
+      <Tabs
+        defaultValue="characters"
+        keepMounted={false}
+        onChange={(value: string | null) => {
+          value ??= defaultValue;
+
+          tabs.setValue(tabs.selectedTab?.id ?? "", value);
+        }}
+        value={currentTab.value}
+      >
         <Tabs.List>
           <H2>{currentTab.name}</H2>
-          <Tabs.Tab value="characters">Characters</Tabs.Tab>
+          <Tabs.Tab value={defaultValue}>Characters</Tabs.Tab>
           <Tabs.Tab value="notes">Notes</Tabs.Tab>
           {/*
           <Tabs.Tab value="items">Items</Tabs.Tab>
