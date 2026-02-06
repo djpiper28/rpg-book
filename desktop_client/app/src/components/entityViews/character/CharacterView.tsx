@@ -3,11 +3,14 @@ import { EditDelete } from "@/components/buttons/editDelete";
 import MarkdownRenderer from "@/components/renderers/markdown";
 import { H2 } from "@/components/typography/H2";
 import { getLogger, getProjectClient } from "@/lib/grpcClient/client";
-import { type CharacterDetails } from "@/lib/grpcClient/pb/project_character";
+import {
+  type CharacterDetails,
+  type CharacterHandle,
+} from "@/lib/grpcClient/pb/project_character";
 import { useTabStore } from "@/stores/tabStore";
 
 export interface CharacterViewProps {
-  characterId: string;
+  characterHandle: CharacterHandle;
   isEditModalOpen: boolean;
   onDelete: () => void;
   onEdit: () => void;
@@ -21,19 +24,13 @@ export function CharacterView(props: Readonly<CharacterViewProps>): ReactNode {
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     const sync = async () => {
-      if (!props.characterId) {
-        return;
-      }
-
       if (!projectHandle) {
         return;
       }
 
       try {
         const resp = await getProjectClient().getCharacter({
-          character: {
-            id: props.characterId,
-          },
+          character: props.characterHandle,
           project: projectHandle,
         });
 
@@ -41,7 +38,7 @@ export function CharacterView(props: Readonly<CharacterViewProps>): ReactNode {
         setIconUrl(resp.response.iconUrl);
       } catch (error: unknown) {
         getLogger().error("Cannot get character", {
-          character: props.characterId,
+          character: props.characterHandle.id,
           error: JSON.stringify(error),
           project: JSON.stringify(projectHandle),
         });
@@ -50,7 +47,7 @@ export function CharacterView(props: Readonly<CharacterViewProps>): ReactNode {
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     sync();
-  }, [projectHandle, props.characterId, props.isEditModalOpen]);
+  }, [projectHandle, props.characterHandle, props.isEditModalOpen]);
 
   if (!character) {
     return <div className="flex-1" />;

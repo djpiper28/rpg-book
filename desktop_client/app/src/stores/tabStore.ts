@@ -1,15 +1,23 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { type ProjectHandle } from "@/lib/grpcClient/pb/project";
+import { type CharacterHandle } from "@/lib/grpcClient/pb/project_character";
+import { type NoteHandle } from "@/lib/grpcClient/pb/project_note";
 
 interface Tab {
   handle: ProjectHandle;
   name: string;
+  selectedCharacter?: CharacterHandle;
+  selectedNote?: NoteHandle;
 }
 
 interface TabStore {
   addTab: (handle: ProjectHandle, name: string) => void;
   removeTab: (handle: ProjectHandle) => void;
+  selected: {
+    setSelectedCharacter: (tabId: string, handle?: CharacterHandle) => void;
+    setSelectedNote: (tabId: string, handle?: NoteHandle) => void;
+  };
   selectedTab?: ProjectHandle;
   setSelectedTab: (handle: ProjectHandle) => void;
   tabs: Record<string, Tab>;
@@ -39,6 +47,21 @@ export const useTabStore = create<TabStore>()(
         set({
           tabs: newTabs,
         });
+      },
+      selected: {
+        setSelectedCharacter: (
+          tabId: string,
+          handle?: CharacterHandle,
+        ): void => {
+          const newTabs = structuredClone(get().tabs);
+          newTabs[tabId].selectedCharacter = handle;
+          set({ tabs: newTabs });
+        },
+        setSelectedNote: (tabId: string, handle?: NoteHandle): void => {
+          const newTabs = structuredClone(get().tabs);
+          newTabs[tabId].selectedNote = handle;
+          set({ tabs: newTabs });
+        },
       },
       selectedTab: undefined,
       setSelectedTab: (handle: ProjectHandle): void => {

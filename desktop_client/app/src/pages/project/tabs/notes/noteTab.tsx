@@ -24,18 +24,15 @@ export function NoteTab(): ReactNode {
   const [deleteOpened, { close: deleteClose, open: deleteOpen }] =
     useDisclosure(false);
 
+  const setSelectedNote = useTabStore((x) => x.selected.setSelectedNote);
   const projectHandle = useTabStore((x) => x.selectedTab);
+  const tabs = useTabStore((x) => x.tabs);
   const projectStore = useProjectStore((x) => x);
   const errorStore = useGlobalErrorStore((x) => x);
   const thisProject = projectHandle && projectStore.getProject(projectHandle);
   const [queryError, setQueryError] = useState("");
   const [queryText, setQueryText] = useState("");
-  const [selectedNoteId, setSelectedNoteId] = useState<string | undefined>();
   const [queryResult, setQueryResult] = useState<Note[]>([]);
-
-  const selectedNote = thisProject?.project.notes.find(
-    (n) => n.handle?.id === selectedNoteId,
-  );
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -94,6 +91,12 @@ export function NoteTab(): ReactNode {
     return "Project not found";
   }
 
+  const selectedNoteHandle = tabs[projectHandle.id].selectedNote;
+
+  const selectedNote = thisProject.project.notes.find(
+    (x) => x.handle === selectedNoteHandle,
+  );
+
   return (
     <>
       <Modal close={createClose} opened={createOpened} title="Create Note">
@@ -101,10 +104,10 @@ export function NoteTab(): ReactNode {
       </Modal>
 
       <Modal close={editClose} opened={editOpened} title="Edit Note">
-        {editOpened && (
+        {editOpened && selectedNoteHandle && (
           <EditNoteModal
             closeDialog={editClose}
-            noteHandle={{ id: selectedNoteId ?? "" }}
+            noteHandle={selectedNoteHandle}
           />
         )}
       </Modal>
@@ -112,21 +115,19 @@ export function NoteTab(): ReactNode {
       <ConfirmModal
         close={deleteClose}
         onConfirm={() => {
-          if (!selectedNote?.handle) {
+          if (!selectedNoteHandle) {
             deleteClose();
             return;
           }
 
-          const noteHandle = selectedNote.handle;
-
           getProjectClient()
             .deleteNote({
-              handle: noteHandle,
+              handle: selectedNoteHandle,
               project: thisProject.handle,
             })
             .then(() => {
-              projectStore.deleteNote(projectHandle, noteHandle);
-              setSelectedNoteId("");
+              projectStore.deleteNote(projectHandle, selectedNoteHandle);
+              setSelectedNote(projectHandle.id, { id: "" });
               deleteClose();
             })
             .catch((error: unknown) => {
@@ -162,14 +163,14 @@ export function NoteTab(): ReactNode {
             placeholder="search here or click help"
             render={(note: Note) => {
               const id = note.handle?.id ?? "";
-              const selected = selectedNoteId == id;
+              const selected = selectedNoteHandle?.id === id;
 
               return (
                 <Table.Tr
                   className={selected ? "bg-gray-500" : ""}
                   key={id}
                   onClick={() => {
-                    setSelectedNoteId(id);
+                    setSelectedNote(projectHandle.id, note.handle);
                   }}
                 >
                   <Table.Th>
@@ -194,10 +195,10 @@ export function NoteTab(): ReactNode {
           />
         </div>
 
-        {selectedNoteId && (
+        {selectedNoteHandle && (
           <NoteView
             isEditModalOpen={editOpened}
-            noteId={selectedNoteId}
+            noteHandle={selectedNoteHandle}
             onDelete={deleteOpen}
             onEdit={editOpen}
           />

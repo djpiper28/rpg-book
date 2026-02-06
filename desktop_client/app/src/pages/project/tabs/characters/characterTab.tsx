@@ -15,8 +15,6 @@ import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
 
 export function CharacterTab(): ReactNode {
-  const [selectedCharacterId, setSelectedCharacterId] = useState("");
-
   const [createOpened, { close: createClose, open: createOpen }] =
     useDisclosure(false);
 
@@ -26,17 +24,18 @@ export function CharacterTab(): ReactNode {
   const [deleteOpened, { close: deleteClose, open: deleteOpen }] =
     useDisclosure(false);
 
+  const setSelectedCharacter = useTabStore(
+    (x) => x.selected.setSelectedCharacter,
+  );
+
   const projectHandle = useTabStore((x) => x.selectedTab);
+  const tabs = useTabStore((x) => x.tabs);
   const projectStore = useProjectStore((x) => x);
   const thisProject = projectHandle && projectStore.getProject(projectHandle);
   const errorStore = useGlobalErrorStore((x) => x);
   const [queryText, setQueryText] = useState("");
   const [queryResult, setQueryResult] = useState<CharacterDetails[]>([]);
   const [queryError, setQueryError] = useState("");
-
-  const selectedCharacter = thisProject?.project.characters.find(
-    (c) => c.handle?.id === selectedCharacterId,
-  );
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -95,6 +94,12 @@ export function CharacterTab(): ReactNode {
     return "Project not found";
   }
 
+  const selectedCharacterHandle = tabs[projectHandle.id].selectedCharacter;
+
+  const selectedCharacter = thisProject.project.characters.find(
+    (x) => x.handle === selectedCharacterHandle,
+  );
+
   return (
     <>
       <Modal close={createClose} opened={createOpened} title="Create Character">
@@ -102,9 +107,9 @@ export function CharacterTab(): ReactNode {
       </Modal>
 
       <Modal close={editClose} opened={editOpened} title="Edit Character">
-        {editOpened && (
+        {editOpened && selectedCharacterHandle && (
           <EditCharacterModal
-            characterHandle={{ id: selectedCharacterId }}
+            characterHandle={selectedCharacterHandle}
             closeDialog={editClose}
           />
         )}
@@ -113,21 +118,23 @@ export function CharacterTab(): ReactNode {
       <ConfirmModal
         close={deleteClose}
         onConfirm={() => {
-          if (!selectedCharacter?.handle) {
+          if (!selectedCharacterHandle) {
             deleteClose();
             return;
           }
 
-          const characterHandle = selectedCharacter.handle;
-
           getProjectClient()
             .deleteCharacter({
-              handle: characterHandle,
+              handle: selectedCharacterHandle,
               project: thisProject.handle,
             })
             .then(() => {
-              projectStore.deleteCharacter(projectHandle, characterHandle);
-              setSelectedCharacterId("");
+              projectStore.deleteCharacter(
+                projectHandle,
+                selectedCharacterHandle,
+              );
+
+              setSelectedCharacter(projectHandle.id, { id: "" });
             })
             .catch((error: unknown) => {
               errorStore.setError({
@@ -163,14 +170,14 @@ export function CharacterTab(): ReactNode {
             placeholder="search here or click help"
             render={(character: CharacterDetails) => {
               const id = character.handle?.id ?? "";
-              const selected = selectedCharacterId == id;
+              const selected = selectedCharacterHandle?.id === id;
 
               return (
                 <Table.Tr
                   className={selected ? "bg-gray-500" : ""}
                   key={id}
                   onClick={() => {
-                    setSelectedCharacterId(id);
+                    setSelectedCharacter(projectHandle.id, character.handle);
                   }}
                 >
                   <Table.Th>
@@ -195,9 +202,9 @@ export function CharacterTab(): ReactNode {
           />
         </div>
 
-        {selectedCharacterId && (
+        {selectedCharacterHandle && (
           <CharacterView
-            characterId={selectedCharacterId}
+            characterHandle={selectedCharacterHandle}
             isEditModalOpen={editOpened}
             onDelete={deleteOpen}
             onEdit={editOpen}
