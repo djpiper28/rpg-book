@@ -78,17 +78,22 @@ if (process.env.RPG_BOOK_CERTIFICATE) {
     FILES_TO_OPEN: JSON.stringify(args),
   };
 
+  const launcherArgs = ["-d", process.cwd()];
   console.log("Starting application with launcher");
 
   if (isDevServer) {
     console.log("Dev server detected");
 
-    ps = spawn(getLauncherPath(), ["pnpm", "dev"], {
-      env,
-      stdio: "inherit",
-    });
+    ps = spawn(
+      getLauncherPath(),
+      [...launcherArgs, "-l", "debug", "pnpm", "dev"],
+      {
+        env,
+        stdio: "inherit",
+      },
+    );
   } else {
-    ps = spawn(getLauncherPath(), [process.execPath], {
+    ps = spawn(getLauncherPath(), [...launcherArgs, process.execPath], {
       env,
       stdio: "inherit",
     });

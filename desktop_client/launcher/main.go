@@ -37,7 +37,7 @@ func createAppDir(path string) error {
 	return nil
 }
 
-func changeWorkingDirectory() error {
+func changeWorkingDirectory() (string, error) {
 	path := platform.GetAppPath("RPG Book")
 	log.Debug("Trying to open data directory", pathLoggerTag, path)
 
@@ -46,23 +46,23 @@ func changeWorkingDirectory() error {
 		if errors.Is(err, os.ErrNotExist) {
 			err = createAppDir(path)
 			if err != nil {
-				return err
+				return "", err
 			}
 
 			// If the app directory was created successfully then we can probably set it as our working directory
 		} else {
-			return err
+			return "", err
 		}
 	} else if !stat.IsDir() {
-		return errors.New("app data folder is not a directory")
+		return "", errors.New("app data folder is not a directory")
 	}
 
 	err = os.Chdir(path)
 	if err != nil {
-		return errors.Join(errors.New("Cannot open data directory"), err)
+		return "", errors.Join(errors.New("Cannot open data directory"), err)
 	}
 
-	return nil
+	return path, nil
 }
 
 func main() {
@@ -70,12 +70,11 @@ func main() {
 	log.Default().SetReportCaller(true)
 	log.Default().SetReportTimestamp(true)
 
-	err := changeWorkingDirectory()
+	path, err := changeWorkingDirectory()
 	if err != nil {
 		log.Warn("Cannot set the app to run its data directory", loggertags.TagError, err)
 	} else {
-		path, err := os.Getwd()
-		log.Info("Current working directory", pathLoggerTag, path, loggertags.TagError, err)
+		log.Info("Current working directory", pathLoggerTag, path)
 	}
 
 	var opts options
@@ -85,18 +84,14 @@ func main() {
 	}
 
 	switch strings.ToLower(opts.LogLevel) {
-	case "err":
-		fallthrough
-	case "erro":
-		fallthrough
-	case "error":
+	case "err", "erro", "error":
 		log.SetLevel(log.ErrorLevel)
-	case "warn":
-		fallthrough
-	case "warning":
+	case "warn", "warning":
 		log.SetLevel(log.WarnLevel)
-	case "info":
+	case "inf", "info":
 		log.SetLevel(log.InfoLevel)
+	case "dbg", "debug":
+		log.SetLevel(log.DebugLevel)
 	}
 
 	if len(launcherCmd) == 0 {

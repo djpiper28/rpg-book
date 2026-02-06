@@ -26,7 +26,9 @@ func GetAppPath(appname string) string {
 	}
 
 	if basePath == "" {
-		basePath = "."
+		log.Warn("Platform specific path could not be found")
+		home := os.Getenv("HOME")
+		basePath = path.Join(home, ".config")
 	}
 
 	basePath = path.Join(basePath, appname)
