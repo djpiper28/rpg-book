@@ -148,12 +148,12 @@ export function CharacterTab(): ReactNode {
       />
 
       <div className="flex flex-row gap-2 pt-2 justify-between">
-        <div className="flex flex-col gap-2 flex-1">
+        <aside className="flex flex-col gap-2 flex-1 h-full">
           <Search<CharacterDetails>
-            elementWrapper={(children: ReactNode[]): ReactNode => {
+            elementWrapper={(children: ReactNode): ReactNode => {
               return (
-                <Table variant="vertical">
-                  <Table.Thead>
+                <Table variant="vertical" className="w-full">
+                  <Table.Thead className="sticky top-0 bg-gray-800 z-10">
                     <Table.Tr>
                       <Table.Th>Name</Table.Th>
                       <Table.Th>Factions</Table.Th>
@@ -200,7 +200,7 @@ export function CharacterTab(): ReactNode {
             }
             searchRes={queryResult}
           />
-        </div>
+        </aside>
 
         {selectedCharacterHandle && (
           <CharacterView
