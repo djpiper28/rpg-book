@@ -86,7 +86,38 @@ export function CharacterSelector(props: Readonly<Props>): ReactNode {
           }}
           placeholder="Character search"
           render={(character: CharacterDetails): ReactNode => {
-            return <Checkbox label={character.name} />;
+            return (
+              <Checkbox
+                checked={props.selectedCharacters.some(
+                  (x) => x.id === character.handle?.id,
+                )}
+                label={character.name}
+                onChange={(ev) => {
+                  const handle = character.handle;
+
+                  if (!handle) {
+                    return;
+                  }
+
+                  if (ev.target.checked) {
+                    const newSelected = structuredClone(
+                      props.selectedCharacters,
+                    );
+
+                    if (!newSelected.some((x) => x.id === handle.id)) {
+                      newSelected.push(handle);
+                      props.onSelectedCharactersChanges(newSelected);
+                    }
+                  } else {
+                    const newSelected = structuredClone(
+                      props.selectedCharacters,
+                    ).filter((x) => x.id === character.handle?.id);
+
+                    props.onSelectedCharactersChanges(newSelected);
+                  }
+                }}
+              />
+            );
           }}
           searchRes={queryResult}
         />
