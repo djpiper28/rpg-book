@@ -5,6 +5,7 @@ import { type NoteDetails } from "@/lib/grpcClient/pb/project_note";
 import { useGlobalErrorStore } from "@/stores/globalErrorStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { useTabStore } from "@/stores/tabStore";
+import { CharacterSelector } from "../character/CharacterSelector";
 import { NoteEdit } from "./NoteEdit";
 
 interface Props {
@@ -36,6 +37,10 @@ export function CreateNoteModal(props: Readonly<Props>): ReactNode {
         onNameChange={(name) => {
           setNote((prev) => ({ ...prev, name }));
         }}
+      />
+      <CharacterSelector
+        onSelectedCharactersChanges={console.log}
+        selectedCharacters={[]}
       />
       <Button
         onClick={() => {

@@ -59,7 +59,10 @@ export function NoteView(props: Readonly<Props>): ReactNode {
           </Button>
         </div>
       </div>
-      <MarkdownRenderer markdown={note.details?.markdown ?? ""} />
+      <MarkdownRenderer
+        className="flex-grow min-h-0"
+        markdown={note.details?.markdown ?? ""}
+      />
     </div>
   );
 }

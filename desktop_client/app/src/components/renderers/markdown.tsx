@@ -20,12 +20,15 @@ function SafeLink(props: Readonly<SafeLinkProps>): ReactNode {
 }
 
 interface Props {
+  className?: string;
   markdown: string;
 }
 
 export default function MarkdownRenderer(props: Readonly<Props>): ReactNode {
   return (
-    <div className="border border-gray-500 rounded-lg p-2 min-w-50 min-h-10">
+    <div
+      className={`border border-gray-500 rounded-lg p-2 min-w-50 min-h-10 w-full h-full ${props.className ?? ""}`}
+    >
       <Markdown
         components={{
           a: SafeLink,
