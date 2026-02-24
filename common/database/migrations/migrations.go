@@ -20,10 +20,16 @@ type Migration struct {
 
 type DbMigrator struct {
 	migrations []Migration
+	Rebinder   int // See https://github.com/jmoiron/sqlx/blob/master/bind.go, defaults to ? (sqlite)
 }
 
+// You will need to change the Rebinder if you are not using sqlite, for example:
+// if you are using Postgres you need to set the DbMigrator.Rebinder to DOLLAR.
 func New(migrations []Migration) *DbMigrator {
-	return &DbMigrator{migrations: migrations}
+	return &DbMigrator{
+		migrations: migrations,
+		Rebinder:   sqlx.QUESTION,
+	}
 }
 
 func (m *DbMigrator) Migrate(db database.Database) error {
@@ -73,10 +79,11 @@ func (m *DbMigrator) Migrate(db database.Database) error {
 			}
 		}
 
-		_, err = tx.Exec(`
+		stmt := sqlx.Rebind(m.Rebinder, `
       INSERT INTO migrations (version, date)
       VALUES (?, ?);
-    `, version+currentMigration+1, time.Now())
+    `)
+		_, err = tx.Exec(stmt, version+currentMigration+1, time.Now())
 		if err != nil {
 			return errors.Join(errors.New("Cannot insert migration record"), err)
 		}
