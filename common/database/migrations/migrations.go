@@ -39,7 +39,7 @@ func (m *DbMigrator) Migrate(db database.Database) error {
 	}
 	defer tx.Rollback()
 
-	_, err = db.GetSqlxDb().Exec(`
+	_, err = tx.Exec(`
 CREATE TABLE IF NOT EXISTS migrations (
   version INTEGER PRIMARY KEY,
   date TIMESTAMPTZ NOT NULL
