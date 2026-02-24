@@ -39,6 +39,16 @@ func (m *DbMigrator) Migrate(db database.Database) error {
 	}
 	defer tx.Rollback()
 
+	_, err = db.GetSqlxDb().Exec(`
+CREATE TABLE IF NOT EXISTS migrations (
+  version INTEGER PRIMARY KEY,
+  date TIMESTAMPTZ NOT NULL
+);
+	`)
+	if err != nil {
+		return errors.Join(errors.New("Cannot create migrations table"), err)
+	}
+
 	var currentMigration int
 	var migrationDate string
 	row := tx.QueryRow("SELECT version, date FROM migrations ORDER BY version DESC LIMIT 1;")
