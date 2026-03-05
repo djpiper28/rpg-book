@@ -35,6 +35,7 @@ export const useTabStore = create<TabStore>()(
         newTabs[handle.id] = {
           handle,
           name,
+          value: "characters",
         };
 
         set({
