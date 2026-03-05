@@ -16,7 +16,7 @@ require (
 	github.com/improbable-eng/grpc-web v0.15.0
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/jmoiron/sqlx v1.4.0
-	github.com/mattn/go-sqlite3 v1.14.33
+	github.com/mattn/go-sqlite3 v1.14.34
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/image v0.35.0
 	golang.org/x/text v0.33.0
