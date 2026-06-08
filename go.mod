@@ -18,7 +18,7 @@ require (
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/mattn/go-sqlite3 v1.14.45
 	github.com/stretchr/testify v1.11.1
-	golang.org/x/image v0.37.0
+	golang.org/x/image v0.41.0
 	golang.org/x/text v0.37.0
 	google.golang.org/grpc v1.82.0-dev
 )
