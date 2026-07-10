@@ -152,7 +152,7 @@ export function CharacterTab(): ReactNode {
           <Search<CharacterDetails>
             elementWrapper={(children: ReactNode): ReactNode => {
               return (
-                <Table className="w-full h-full" variant="vertical">
+                <Table className="w-full" variant="vertical">
                   <Table.Thead className="sticky top-0 bg-gray-800 z-10">
                     <Table.Tr>
                       <Table.Th>Name</Table.Th>

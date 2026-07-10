@@ -141,11 +141,11 @@ export function NoteTab(): ReactNode {
       />
 
       <div className="flex flex-row gap-2 pt-2 justify-between h-full min-h-0">
-        <div className="flex flex-col gap-2 flex-1 h-full min-h-0">
+        <aside className="flex flex-col gap-2 flex-1 h-full min-h-0">
           <Search<Note>
             elementWrapper={(children: ReactNode): ReactNode => {
               return (
-                <Table className="w-full h-full" variant="vertical">
+                <Table className="w-full" variant="vertical">
                   <Table.Thead className="sticky top-0 bg-gray-800 z-10">
                     <Table.Tr>
                       <Table.Th>Name</Table.Th>
@@ -193,7 +193,7 @@ export function NoteTab(): ReactNode {
             }
             searchRes={queryResult}
           />
-        </div>
+        </aside>
 
         {selectedNoteHandle && (
           <NoteView

@@ -3,7 +3,9 @@
 
 @custom-variant dark (&:is(.dark *));
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100vh !important;
   max-height: 100vh !important;
   min-height: 100vh !important;

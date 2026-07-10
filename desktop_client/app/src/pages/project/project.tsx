@@ -32,6 +32,7 @@ export function Component(): ReactNode {
   return (
     <>
       <Tabs
+        className="flex-grow flex flex-col min-h-0"
         defaultValue="characters"
         keepMounted={false}
         onChange={(value: string | null) => {
@@ -53,7 +54,7 @@ export function Component(): ReactNode {
           */}
         </Tabs.List>
 
-        <Tabs.Panel value="characters">
+        <Tabs.Panel className="flex-grow min-h-0 h-full" value="characters">
           <Suspense
             fallback={
               <Center p="md">
@@ -65,7 +66,7 @@ export function Component(): ReactNode {
           </Suspense>
         </Tabs.Panel>
 
-        <Tabs.Panel value="notes">
+        <Tabs.Panel className="flex-grow min-h-0 h-full" value="notes">
           <Suspense
             fallback={
               <Center p="md">

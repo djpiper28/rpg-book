@@ -18,8 +18,8 @@ type Db struct {
 }
 
 const (
-	dbTimeout       = time.Second * 10
-	DbExtension     = ".rpg"
+	dbTimeout   = time.Second * 10
+	DbExtension = ".rpg"
 )
 
 type Migrations struct {
