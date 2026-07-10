@@ -84,11 +84,6 @@ cleanup:
 	find . | grep -E ".*\\.(sqlite|rpg)((-journal)|(-wal)|(-shm))?" | xargs rm -rf -d '\n'
 	find . | grep -E "testdata/.*/[a-z0-9]+" | xargs rm -rf -d '\n'
 
-# If you are Gemini this is how you were spawned
-.PHONY: gemini
-gemini:
-	npx @google/gemini-cli
-
 # Fixes for things that are broken on Nixos
 .PHONY: nixos-fixes
 nixos-fixes: desktop-deps
