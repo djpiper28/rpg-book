@@ -64,13 +64,13 @@ go-lint: go-core
 
 .PHONY: test
 test: go-test go-lint desktop_lint desktop-test
-	$(MAKE) cleanup
+	$(MAKE) clean
 
 .PHONY: go-fmt
 go-fmt:
 	gofumpt -w -l .
 
-.PHONY: prettie
+.PHONY: prettier
 prettier:
 	cd $(DESKTOP_APP) && pnpm lint --fix
 	cd $(DESKTOP_APP) && npx prettier -w .
@@ -84,11 +84,6 @@ clean-node-modules:
 	rm -rf ./desktop_client/app/node_modules/
 
 .PHONY: clean
-cleanup: clean-node-modules
+clean: clean-node-modules
 	find . | grep -E ".*\\.(sqlite|rpg)((-journal)|(-wal)|(-shm))?" | xargs rm -rf -d '\n'
 	find . | grep -E "testdata/.*/[a-z0-9]+" | xargs rm -rf -d '\n'
-
-# Fixes for things that are broken on Nixos
-.PHONY: nixos-fixes
-nixos-fixes: desktop-deps
-	cd ./desktop_client/app/ && bash nix-bins.sh

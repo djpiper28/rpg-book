@@ -19,4 +19,9 @@ pkgs.mkShell {
     protoc-gen-go-grpc
     grpc-tools
   ];
+
+  shellHook = ''
+    # Force npm/pnpm to use the patched NixOS electron binary instead of downloading its own
+    export ELECTRON_OVERRIDE_DIST_PATH="${pkgs.electron}/bin"
+  '';
 }
