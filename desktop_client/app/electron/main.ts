@@ -1,12 +1,5 @@
 import * as remote from "@electron/remote/main";
-import {
-  BrowserWindow,
-  Menu,
-  app,
-  dialog,
-  globalShortcut,
-  session,
-} from "electron";
+import { BrowserWindow, Menu, app, dialog, session } from "electron";
 import { type ChildProcess, spawn } from "node:child_process";
 import path from "node:path";
 import { exit } from "node:process";
@@ -83,7 +76,6 @@ if (process.env.RPG_BOOK_CERTIFICATE) {
   const env = {
     ...process.env,
     FILES_TO_OPEN: JSON.stringify(args),
-    VITE_DEV_SERVER_URL,
   };
 
   const launcherArgs = ["-d", process.cwd()];
@@ -170,7 +162,7 @@ function createWindow(): void {
   Menu.setApplicationMenu(menu);
 
   if (isDevServer) {
-    win.webContents.openDevTools({ mode: "detach" });
+    win.webContents.openDevTools();
   }
 
   // Test active push message to Renderer-process.
