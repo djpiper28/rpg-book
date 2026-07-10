@@ -20,12 +20,6 @@ type Db struct {
 const (
 	dbTimeout       = time.Second * 10
 	DbExtension     = ".rpg"
-	migrationsTable = `
-CREATE TABLE IF NOT EXISTS migrations (
-  version INTEGER PRIMARY KEY,
-  date TIMESTAMPTZ NOT NULL
-);
-  `
 )
 
 type Migrations struct {
@@ -55,21 +49,7 @@ func New(filename string) (*Db, error) {
 		filename: filename,
 	}
 
-	err = ret.prepareMigrations()
-	if err != nil {
-		return nil, errors.Join(errors.New("Cannot check initial migrations table"), err)
-	}
-
 	return ret, nil
-}
-
-func (d *Db) prepareMigrations() error {
-	_, err := d.Db.Exec(migrationsTable)
-	if err != nil {
-		return errors.Join(errors.New("Cannot check for migrations table"), err)
-	}
-
-	return nil
 }
 
 func (d *Db) Close() {
