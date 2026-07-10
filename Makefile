@@ -79,8 +79,12 @@ prettier:
 .PHONY: format
 format: go-fmt prettier
 
-.PHONY: cleanup
-cleanup:
+.PHONY: clean-node-modules
+clean-node-modules:
+	rm -rf ./desktop_client/app/node_modules/
+
+.PHONY: clean
+cleanup: clean-node-modules
 	find . | grep -E ".*\\.(sqlite|rpg)((-journal)|(-wal)|(-shm))?" | xargs rm -rf -d '\n'
 	find . | grep -E "testdata/.*/[a-z0-9]+" | xargs rm -rf -d '\n'
 
