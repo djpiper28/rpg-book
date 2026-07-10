@@ -19,9 +19,9 @@ export function Search<T>(props: Readonly<Props<T>>): ReactNode {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col gap-2 h-full overflow-hidden">
+    <div className="flex flex-col gap-2 h-full min-h-0">
       <div className="flex-none">
-        <div className="flex flex-row gap-2 justify-between">
+        <div className="flex flex-row gap-2 justify-between top-0 sticky">
           <Input
             className="grow"
             onChange={(event) => {

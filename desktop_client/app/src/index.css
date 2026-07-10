@@ -1,10 +1,13 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@layer tailwind {
-  @tailwind base;
-}
-@tailwind components;
-@tailwind utilities;
-
 @custom-variant dark (&:is(.dark *));
+
+html, body, #root {
+  height: 100vh !important;
+  max-height: 100vh !important;
+  min-height: 100vh !important;
+  overflow: hidden !important;
+  margin: 0;
+  padding: 0;
+}

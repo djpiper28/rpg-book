@@ -1,4 +1,4 @@
-import { Button, ScrollArea, Table } from "@mantine/core";
+import { Button, Table } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { type ReactNode, useEffect, useState } from "react";
 import { CharacterView } from "@/components/entityViews/character/CharacterView";
@@ -147,61 +147,59 @@ export function CharacterTab(): ReactNode {
         title={`Delete Character "${selectedCharacter?.name ?? "no name"}"`}
       />
 
-      <div className="flex flex-row gap-2 pt-2 justify-between">
-        <aside className="flex flex-col gap-2 flex-1 h-full">
-          <ScrollArea h="100%" type="always">
-            <Search<CharacterDetails>
-              elementWrapper={(children: ReactNode): ReactNode => {
-                return (
-                  <Table className="w-full" variant="vertical">
-                    <Table.Thead className="sticky top-0 bg-gray-800 z-10">
-                      <Table.Tr>
-                        <Table.Th>Name</Table.Th>
-                        <Table.Th>Factions</Table.Th>
-                      </Table.Tr>
-                    </Table.Thead>
-                    <Table.Tbody>{children}</Table.Tbody>
-                  </Table>
-                );
-              }}
-              error={queryError}
-              onChange={(txt: string) => {
-                setQueryText(txt);
-              }}
-              placeholder="search here or click help"
-              render={(character: CharacterDetails) => {
-                const id = character.handle?.id ?? "";
-                const selected = selectedCharacterHandle?.id === id;
+      <div className="flex flex-row gap-2 pt-2 justify-between h-full min-h-0">
+        <aside className="flex flex-col gap-2 flex-1 h-full min-h-0">
+          <Search<CharacterDetails>
+            elementWrapper={(children: ReactNode): ReactNode => {
+              return (
+                <Table className="w-full h-full" variant="vertical">
+                  <Table.Thead className="sticky top-0 bg-gray-800 z-10">
+                    <Table.Tr>
+                      <Table.Th>Name</Table.Th>
+                      <Table.Th>Factions</Table.Th>
+                    </Table.Tr>
+                  </Table.Thead>
+                  <Table.Tbody>{children}</Table.Tbody>
+                </Table>
+              );
+            }}
+            error={queryError}
+            onChange={(txt: string) => {
+              setQueryText(txt);
+            }}
+            placeholder="search here or click help"
+            render={(character: CharacterDetails) => {
+              const id = character.handle?.id ?? "";
+              const selected = selectedCharacterHandle?.id === id;
 
-                return (
-                  <Table.Tr
-                    className={selected ? "bg-gray-500" : ""}
-                    key={id}
-                    onClick={() => {
-                      setSelectedCharacter(projectHandle.id, character.handle);
-                    }}
-                  >
-                    <Table.Th>
-                      <div className="flex flex-row gap-2">
-                        <P className="text-wrap">{character.name}</P>
-                      </div>
-                    </Table.Th>
-                    <Table.Th>TODO: Change me</Table.Th>
-                  </Table.Tr>
-                );
-              }}
-              rightElement={
-                <Button
+              return (
+                <Table.Tr
+                  className={selected ? "bg-gray-500" : ""}
+                  key={id}
                   onClick={() => {
-                    createOpen();
+                    setSelectedCharacter(projectHandle.id, character.handle);
                   }}
                 >
-                  Add Character
-                </Button>
-              }
-              searchRes={queryResult}
-            />
-          </ScrollArea>
+                  <Table.Th>
+                    <div className="flex flex-row gap-2">
+                      <P className="text-wrap">{character.name}</P>
+                    </div>
+                  </Table.Th>
+                  <Table.Th>TODO: Change me</Table.Th>
+                </Table.Tr>
+              );
+            }}
+            rightElement={
+              <Button
+                onClick={() => {
+                  createOpen();
+                }}
+              >
+                Add Character
+              </Button>
+            }
+            searchRes={queryResult}
+          />
         </aside>
 
         {selectedCharacterHandle && (

@@ -152,7 +152,7 @@ function Layout(): ReactNode {
       >
         <P>{currentError?.body}</P>
       </ErrorModal>
-      <div className="flex flex-col gap-3 p-2 h-screen">
+      <div className="flex flex-col gap-3 p-2 h-screen max-h-screen">
         <header
           className="flex-none flex flex-row gap-3 justify-between items-center border-b border-b-gray-100 border-r-2"
           id="menu"
