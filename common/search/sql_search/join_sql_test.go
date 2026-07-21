@@ -27,6 +27,11 @@ type UserOrder struct {
 	Item string `db:"item"`
 }
 
+type Friend struct {
+	FriendAId int `db:"friend_a_id"`
+	FriendBId int `db:"friend_b_id"`
+}
+
 func newJoinTestDb(t *testing.T) (*sqlite3.Db, func()) {
 	t.Helper()
 
@@ -51,12 +56,21 @@ CREATE TABLE orders (
   item TEXT NOT NULL,
   FOREIGN KEY(user_id) REFERENCES users(id)
 );
+
+CREATE TABLE friends (
+	friend_a_id INTEGER,
+	friend_b_id INTEGER,
+  FOREIGN KEY(friend_a_id) REFERENCES users(id),
+  FOREIGN KEY(friend_b_id) REFERENCES users(id),
+	CHECK(friend_a_id <> friend_b_id)
+);
     `)
 	require.NoError(t, err)
 
 	users := []User{
 		{Id: 1, Name: "Alice"},
 		{Id: 2, Name: "Bob"},
+		{Id: 3, Name: "Charlie"},
 	}
 
 	for _, user := range users {
@@ -72,6 +86,15 @@ CREATE TABLE orders (
 
 	for _, order := range orders {
 		_, err := db.Db.NamedExec("INSERT INTO orders (id, user_id, item) VALUES(:id, :user_id, :item);", order)
+		require.NoError(t, err)
+	}
+
+	friends := []Friend{
+		{FriendAId: 1, FriendBId: 2},
+	}
+
+	for _, friend := range friends {
+		_, err := db.Db.NamedExec("INSERT INTO friends (friend_a_id, friend_b_id) VALUES(:friend_a_id, :friend_b_id);", friend)
 		require.NoError(t, err)
 	}
 

@@ -64,10 +64,7 @@ export function CharacterView(props: Readonly<CharacterViewProps>): ReactNode {
           <img alt="User selected" className="max-h-screen" src={iconUrl} />
         )}
       </div>
-      <MarkdownRenderer
-        className="flex-grow min-h-0"
-        markdown={character.description}
-      />
+      <MarkdownRenderer markdown={character.description} />
     </div>
   );
 }

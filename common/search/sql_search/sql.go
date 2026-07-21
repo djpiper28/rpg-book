@@ -13,10 +13,17 @@ type SqlTableData struct {
 	JoinClauses  string   // i.e: LEFT JOIN Customers ON Orders.CustomerID=Customers.CustomerID;
 }
 
+// Allows you to map a column such as bar of foo to your custom query such fragment such as
+// return "foo.bar = ? AND foo.qux = ?", []any{arg, arg}, nil
+type CustomColumn interface {
+	Map(operator parser.GeneratorOperator, value string) (query string, args []any, err error)
+}
+
 type SqlColmnMap struct {
 	TextColumns         map[string]string
 	NumberColumns       map[string]string
-	BasicQueryColumn    string                   // A column as defined in either column map
+	CustomColumns       map[string]CustomColumn
+	BasicQueryColumn    string                   // A column as defined in any column map
 	BasicQueryOperation parser.GeneratorOperator // Defaults to includes
 }
 
@@ -37,6 +44,10 @@ func AsSql(query *parser.Node, tableData SqlTableData, columnMap SqlColmnMap) (s
 
 	if columnMap.TextColumns == nil {
 		columnMap.TextColumns = make(map[string]string)
+	}
+
+	if columnMap.CustomColumns == nil {
+		columnMap.CustomColumns = make(map[string]CustomColumn)
 	}
 
 	// Generate SELECT clause
@@ -144,6 +155,16 @@ func (s *sqlScanner) GetQuery(depth int, node *parser.Node) (string, error) {
 func (s *sqlScanner) ProcessSqlSetGenerator(key string, operator parser.GeneratorOperator, value string) (string, error) {
 	if key == "" {
 		return "", errors.New("Cannot query with empty keys")
+	}
+
+	if mapper := s.SqlColmns.CustomColumns[key]; mapper != nil {
+		query, args, err := mapper.Map(operator, value)
+		if err != nil {
+			return "", errors.Join(errors.New("Cannot execute custom query mapper"), err)
+		}
+
+		s.OrderedArgs = append(s.OrderedArgs, args...)
+		return query, nil
 	}
 
 	defer func() {
