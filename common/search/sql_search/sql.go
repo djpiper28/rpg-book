@@ -3,6 +3,7 @@ package sqlsearch
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/djpiper28/rpg-book/common/search/parser"
 )
@@ -22,6 +23,7 @@ type CustomColumn interface {
 type SqlColmnMap struct {
 	TextColumns         map[string]string
 	NumberColumns       map[string]string
+	BooleanColumns      map[string]string
 	CustomColumns       map[string]CustomColumn
 	BasicQueryColumn    string                   // A column as defined in any column map
 	BasicQueryOperation parser.GeneratorOperator // Defaults to includes
@@ -46,16 +48,21 @@ func AsSql(query *parser.Node, tableData SqlTableData, columnMap SqlColmnMap) (s
 		columnMap.TextColumns = make(map[string]string)
 	}
 
+	if columnMap.BooleanColumns == nil {
+		columnMap.BooleanColumns = make(map[string]string)
+	}
+
 	if columnMap.CustomColumns == nil {
 		columnMap.CustomColumns = make(map[string]CustomColumn)
 	}
 
 	// Generate SELECT clause
-	selectClause := "SELECT "
+	var selectClause strings.Builder
+	selectClause.WriteString("SELECT ")
 	for i, field := range tableData.FieldsToScan {
-		selectClause += field
+		selectClause.WriteString(field)
 		if i < len(tableData.FieldsToScan)-1 {
-			selectClause += ", "
+			selectClause.WriteString(", ")
 		}
 	}
 
@@ -79,17 +86,17 @@ func AsSql(query *parser.Node, tableData SqlTableData, columnMap SqlColmnMap) (s
 
 	whereClause = "WHERE\n" + whereClause
 
-	return selectClause + "\n" + fromClause + "\n" + whereClause + ";", s.OrderedArgs, nil
+	return selectClause.String() + "\n" + fromClause + "\n" + whereClause + ";", s.OrderedArgs, nil
 }
 
 func nSpaces(n int) string {
 	const tabWidth = 2
 
-	output := ""
+	var output strings.Builder
 	for range n * tabWidth {
-		output += "  "
+		output.WriteString("  ")
 	}
-	return output
+	return output.String()
 }
 
 const termSpaces = 1
@@ -167,12 +174,36 @@ func (s *sqlScanner) ProcessSqlSetGenerator(key string, operator parser.Generato
 		return query, nil
 	}
 
+	sqlOperator := ""
+	mappedKey, ok := s.SqlColmns.BooleanColumns[key]
+	if ok {
+		switch operator {
+		case parser.GeneratorOperator_Equals:
+			sqlOperator = "="
+		case parser.GeneratorOperator_NotEquals:
+			sqlOperator = "<>"
+		default:
+			return "", fmt.Errorf("%d is not a supported text generator operator", operator)
+		}
+
+		switch strings.ToLower(value) {
+		case "true", "t", "1":
+			s.OrderedArgs = append(s.OrderedArgs, true)
+		case "false", "f", "0":
+			s.OrderedArgs = append(s.OrderedArgs, false)
+		default:
+			return "", fmt.Errorf("%s is not a valid boolean value", value)
+		}
+
+		return fmt.Sprintf("%s %s ?", mappedKey, sqlOperator), nil
+	}
+
+	// The below mappers use the string value
 	defer func() {
 		s.OrderedArgs = append(s.OrderedArgs, value)
 	}()
 
-	sqlOperator := ""
-	mappedKey, ok := s.SqlColmns.NumberColumns[key]
+	mappedKey, ok = s.SqlColmns.NumberColumns[key]
 	if ok {
 		switch operator {
 		case parser.GeneratorOperator_GreaterThan:
@@ -195,21 +226,21 @@ func (s *sqlScanner) ProcessSqlSetGenerator(key string, operator parser.Generato
 	}
 
 	mappedKey, ok = s.SqlColmns.TextColumns[key]
-	if !ok {
-		return "", fmt.Errorf("'%s' is not in the column map", key)
+	if ok {
+		switch operator {
+		case parser.GeneratorOperator_Equals:
+			sqlOperator = "="
+		case parser.GeneratorOperator_NotEquals:
+			sqlOperator = "<>"
+		case parser.GeneratorOperator_Includes:
+			sqlOperator = "LIKE"
+			value = "%" + value + "%"
+		default:
+			return "", fmt.Errorf("%d is not a supported text generator operator", operator)
+		}
+
+		return fmt.Sprintf("%s %s ?", mappedKey, sqlOperator), nil
 	}
 
-	switch operator {
-	case parser.GeneratorOperator_Equals:
-		sqlOperator = "="
-	case parser.GeneratorOperator_NotEquals:
-		sqlOperator = "<>"
-	case parser.GeneratorOperator_Includes:
-		sqlOperator = "LIKE"
-		value = "%" + value + "%"
-	default:
-		return "", fmt.Errorf("%d is not a supported text generator operator", operator)
-	}
-
-	return fmt.Sprintf("%s %s ?", mappedKey, sqlOperator), nil
+	return "", fmt.Errorf("'%s' is not in the column map", key)
 }

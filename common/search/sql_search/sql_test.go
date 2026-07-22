@@ -125,6 +125,9 @@ var TestColumnMap sqlsearch.SqlColmnMap = sqlsearch.SqlColmnMap{
 		"age": "age",
 		"ans": "age",
 	},
+	BooleanColumns: map[string]string{
+		"likes_cats": "likes_cats",
+	},
 	BasicQueryColumn:    "name", // This tests the alias system
 	BasicQueryOperation: parser.GeneratorOperator_Includes,
 }

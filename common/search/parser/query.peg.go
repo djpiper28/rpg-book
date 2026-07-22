@@ -385,6 +385,7 @@ func Size(size int) func(*parser) error {
 		return nil
 	}
 }
+
 func (p *parser) Init(options ...func(*parser) error) error {
 	var (
 		max                  token32
