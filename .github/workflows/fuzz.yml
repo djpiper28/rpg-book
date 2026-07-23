@@ -18,4 +18,6 @@ jobs:
       - uses: ./.github/workflows/shared/setup
       - name: Test
         shell: bash
+        env:
+          FUZZTIME: 5m
         run: make fuzz -j
