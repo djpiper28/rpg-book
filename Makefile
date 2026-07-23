@@ -36,12 +36,11 @@ go-generate: desktop-deps
 .PHONY: go-core
 go-core: go-generate
 
-FUZZARGS=-fuzztime=10s
 .PHONY: fuzz
 fuzz: go-core
-	go test -fuzz=FuzzSearchCharacter $(FUZZARGS) ./desktop_client/backend/project/search_fuzz_test.go
-	go test -fuzz=FuzzSearchNote $(FUZZARGS) ./desktop_client/backend/project/search_fuzz_test.go
-	$(MAKE) cleanup
+	go test -fuzz=FuzzParser ./common/search/parser/
+	go test -fuzz=FuzzSearchCharacter,FuzzSearchNote ./desktop_client/backend/project/
+	$(MAKE) clean
 
 .PHONY: go-test
 go-test: go-core
