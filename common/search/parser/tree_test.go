@@ -8,6 +8,8 @@ import (
 )
 
 func TestImpliedAnd(t *testing.T) {
+	t.Parallel()
+
 	ast, err := parser.Parse("a b")
 	require.NoError(t, err)
 	require.Equal(t, &parser.Node{
@@ -29,6 +31,8 @@ func TestImpliedAnd(t *testing.T) {
 }
 
 func TestAnd(t *testing.T) {
+	t.Parallel()
+
 	ast, err := parser.Parse("a and b")
 	require.NoError(t, err)
 	require.Equal(t, &parser.Node{
@@ -50,6 +54,8 @@ func TestAnd(t *testing.T) {
 }
 
 func TestOr(t *testing.T) {
+	t.Parallel()
+
 	ast, err := parser.Parse("a or b")
 	require.NoError(t, err)
 	require.Equal(t, &parser.Node{
@@ -71,37 +77,41 @@ func TestOr(t *testing.T) {
 }
 
 func TestMultipleOperators(t *testing.T) {
+	t.Parallel()
+
 	ast, err := parser.Parse("a or b and c")
 	require.NoError(t, err)
 	require.Equal(t, &parser.Node{
 		Type:           parser.NodeType_BinaryOperator,
-		BinaryOperator: parser.BinaryOperator_Or,
+		BinaryOperator: parser.BinaryOperator_And,
 		Left: &parser.Node{
-			Type:           parser.NodeType_BinaryOperator,
-			BinaryOperator: parser.BinaryOperator_And,
-			Left: &parser.Node{
-				Type: parser.NodeType_Basic,
-				BasicQuery: parser.TextQuery{
-					Value: "c",
-				},
+			Type: parser.NodeType_Basic,
+			BasicQuery: parser.TextQuery{
+				Value: "c",
 			},
-			Right: &parser.Node{
+		},
+		Right: &parser.Node{
+			Type:           parser.NodeType_BinaryOperator,
+			BinaryOperator: parser.BinaryOperator_Or,
+			Left: &parser.Node{
 				Type: parser.NodeType_Basic,
 				BasicQuery: parser.TextQuery{
 					Value: "b",
 				},
 			},
-		},
-		Right: &parser.Node{
-			Type: parser.NodeType_Basic,
-			BasicQuery: parser.TextQuery{
-				Value: "a",
+			Right: &parser.Node{
+				Type: parser.NodeType_Basic,
+				BasicQuery: parser.TextQuery{
+					Value: "a",
+				},
 			},
 		},
 	}, ast)
 }
 
 func TestMultipleOperatorsBrackets1(t *testing.T) {
+	t.Parallel()
+
 	ast, err := parser.Parse("a or (b and c)")
 	require.NoError(t, err)
 	require.Equal(t, &parser.Node{
@@ -133,6 +143,8 @@ func TestMultipleOperatorsBrackets1(t *testing.T) {
 }
 
 func TestMultipleOperatorsBrackets2(t *testing.T) {
+	t.Parallel()
+
 	ast, err := parser.Parse("(a or (b and c))")
 	require.NoError(t, err)
 	require.Equal(t, &parser.Node{
@@ -164,6 +176,8 @@ func TestMultipleOperatorsBrackets2(t *testing.T) {
 }
 
 func TestMultipleOperatorsBrackets3(t *testing.T) {
+	t.Parallel()
+
 	ast, err := parser.Parse("(a or b) and c")
 	require.NoError(t, err)
 	require.Equal(t, &parser.Node{

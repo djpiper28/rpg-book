@@ -38,8 +38,9 @@ go-core: go-generate
 
 .PHONY: fuzz
 fuzz: go-core
-	go test -fuzz=FuzzParser ./common/search/parser/
-	go test -fuzz=FuzzSearchCharacter,FuzzSearchNote ./desktop_client/backend/project/
+	go test -run=^FuzzParser$$ -fuzz=FuzzParser ./common/search/parser/
+	go test -run=^FuzzSearchCharacter$$ -fuzz=FuzzSearchCharacter ./desktop_client/backend/project/
+	go test -run=^FuzzSearchNote$$ -fuzz=FuzzSearchNote ./desktop_client/backend/project/
 	$(MAKE) clean
 
 .PHONY: go-test
