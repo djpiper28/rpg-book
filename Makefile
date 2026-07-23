@@ -36,11 +36,13 @@ go-generate: desktop-deps
 .PHONY: go-core
 go-core: go-generate
 
+FUZZTIME ?= 1m
+
 .PHONY: fuzz
 fuzz: go-core
-	go test -run=^FuzzParser$$ -fuzz=FuzzParser ./common/search/parser/
-	go test -run=^FuzzSearchCharacter$$ -fuzz=FuzzSearchCharacter ./desktop_client/backend/project/
-	go test -run=^FuzzSearchNote$$ -fuzz=FuzzSearchNote ./desktop_client/backend/project/
+	go test -run=^FuzzParser$$ -fuzz=FuzzParser -fuzztime=$(FUZZTIME) ./common/search/parser/
+	go test -run=^FuzzSearchCharacter$$ -fuzz=FuzzSearchCharacter -fuzztime=$(FUZZTIME) ./desktop_client/backend/project/
+	go test -run=^FuzzSearchNote$$ -fuzz=FuzzSearchNote -fuzztime=$(FUZZTIME) ./desktop_client/backend/project/
 	$(MAKE) clean
 
 .PHONY: go-test
