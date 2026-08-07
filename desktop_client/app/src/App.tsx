@@ -232,7 +232,7 @@ function Layout(): ReactNode {
           </div>
         </header>
 
-        <div className="flex-grow flex flex-col gap-3 p-2 min-h-0 overflow-hidden">
+        <div className="grow flex flex-col gap-3 p-2 min-h-0 overflow-hidden">
           <Outlet />
         </div>
       </div>

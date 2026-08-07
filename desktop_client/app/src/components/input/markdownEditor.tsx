@@ -14,7 +14,7 @@ export function MarkdownEditor(props: Readonly<Props>): ReactNode {
 
   return (
     <div className="flex flex-row gap-5 justify-between">
-      <div className="flex flex-col gap-1 flex-grow">
+      <div className="flex flex-col gap-1 grow">
         <Textarea
           autosize
           className="grow min-w-50"
@@ -40,7 +40,7 @@ Supports **markdown**.`}
         </Button>
       </div>
       {showPreview && (
-        <div className="flex flex-col flex-grow">
+        <div className="flex flex-col grow">
           <P>Preview</P>
           <MarkdownRenderer markdown={props.value} />
         </div>
