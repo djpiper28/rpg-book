@@ -41,7 +41,7 @@ export function Search<T>(props: Readonly<Props<T>>): ReactNode {
           {props.rightElement}
         </div>
       </div>
-      <div className="flex-grow overflow-y-auto">
+      <div className="grow overflow-y-auto">
         {props.error && (
           <P className="text-red-500">Search error: {props.error}</P>
         )}
