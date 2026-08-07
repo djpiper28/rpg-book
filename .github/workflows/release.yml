@@ -56,7 +56,6 @@ jobs:
           mkdir release
           mv ${{ env.app_artifact }} release/
           cp *.md release/
-          rm release/GEMINI.md
           cp build_info.txt release/
           zip -r ${{ env.zip_name }} release
 
