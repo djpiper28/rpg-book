@@ -20,7 +20,7 @@ require (
 	github.com/stretchr/testify v1.12.1
 	golang.org/x/image v0.43.0
 	golang.org/x/text v0.41.0
-	google.golang.org/grpc v1.85.0-dev.0.20260825072537-93e31b48545e
+	google.golang.org/grpc v1.86.0-dev
 )
 
 require (
